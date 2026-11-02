@@ -1,0 +1,73 @@
+{
+  "boats": [
+    {
+      "id": "boat-ya79",
+      "name": "Ya 79",
+      "captain_title": "KAPTAN",
+      "captain_name": "Bekir",
+      "captain_surname": "Temiz",
+      "notes": "Setur Marinas Mürettebat Bilgi Formu",
+      "image_url": "/uploads/ya79_form.jpg",
+      "created_at": "2026-11-02T11:41:01.164Z",
+      "crew": [
+        {
+          "id": "c1",
+          "name": "Bekir",
+          "surname": "Temiz",
+          "role": "Kaptan",
+          "phone": "0532 553 51 11"
+        },
+        {
+          "id": "c2",
+          "name": "Ceyhun",
+          "surname": "Esen",
+          "role": "Gemici",
+          "phone": "0553 494 04 44"
+        },
+        {
+          "id": "c3",
+          "name": "Yusuf",
+          "surname": "Şahin",
+          "role": "Gemici",
+          "phone": "0533 321 58 83"
+        },
+        {
+          "id": "c4",
+          "name": "Batuhan",
+          "surname": "Demirhan",
+          "role": "Gemici",
+          "phone": "0507 707 83 97"
+        },
+        {
+          "id": "c5",
+          "name": "Mehmet",
+          "surname": "Erevciler",
+          "role": "Aşçı",
+          "phone": "0531 524 56 94"
+        }
+      ]
+    },
+    {
+      "id": "boat-turmepa",
+      "name": "DTO TURMEPA (Atık Teknesi)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Aytaç",
+      "captain_surname": "Akboyun",
+      "notes": "Setur Marinas Formu",
+      "image_url": "/uploads/form_1793614609974_7ff6bd63.jpg",
+      "created_at": "2026-11-02T11:41:01.165Z",
+      "crew": [
+        {
+          "id": "c6",
+          "name": "İbrahim Aytaç",
+          "surname": "Akboyun",
+          "role": "Kaptan",
+          "phone": "0543 395 50 73"
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "gemini_api_key": ""
+  }
+}

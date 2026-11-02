@@ -1,51 +1,78 @@
-// server.js - Marina Tekne ve Mürettebat Rehberi (Zero-dependency Node.js Server)
+// server.js - Marina Tekne ve Mürettebat Rehberi (100% Taşınabilir & Bağımsız Node.js Sunucusu)
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { DatabaseSync } = require('node:sqlite');
 const crypto = require('node:crypto');
 
 const PORT = process.env.PORT || 3000;
 const DATA_DIR = path.join(__dirname, 'data');
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
-const DB_PATH = path.join(DATA_DIR, 'rehber.db');
+const DB_FILE = path.join(DATA_DIR, 'rehber.json');
 
 // Ensure directories exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-// Initialize SQLite Database
-const db = new DatabaseSync(DB_PATH);
+// Initial seed data if rehber.json does not exist
+const initialData = {
+  boats: [
+    {
+      id: 'boat-ya79',
+      name: 'Ya 79',
+      captain_title: 'KAPTAN',
+      captain_name: 'Bekir',
+      captain_surname: 'Temiz',
+      notes: 'Setur Marinas Mürettebat Bilgi Formu',
+      image_url: '/uploads/ya79_form.jpg',
+      created_at: new Date().toISOString(),
+      crew: [
+        { id: 'c1', name: 'Bekir', surname: 'Temiz', role: 'Kaptan', phone: '0532 553 51 11' },
+        { id: 'c2', name: 'Ceyhun', surname: 'Esen', role: 'Gemici', phone: '0553 494 04 44' },
+        { id: 'c3', name: 'Yusuf', surname: 'Şahin', role: 'Gemici', phone: '0533 321 58 83' },
+        { id: 'c4', name: 'Batuhan', surname: 'Demirhan', role: 'Gemici', phone: '0507 707 83 97' },
+        { id: 'c5', name: 'Mehmet', surname: 'Erevciler', role: 'Aşçı', phone: '0531 524 56 94' }
+      ]
+    },
+    {
+      id: 'boat-turmepa',
+      name: 'DTO TURMEPA (Atık Teknesi)',
+      captain_title: 'KAPTAN',
+      captain_name: 'Aytaç',
+      captain_surname: 'Akboyun',
+      notes: 'Setur Marinas Formu',
+      image_url: '/uploads/form_1793614609974_7ff6bd63.jpg',
+      created_at: new Date().toISOString(),
+      crew: [
+        { id: 'c6', name: 'İbrahim Aytaç', surname: 'Akboyun', role: 'Kaptan', phone: '0543 395 50 73' }
+      ]
+    }
+  ],
+  settings: {
+    gemini_api_key: process.env.GEMINI_API_KEY || ''
+  }
+};
 
-// Create tables
-db.exec(`
-  CREATE TABLE IF NOT EXISTS boats (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    captain_title TEXT DEFAULT 'KAPTAN',
-    captain_name TEXT,
-    captain_surname TEXT,
-    notes TEXT,
-    image_url TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+// Database helper functions (JSON based, 100% portable on all Node versions)
+function readDb() {
+  if (!fs.existsSync(DB_FILE)) {
+    fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
+    return initialData;
+  }
+  try {
+    const raw = fs.readFileSync(DB_FILE, 'utf-8');
+    return JSON.parse(raw);
+  } catch (err) {
+    console.error('Veritabanı okuma hatası, yedek yükleniyor:', err);
+    return initialData;
+  }
+}
 
-  CREATE TABLE IF NOT EXISTS crew_members (
-    id TEXT PRIMARY KEY,
-    boat_id TEXT NOT NULL,
-    name TEXT NOT NULL,
-    surname TEXT NOT NULL,
-    role TEXT NOT NULL,
-    phone TEXT NOT NULL,
-    sort_order INTEGER DEFAULT 0,
-    FOREIGN KEY(boat_id) REFERENCES boats(id) ON DELETE CASCADE
-  );
+function writeDb(data) {
+  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+}
 
-  CREATE TABLE IF NOT EXISTS settings (
-    key TEXT PRIMARY KEY,
-    value TEXT
-  );
-`);
+// Initialize DB file
+readDb();
 
 // MIME types helper
 const MIME_TYPES = {
@@ -67,7 +94,7 @@ function parseJsonBody(req) {
     let body = '';
     req.on('data', chunk => {
       body += chunk;
-      if (body.length > 50 * 1024 * 1024) { // 50MB limit
+      if (body.length > 50 * 1024 * 1024) {
         reject(new Error('Payload too large'));
       }
     });
@@ -82,7 +109,7 @@ function parseJsonBody(req) {
   });
 }
 
-// Gemini Vision API parser function with model fallback
+// Gemini Vision API parser with model fallback
 async function analyzeImageWithGemini(base64Data, mimeType = 'image/jpeg', apiKey) {
   if (!apiKey || apiKey.trim() === '') {
     throw new Error('Gemini API anahtarı ayarlanmamış.');
@@ -137,7 +164,6 @@ Yalnızca şu JSON formatında cevap ver, Markdown kod bloğu veya başka bir me
     }
   };
 
-  // Model priority list
   const models = ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
   let lastError = null;
 
@@ -192,29 +218,29 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
 
   try {
+    const db = readDb();
+
     // API: GET /api/boats
     if (req.method === 'GET' && pathname === '/api/boats') {
-      const boats = db.prepare('SELECT * FROM boats ORDER BY created_at DESC').all();
-      const crewStmt = db.prepare('SELECT * FROM crew_members WHERE boat_id = ? ORDER BY sort_order ASC');
-
-      const result = boats.map(b => ({
-        ...b,
-        crew: crewStmt.all(b.id)
-      }));
-
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(result));
+      res.end(JSON.stringify(db.boats || []));
       return;
     }
 
     // API: GET /api/contacts
     if (req.method === 'GET' && pathname === '/api/contacts') {
-      const contacts = db.prepare(`
-        SELECT c.*, b.name as boat_name, b.image_url as boat_image_url
-        FROM crew_members c
-        JOIN boats b ON c.boat_id = b.id
-        ORDER BY c.name ASC, c.surname ASC
-      `).all();
+      const contacts = [];
+      (db.boats || []).forEach(b => {
+        (b.crew || []).forEach(c => {
+          contacts.push({
+            ...c,
+            boat_id: b.id,
+            boat_name: b.name,
+            boat_image_url: b.image_url
+          });
+        });
+      });
+      contacts.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify(contacts));
@@ -226,36 +252,27 @@ const server = http.createServer(async (req, res) => {
       const body = await parseJsonBody(req);
       const boatId = crypto.randomUUID();
 
-      db.prepare(`
-        INSERT INTO boats (id, name, captain_title, captain_name, captain_surname, notes, image_url)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `).run(
-        boatId,
-        body.name || 'İsimsiz Tekne',
-        body.captain_title || 'KAPTAN',
-        body.captain_name || '',
-        body.captain_surname || '',
-        body.notes || '',
-        body.image_url || ''
-      );
+      const newBoat = {
+        id: boatId,
+        name: body.name || 'İsimsiz Tekne',
+        captain_title: body.captain_title || 'KAPTAN',
+        captain_name: body.captain_name || '',
+        captain_surname: body.captain_surname || '',
+        notes: body.notes || '',
+        image_url: body.image_url || '',
+        created_at: new Date().toISOString(),
+        crew: (body.crew || []).map((c, idx) => ({
+          id: crypto.randomUUID(),
+          name: c.name || '',
+          surname: c.surname || '',
+          role: c.role || '',
+          phone: c.phone || '',
+          sort_order: idx + 1
+        }))
+      };
 
-      if (Array.isArray(body.crew)) {
-        const insertCrew = db.prepare(`
-          INSERT INTO crew_members (id, boat_id, name, surname, role, phone, sort_order)
-          VALUES (?, ?, ?, ?, ?, ?, ?)
-        `);
-        body.crew.forEach((c, idx) => {
-          insertCrew.run(
-            crypto.randomUUID(),
-            boatId,
-            c.name || '',
-            c.surname || '',
-            c.role || '',
-            c.phone || '',
-            idx + 1
-          );
-        });
-      }
+      db.boats.unshift(newBoat);
+      writeDb(db);
 
       res.writeHead(201, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, id: boatId }));
@@ -265,18 +282,18 @@ const server = http.createServer(async (req, res) => {
     // API: DELETE /api/boats/:id
     if (req.method === 'DELETE' && pathname.startsWith('/api/boats/')) {
       const boatId = pathname.replace('/api/boats/', '');
-      const boat = db.prepare('SELECT * FROM boats WHERE id = ?').get(boatId);
+      const boatIndex = db.boats.findIndex(b => b.id === boatId);
       
-      if (boat) {
-        db.prepare('DELETE FROM crew_members WHERE boat_id = ?').run(boatId);
-        db.prepare('DELETE FROM boats WHERE id = ?').run(boatId);
-        
+      if (boatIndex !== -1) {
+        const boat = db.boats[boatIndex];
         if (boat.image_url && boat.image_url.startsWith('/uploads/')) {
           const imgFile = path.join(__dirname, 'public', boat.image_url);
-          if (fs.existsSync(imgFile) && !boat.image_url.includes('ya79_form.jpg')) {
+          if (fs.existsSync(imgFile) && !boat.image_url.includes('ya79_form.jpg') && !boat.image_url.includes('7ff6bd63')) {
             try { fs.unlinkSync(imgFile); } catch (e) {}
           }
         }
+        db.boats.splice(boatIndex, 1);
+        writeDb(db);
       }
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -293,7 +310,6 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-      // Save base64 image to uploads/
       const match = body.image.match(/^data:image\/([a-zA-Z]+);base64,/);
       const ext = match ? (match[1] === 'jpeg' ? 'jpg' : match[1]) : 'jpg';
       const filename = `form_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.${ext}`;
@@ -303,16 +319,14 @@ const server = http.createServer(async (req, res) => {
       fs.writeFileSync(filePath, Buffer.from(cleanBase64, 'base64'));
       const imageUrl = `/uploads/${filename}`;
 
-      // Check API key
-      const settingRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('gemini_api_key');
-      const apiKey = body.apiKey || req.headers['x-gemini-api-key'] || settingRow?.value || process.env.GEMINI_API_KEY;
+      const apiKey = body.apiKey || req.headers['x-gemini-api-key'] || db.settings?.gemini_api_key || process.env.GEMINI_API_KEY;
 
       if (!apiKey || apiKey.trim() === '') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           imageUrl,
           requiresApiKey: true,
-          message: 'Fotoğraf kaydedildi ancak yapay zekânın el yazısını okuması için Google Gemini API anahtarı tanımlanmalıdır.'
+          message: 'Fotoğraf kaydedildi ancak otomatik okuma için API anahtarı girilmelidir.'
         }));
         return;
       }
@@ -330,14 +344,13 @@ const server = http.createServer(async (req, res) => {
         res.end(JSON.stringify({
           imageUrl,
           aiError: aiErr.message,
-          message: `Yapay zekâ analizinde hata oluştu: ${aiErr.message}`
+          message: `Yapay zekâ hatası: ${aiErr.message}`
         }));
       }
       return;
     }
 
     // API: POST /api/analyze-existing
-    // Allows analyzing an already uploaded image with a freshly entered API key
     if (req.method === 'POST' && pathname === '/api/analyze-existing') {
       const body = await parseJsonBody(req);
       if (!body.imageUrl) {
@@ -357,8 +370,7 @@ const server = http.createServer(async (req, res) => {
       const cleanBase64 = fileBuffer.toString('base64');
       const ext = path.extname(filePath).toLowerCase().replace('.', '') || 'jpeg';
 
-      const settingRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('gemini_api_key');
-      const apiKey = body.apiKey || settingRow?.value || process.env.GEMINI_API_KEY;
+      const apiKey = body.apiKey || db.settings?.gemini_api_key || process.env.GEMINI_API_KEY;
 
       if (!apiKey) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -383,8 +395,7 @@ const server = http.createServer(async (req, res) => {
     // API: GET /api/settings / POST /api/settings
     if (pathname === '/api/settings') {
       if (req.method === 'GET') {
-        const keyRow = db.prepare('SELECT value FROM settings WHERE key = ?').get('gemini_api_key');
-        const activeKey = keyRow?.value || process.env.GEMINI_API_KEY || '';
+        const activeKey = db.settings?.gemini_api_key || process.env.GEMINI_API_KEY || '';
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           hasGeminiApiKey: activeKey.length > 5,
@@ -395,11 +406,9 @@ const server = http.createServer(async (req, res) => {
       if (req.method === 'POST') {
         const body = await parseJsonBody(req);
         if (body.gemini_api_key !== undefined) {
-          const val = body.gemini_api_key.trim();
-          db.prepare(`
-            INSERT INTO settings (key, value) VALUES ('gemini_api_key', ?)
-            ON CONFLICT(key) DO UPDATE SET value = excluded.value
-          `).run(val);
+          db.settings = db.settings || {};
+          db.settings.gemini_api_key = body.gemini_api_key.trim();
+          writeDb(db);
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
@@ -410,17 +419,15 @@ const server = http.createServer(async (req, res) => {
     // API: GET /api/export-vcard/:id
     if (req.method === 'GET' && pathname.startsWith('/api/export-vcard/')) {
       const boatId = pathname.replace('/api/export-vcard/', '');
-      const boat = db.prepare('SELECT * FROM boats WHERE id = ?').get(boatId);
+      const boat = db.boats.find(b => b.id === boatId);
       if (!boat) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Tekne bulunamadı');
         return;
       }
 
-      const crew = db.prepare('SELECT * FROM crew_members WHERE boat_id = ?').all(boatId);
       let vcardContent = '';
-      
-      for (const m of crew) {
+      for (const m of (boat.crew || [])) {
         vcardContent += 'BEGIN:VCARD\r\n';
         vcardContent += 'VERSION:3.0\r\n';
         vcardContent += `FN:${m.name} ${m.surname} (${boat.name} - ${m.role})\r\n`;
@@ -442,18 +449,13 @@ const server = http.createServer(async (req, res) => {
 
     // API: GET /api/export-csv
     if (req.method === 'GET' && pathname === '/api/export-csv') {
-      const rows = db.prepare(`
-        SELECT b.name as tekne_adi, b.captain_name || ' ' || b.captain_surname as kaptan,
-               c.name as personel_isim, c.surname as personel_soyisim, c.role as gorev, c.phone as telefon
-        FROM boats b
-        LEFT JOIN crew_members c ON b.id = c.boat_id
-        ORDER BY b.name ASC, c.sort_order ASC
-      `).all();
-
       let csv = '\uFEFFTekne Adı;Sorumlu Kaptan;Personel İsim;Personel Soyisim;Görev;Telefon\r\n';
-      for (const r of rows) {
-        csv += `"${r.tekne_adi || ''}";"${r.kaptan || ''}";"${r.personel_isim || ''}";"${r.personel_soyisim || ''}";"${r.gorev || ''}";"${r.telefon || ''}"\r\n`;
-      }
+      (db.boats || []).forEach(b => {
+        const kaptan = `${b.captain_name || ''} ${b.captain_surname || ''}`.trim();
+        (b.crew || []).forEach(c => {
+          csv += `"${b.name || ''}";"${kaptan}";"${c.name || ''}";"${c.surname || ''}";"${c.role || ''}";"${c.phone || ''}"\r\n`;
+        });
+      });
 
       res.writeHead(200, {
         'Content-Type': 'text/csv; charset=utf-8',
@@ -494,5 +496,6 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log(`⚓ Marina Servisi Yeniden Başlatıldı (Port: ${PORT})`);
+  console.log(`⚓ Marina Tekne & Mürettebat Rehberi Servisi Başlatıldı!`);
+  console.log(`Port: ${PORT}`);
 });
