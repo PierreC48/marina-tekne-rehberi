@@ -1,6 +1,26 @@
 {
   "boats": [
     {
+      "id": "bff3f6cb-1243-4b36-ba0b-c6679114a3d8",
+      "name": "MADCAT (MB)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Yusuf",
+      "captain_surname": "YILMAZ",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701699420_9f2ba8e3.jpg",
+      "created_at": "2026-11-03T10:28:53.903Z",
+      "crew": [
+        {
+          "id": "4d20bef8-2d56-4678-96aa-c40130c8eb44",
+          "name": "Furkan",
+          "surname": "İnceler",
+          "role": "Gemici",
+          "phone": "0538 082 0851",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "0b3de62e-d6f1-464c-b35d-21120b367ceb",
       "name": "MYS Tere AB",
       "captain_title": "KAPTAN",
