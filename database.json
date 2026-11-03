@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "ff48c0b6-a229-44ca-92b8-360b59b10548",
+      "name": "SEA SUN",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701490909_4c0e22dc.jpg",
+      "created_at": "2026-11-03T10:25:06.833Z",
+      "crew": [
+        {
+          "id": "c70e44e3-c4ad-4e29-b3eb-7db613a4657a",
+          "name": "BATUHAN",
+          "surname": "ALTIN",
+          "role": "Gemici",
+          "phone": "0542-684-6030",
+          "sort_order": 1
+        },
+        {
+          "id": "42b75b82-ce7a-4f84-aa78-96945fb550ea",
+          "name": "MEHMET ALİ",
+          "surname": "DURMUŞ",
+          "role": "Gemici",
+          "phone": "0538-620-53-15",
+          "sort_order": 2
+        },
+        {
+          "id": "3d4b7bd1-37e0-4352-b8ca-8650443a5256",
+          "name": "AHMET",
+          "surname": "TÜRK",
+          "role": "Gemici",
+          "phone": "0506-123-73-15",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "08b316f0-4bbd-466f-b487-846815686b4d",
       "name": "ARYA (m/y)",
       "captain_title": "KAPTAN",
