@@ -1,6 +1,34 @@
 {
   "boats": [
     {
+      "id": "309f507f-5600-49f3-8b05-00ef4389db27",
+      "name": "Kilim-1 (4)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Dursun",
+      "captain_surname": "Ezmeci",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702068602_f4f2029b.jpg",
+      "created_at": "2026-11-03T10:35:32.198Z",
+      "crew": [
+        {
+          "id": "9015098c-04a4-459b-b5cb-28728caa2ea4",
+          "name": "Ismail",
+          "surname": "Ezmeci",
+          "role": "Gemici",
+          "phone": "0542 585 7479",
+          "sort_order": 1
+        },
+        {
+          "id": "213b04ee-204d-4129-9335-8605a07caf31",
+          "name": "Dursun",
+          "surname": "Ezmeci",
+          "role": "KAPTAN",
+          "phone": "0536 574 0529",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "4a718462-f3d1-4b04-a29e-0ac2ffcccf26",
       "name": "Hawk",
       "captain_title": "KAPTAN",
