@@ -1,6 +1,66 @@
 {
   "boats": [
     {
+      "id": "6d3e5475-646e-4ca0-b00e-23bd0ed09c9c",
+      "name": "LAVİNYA (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Nuri",
+      "captain_surname": "ERKUL",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701493430_b165d07b.jpg",
+      "created_at": "2026-11-03T10:25:21.644Z",
+      "crew": [
+        {
+          "id": "6ade2365-b725-4ae1-8428-bbc93dea0ca8",
+          "name": "Nuri",
+          "surname": "ERKUL",
+          "role": "Kaptan",
+          "phone": "0532 514 55 10",
+          "sort_order": 1
+        },
+        {
+          "id": "e3bb3090-c8e5-41ea-9f49-c054c6263a88",
+          "name": "Doğukan",
+          "surname": "AKAR",
+          "role": "Gemici",
+          "phone": "0541 921 02 28",
+          "sort_order": 2
+        },
+        {
+          "id": "f529d5b5-ae47-430c-9f65-78b3d1ad9253",
+          "name": "Elvan",
+          "surname": "ERKUL",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "fb4aa85a-2193-4568-94c3-c82c68e9193e",
+          "name": "Mısra",
+          "surname": "AKAR",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        },
+        {
+          "id": "faedfbf7-da8e-429e-ac79-c0421670bab4",
+          "name": "Tolga Celal",
+          "surname": "SAĞLIK",
+          "role": "Gemici",
+          "phone": "0537 762 93 18",
+          "sort_order": 5
+        },
+        {
+          "id": "8ebb536e-e409-459a-8d23-da01daecbc4e",
+          "name": "Enes",
+          "surname": "TOPALOĞLU",
+          "role": "Gemici",
+          "phone": "0539 290 27 41",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
       "id": "ff48c0b6-a229-44ca-92b8-360b59b10548",
       "name": "SEA SUN",
       "captain_title": "KAPTAN",
