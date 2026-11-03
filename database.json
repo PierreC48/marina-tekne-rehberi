@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "274b3219-ac88-459e-85c4-141a0eacf8e8",
+      "name": "Aquala 1",
+      "captain_title": "KAPTAN",
+      "captain_name": "İhsan",
+      "captain_surname": "Özkargın",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793708538348_e3a7a9c8.jpg",
+      "form_date": "2026-11-03",
+      "created_at": "2026-11-03T12:24:45.202Z",
+      "updated_at": "2026-11-03T12:24:45.202Z",
+      "crew": [
+        {
+          "id": "f942cca6-b308-4000-a494-664cb9fd7147",
+          "name": "Faruk",
+          "surname": "Yüzüak",
+          "role": "Gemici",
+          "phone": "0554 293 27 59",
+          "sort_order": 1
+        },
+        {
+          "id": "f83baad5-05bc-4886-91ae-6e02fbe9946c",
+          "name": "Cem",
+          "surname": "Çelik",
+          "role": "Gemici",
+          "phone": "0505320650189",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "baab05be-657e-406b-a17d-b1dd5c304323",
       "name": "Thirty Eight (my)",
       "captain_title": "KAPTAN",
@@ -1387,5 +1417,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-03T12:22:52.294Z"
+  "last_backup_at": "2026-11-03T12:24:45.302Z"
 }
