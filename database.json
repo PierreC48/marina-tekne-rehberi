@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "8bfe0c88-83b6-489c-95a3-5ce0e3f5ffcd",
+      "name": "TOMA HAWK",
+      "captain_title": "KAPTAN",
+      "captain_name": "Nazmi",
+      "captain_surname": "Aydın",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701833836_5f02faf9.jpg",
+      "created_at": "2026-11-03T10:31:02.167Z",
+      "crew": [
+        {
+          "id": "0bdcb021-0858-41ea-a8ee-ba1ddca9f1ea",
+          "name": "Nazmi",
+          "surname": "Aydın",
+          "role": "Kaptan",
+          "phone": "0532 691 8208",
+          "sort_order": 1
+        },
+        {
+          "id": "610b7a1a-45c0-4b0f-a085-69409ebc47cc",
+          "name": "Bilal",
+          "surname": "Özden",
+          "role": "Gemici",
+          "phone": "0542 728 3839",
+          "sort_order": 2
+        },
+        {
+          "id": "f4c1aebd-9ec2-4e2d-98a2-733882a7a815",
+          "name": "Kerem",
+          "surname": "Onur Karaca",
+          "role": "Gemici",
+          "phone": "0541 781 1992",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "fcea0efb-5e4b-471f-b5bd-46197225432e",
       "name": "SHENA (M/Y)",
       "captain_title": "KAPTAN",
