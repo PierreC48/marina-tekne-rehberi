@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "7a5bf05e-25c7-418e-9a20-54871a98b322",
+      "name": "DAPHNE (MY)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Sercan",
+      "captain_surname": "ALSLAN",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702184923_e625c1bd.jpg",
+      "created_at": "2026-11-03T10:36:40.771Z",
+      "crew": [
+        {
+          "id": "2db01a65-8079-4b59-b1b8-b61e48b37ca9",
+          "name": "Sercan",
+          "surname": "ARSLAN",
+          "role": "Kaptan",
+          "phone": "0535 416 04 04",
+          "sort_order": 1
+        },
+        {
+          "id": "71478351-88fa-43cc-ab8a-7149a3acf206",
+          "name": "Erhan",
+          "surname": "SAĞLAM",
+          "role": "Gemici",
+          "phone": "0535 388 54 20",
+          "sort_order": 2
+        },
+        {
+          "id": "c29f16af-e04e-4341-ae2f-0b333b824c90",
+          "name": "İbrahim",
+          "surname": "TURSUN",
+          "role": "Koray Marin",
+          "phone": "0536 776 00 04",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "309f507f-5600-49f3-8b05-00ef4389db27",
       "name": "Kilim-1 (4)",
       "captain_title": "KAPTAN",
