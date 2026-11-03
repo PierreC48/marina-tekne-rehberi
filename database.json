@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "baab05be-657e-406b-a17d-b1dd5c304323",
+      "name": "THİRTY EİGTH (MY)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793692616731_c7ed728a.jpg",
+      "created_at": "2026-11-03T07:59:07.190Z",
+      "crew": [
+        {
+          "id": "d70428bc-15c7-4b24-9d1d-83eebff7e1a5",
+          "name": "Ahmet",
+          "surname": "Tarlacı",
+          "role": "Kaptan",
+          "phone": "05337784176",
+          "sort_order": 1
+        },
+        {
+          "id": "f8224dc7-8004-4a4e-af1d-8b020adcde53",
+          "name": "Umutcan",
+          "surname": "Yeşil",
+          "role": "Gemici",
+          "phone": "05438988586",
+          "sort_order": 2
+        },
+        {
+          "id": "17c1f8f5-5ed4-415c-9bdd-1de66c2d4fba",
+          "name": "Buğra",
+          "surname": "Kalender",
+          "role": "Gemici",
+          "phone": "05073012283",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "cda91d95-b248-4f5e-851b-852aa45c1338",
       "name": "Thirty eight",
       "captain_title": "KAPTAN",
