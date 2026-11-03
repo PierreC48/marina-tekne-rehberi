@@ -1,6 +1,44 @@
 {
   "boats": [
     {
+      "id": "d1fdc135-8043-49cc-be5a-6e4a7002e444",
+      "name": "Aquıla J",
+      "captain_title": "KAPTAN",
+      "captain_name": "İhsan",
+      "captain_surname": "Özkargın",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793707523043_a1d342f2.jpg",
+      "form_date": "2026-11-03",
+      "created_at": "2026-11-03T12:05:54.020Z",
+      "updated_at": "2026-11-03T12:05:54.020Z",
+      "crew": [
+        {
+          "id": "54e9a00e-eaf6-42ad-b0c8-a3a9b360f56e",
+          "name": "İhsan",
+          "surname": "Özkargın",
+          "role": "Kaptan",
+          "phone": "0530 682 11 52",
+          "sort_order": 1
+        },
+        {
+          "id": "604172dd-9dd5-47d0-9d59-0d8b639dcef2",
+          "name": "Faruk",
+          "surname": "Yüzak",
+          "role": "Mürettebat",
+          "phone": "0554 293 27 59",
+          "sort_order": 2
+        },
+        {
+          "id": "c31195a6-c637-4fb1-88cb-3b4da500101d",
+          "name": "Cem",
+          "surname": "Çelik",
+          "role": "Mürettebat",
+          "phone": "0532 065 01 89",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "3fe40c62-be4a-49cb-b154-1682a4a3d1fd",
       "name": "Dream (mb)",
       "captain_title": "KAPTAN",
@@ -1333,5 +1371,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-03T11:05:54.506Z"
+  "last_backup_at": "2026-11-03T12:05:54.032Z"
 }
