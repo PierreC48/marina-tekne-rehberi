@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "ce4f71d7-49ae-4da3-b08e-5537d39fd945",
+      "name": "EYLÜL (MD)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ali Rıza",
+      "captain_surname": "Fidanağaç",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793684354789_1d1f79e5.jpg",
+      "created_at": "2026-11-03T05:39:34.824Z",
+      "crew": [
+        {
+          "id": "5ed4de4a-7767-45bb-966d-c0c435458ef2",
+          "name": "Ali Rıza",
+          "surname": "Fidanağaç",
+          "role": "Kaptan",
+          "phone": "0507 139 86 15",
+          "sort_order": 1
+        },
+        {
+          "id": "1dfd6d9e-da49-44d0-9d38-7c9a05212c5e",
+          "name": "İbrahim",
+          "surname": "Özgün",
+          "role": "Gemici",
+          "phone": "0544 423 15 19",
+          "sort_order": 2
+        },
+        {
+          "id": "2be5e476-471e-4565-8128-299952e88220",
+          "name": "Gürkay",
+          "surname": "Işık",
+          "role": "Gemici",
+          "phone": "0537 402 28 38",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "4b096548-150f-4170-9c65-d8006691ce97",
       "name": "Era - 11",
       "captain_title": "KAPTAN",
