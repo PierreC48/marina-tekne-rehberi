@@ -1,6 +1,19 @@
 {
   "boats": [
     {
+      "id": "36ffcfe9-ff6c-4c3f-a963-9b6b9410ba8b",
+      "name": "Aquala 1",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793708413426_4aaab646.jpg",
+      "form_date": "2026-11-03",
+      "created_at": "2026-11-03T12:20:56.981Z",
+      "updated_at": "2026-11-03T12:20:56.981Z",
+      "crew": []
+    },
+    {
       "id": "baab05be-657e-406b-a17d-b1dd5c304323",
       "name": "Thirty Eight (my)",
       "captain_title": "KAPTAN",
@@ -1387,5 +1400,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-03T12:07:44.976Z"
+  "last_backup_at": "2026-11-03T12:20:56.988Z"
 }
