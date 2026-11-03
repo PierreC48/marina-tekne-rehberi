@@ -1,6 +1,50 @@
 {
   "boats": [
     {
+      "id": "935ed00a-3f3c-408c-a3a3-a7f6da923e69",
+      "name": "Yaşar 79 (M/Y)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Serdar",
+      "captain_surname": "BİNGÖL",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701528831_d0324575.jpg",
+      "created_at": "2026-11-03T10:25:50.959Z",
+      "crew": [
+        {
+          "id": "fd9d629e-6ab0-4328-b36b-3143ed6f5381",
+          "name": "İmre",
+          "surname": "Yılmaz",
+          "role": "Gemici",
+          "phone": "0544 310 01 48",
+          "sort_order": 1
+        },
+        {
+          "id": "0bee24ab-210d-4c02-8b85-883db4abae89",
+          "name": "Nevzat",
+          "surname": "Önder DOĞAN",
+          "role": "Gemici",
+          "phone": "0544 977 48 00",
+          "sort_order": 2
+        },
+        {
+          "id": "d5a9b86b-41e6-41f5-933c-d5ff5c1bc558",
+          "name": "Mustafa",
+          "surname": "YOMRA",
+          "role": "Gemici",
+          "phone": "0530 262 81 08",
+          "sort_order": 3
+        },
+        {
+          "id": "78f1b36d-870e-4d05-8704-a55093e1bcab",
+          "name": "Ali",
+          "surname": "ŞİŞMAN",
+          "role": "Aşçı",
+          "phone": "0541 205 22 55",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
       "id": "6d3e5475-646e-4ca0-b00e-23bd0ed09c9c",
       "name": "LAVİNYA (my)",
       "captain_title": "KAPTAN",
