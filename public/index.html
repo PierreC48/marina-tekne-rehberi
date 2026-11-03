@@ -6,6 +6,8 @@
   <meta name="theme-color" content="#082f49">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23082f49'/><text y='.9em' x='50%' text-anchor='middle' font-size='65'>⚓</text></svg>">
   <title>Marina Tekne & Mürettebat Rehberi</title>
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -57,7 +59,12 @@
           ⚓
         </div>
         <div class="min-w-0">
-          <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight truncate">Marina Rehberi</h1>
+          <div class="flex items-center gap-1.5">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight truncate">Marina Rehberi</h1>
+            <span id="offline-badge" class="hidden px-2 py-0.5 text-[10px] font-bold bg-amber-500 text-slate-950 rounded-full shrink-0">
+              📡 Çevrimdışı
+            </span>
+          </div>
           <p class="text-[11px] text-sky-200 truncate">Mürettebat & İletişim Portalı</p>
         </div>
       </div>
@@ -66,17 +73,18 @@
       <div class="flex items-center gap-1.5 shrink-0">
         <button onclick="openUploadModal()" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-md shadow-sky-600/30 transition-all active:scale-95">
           <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          <span class="hidden xs:inline">Form</span><span>Yükle</span>
+          <span>Form Yükle</span>
         </button>
 
-        <a href="/api/export-csv" download class="hidden sm:inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-2 rounded-xl text-xs font-medium border border-slate-700 transition" title="Excel İndir">
+        <a href="/api/export-csv" download class="hidden sm:inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-2 rounded-xl text-xs font-medium border border-slate-700 transition" title="Excel (CSV) İndir">
           <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
           <span>Excel</span>
         </a>
 
-        <button onclick="openSettingsModal()" class="p-2 text-slate-300 hover:text-white hover:bg-slate-800 rounded-xl transition" title="Ayarlar">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        </button>
+        <a href="/api/backup" download class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-2 rounded-xl text-xs font-medium border border-slate-700 transition" title="Tam Veritabanı Yedeği İndir (.json)">
+          <span>💾</span>
+          <span class="hidden sm:inline">Yedek</span>
+        </a>
       </div>
 
     </div>
@@ -90,7 +98,7 @@
           type="text" 
           id="search-input" 
           oninput="handleSearch(this.value)" 
-          placeholder="Tekne adı, isim veya telefon ara..." 
+          placeholder="Tekne adı, kaptan, personel ismi veya telefon ara..." 
           class="w-full bg-marine-900/95 text-white placeholder-sky-300/60 text-xs sm:text-sm rounded-xl pl-9 pr-4 py-2.5 border border-marine-700 focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-transparent transition"
         />
         <svg class="w-4 h-4 text-sky-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
@@ -100,11 +108,11 @@
       <div class="flex items-center gap-1 bg-marine-900/90 p-1 rounded-xl text-xs sm:text-sm border border-marine-800 overflow-x-auto no-scrollbar">
         <button id="tab-boats" onclick="switchTab('boats')" class="flex-1 py-2 px-3 rounded-lg font-semibold transition text-white bg-marine-700 shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span>⛵ Tekneler</span>
-          <span id="stat-boat-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">2</span>
+          <span id="stat-boat-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
         <button id="tab-contacts" onclick="switchTab('contacts')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span>👥 Tüm Kişiler</span>
-          <span id="stat-contact-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">6</span>
+          <span id="stat-contact-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
         <button id="tab-gallery" onclick="switchTab('gallery')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span>🖼️ Orijinal Formlar</span>
@@ -134,7 +142,7 @@
       <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         <div class="p-3.5 sm:p-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
           <h2 class="font-bold text-slate-800 text-sm sm:text-base">Tüm Mürettebat İletişim Rehberi</h2>
-          <span id="filtered-contact-count" class="text-xs bg-sky-100 text-sky-800 px-2.5 py-1 rounded-full font-semibold">6 Kişi</span>
+          <span id="filtered-contact-count" class="text-xs bg-sky-100 text-sky-800 px-2.5 py-1 rounded-full font-semibold">0 Kişi</span>
         </div>
 
         <!-- Desktop Contacts Table (hidden on mobile) -->
@@ -142,11 +150,12 @@
           <table class="w-full text-left text-sm text-slate-600">
             <thead class="bg-slate-100/70 text-slate-700 font-semibold text-xs uppercase tracking-wider">
               <tr>
-                <th class="px-5 py-3">İsim Soyisim</th>
-                <th class="px-5 py-3">Tekne Adı</th>
-                <th class="px-5 py-3">Görevi</th>
-                <th class="px-5 py-3">Telefon</th>
-                <th class="px-5 py-3 text-right">Hızlı İletişim</th>
+                <th class="px-4 py-3">İsim Soyisim</th>
+                <th class="px-4 py-3">Tekne Adı</th>
+                <th class="px-4 py-3">Görevi</th>
+                <th class="px-4 py-3">Telefon</th>
+                <th class="px-4 py-3">Form Tarihi</th>
+                <th class="px-4 py-3 text-right">Hızlı İletişim & Rehber</th>
               </tr>
             </thead>
             <tbody id="contacts-table-body" class="divide-y divide-slate-100">
@@ -192,7 +201,7 @@
       </div>
 
       <!-- Boat & Crew Details Sidebar in Modal -->
-      <div class="w-full md:w-96 p-4 sm:p-5 bg-white flex flex-col overflow-y-auto max-h-[40vh] md:max-h-[85vh]">
+      <div class="w-full md:w-96 p-4 sm:p-5 bg-white flex flex-col overflow-y-auto max-h-[42vh] md:max-h-[85vh]">
         <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
           <div class="min-w-0">
             <span class="text-[10px] font-bold text-sky-600 uppercase tracking-wider">Mürettebat Bilgileri</span>
@@ -201,13 +210,19 @@
           <button onclick="closePhotoModal()" class="hidden md:block text-slate-400 hover:text-slate-700 p-1 rounded-lg">✕</button>
         </div>
 
-        <div class="mt-2.5 text-xs text-slate-500 bg-slate-50 p-2 rounded-xl border border-slate-100">
+        <div class="mt-2.5 text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-100 space-y-1">
           <p><strong class="text-slate-700">Kaptan:</strong> <span id="modal-captain-name">-</span></p>
-          <p class="mt-0.5"><strong class="text-slate-700">Tarih:</strong> <span id="modal-date">-</span></p>
+          <p><strong class="text-slate-700">Form Tarihi:</strong> <span id="modal-form-date">-</span></p>
+          <p><strong class="text-slate-700">Son Güncelleme:</strong> <span id="modal-date">-</span></p>
         </div>
 
         <div class="mt-3 flex-1 overflow-y-auto">
-          <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Mürettebat Listesi</h4>
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Mürettebat Listesi</h4>
+            <button id="modal-vcard-boat-btn" type="button" class="text-[11px] font-bold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2 py-1 rounded-lg transition">
+              📇 Tümünü Rehbere Ekle
+            </button>
+          </div>
           <div id="modal-crew-list" class="space-y-1.5">
             <!-- Rendered dynamically -->
           </div>
@@ -233,11 +248,28 @@
           <span class="text-lg">📸</span>
           <div>
             <h3 class="font-bold text-sm sm:text-base text-white">Yeni Mürettebat Formu Ekle</h3>
-            <p class="text-[11px] text-sky-200">Fotoğraf çekin veya galerinizden seçin</p>
+            <p class="text-[11px] text-sky-200">Kameradan çekin veya galerinizden seçin (Maks. 8 MB - JPG/PNG/WEBP)</p>
           </div>
         </div>
         <button onclick="closeUploadModal()" class="text-sky-300 hover:text-white p-1 rounded-lg text-lg">✕</button>
       </div>
+
+      <!-- Hidden File Inputs (Placed outside labels to prevent double-event bubbling on Android) -->
+      <input 
+        type="file" 
+        id="file-input-camera" 
+        accept="image/*" 
+        capture="environment" 
+        class="sr-only" 
+        onchange="handleFileSelected(event)"
+      />
+      <input 
+        type="file" 
+        id="file-input-gallery" 
+        accept="image/*" 
+        class="sr-only" 
+        onchange="handleFileSelected(event)"
+      />
 
       <!-- Step 1: DUAL OPTION (CAMERA OR GALLERY) -->
       <div id="upload-step-pick" class="p-4 sm:p-6 overflow-y-auto">
@@ -248,92 +280,73 @@
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           
-          <!-- Option 1: Direct System Camera (Android & iOS 100% Native Compatible) -->
-          <label 
-            class="relative border-2 border-dashed border-sky-300 hover:border-sky-500 bg-sky-50/70 hover:bg-sky-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-98 overflow-hidden group shadow-xs"
+          <!-- Option 1: Direct Live Camera (Works 100% on Android & iOS) -->
+          <button 
+            type="button"
+            onclick="startLiveCamera()"
+            class="border-2 border-dashed border-sky-300 hover:border-sky-500 bg-sky-50/70 hover:bg-sky-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 group shadow-xs"
           >
-            <input 
-              type="file" 
-              id="file-input-camera" 
-              accept="image/jpeg,image/png,image/webp,image/*" 
-              capture="environment" 
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
-              onchange="handleFileSelected(event)"
-            />
-            <div class="w-14 h-14 rounded-2xl bg-sky-600 text-white flex items-center justify-center text-2xl mb-2.5 shadow-md shadow-sky-600/30 group-hover:scale-105 transition pointer-events-none">
+            <div class="w-14 h-14 rounded-2xl bg-sky-600 text-white flex items-center justify-center text-2xl mb-2.5 shadow-md shadow-sky-600/30 group-hover:scale-105 transition">
               📷
             </div>
-            <h4 class="text-sm font-bold text-slate-900 pointer-events-none">Kameradan Çek</h4>
-            <p class="text-[11px] text-slate-500 mt-1 pointer-events-none">
-              Telefonun kamerasını açarak formun fotoğrafını anında çekin.
+            <h4 class="text-sm font-bold text-slate-900">Kameradan Çek</h4>
+            <p class="text-[11px] text-slate-500 mt-1">
+              Kamerayı doğrudan açarak formun fotoğrafını anında çekin.
             </p>
-            <span class="mt-3 inline-block bg-sky-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm pointer-events-none">
+            <span class="mt-3 inline-block bg-sky-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-sm">
               Kamerayı Aç
             </span>
-          </label>
+          </button>
 
           <!-- Option 2: Gallery / Files -->
           <label 
-            class="relative border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/70 hover:bg-indigo-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-98 overflow-hidden group shadow-xs"
+            for="file-input-gallery"
+            class="border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/70 hover:bg-indigo-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 group shadow-xs"
           >
-            <input 
-              type="file" 
-              id="file-input-gallery" 
-              accept="image/*,image/jpeg,image/png,image/webp" 
-              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
-              onchange="handleFileSelected(event)"
-            />
-            <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-2.5 shadow-md shadow-indigo-600/30 group-hover:scale-105 transition pointer-events-none">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-2.5 shadow-md shadow-indigo-600/30 group-hover:scale-105 transition">
               🖼️
             </div>
-            <h4 class="text-sm font-bold text-slate-900 pointer-events-none">Galeriden / Dosyadan Seç</h4>
-            <p class="text-[11px] text-slate-500 mt-1 pointer-events-none">
+            <h4 class="text-sm font-bold text-slate-900">Galeriden / Dosyadan Seç</h4>
+            <p class="text-[11px] text-slate-500 mt-1">
               Telefonunuzdaki fotoğraflardan veya albümden önceden çekilmiş formu seçin.
             </p>
-            <span class="mt-3 inline-block bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm pointer-events-none">
+            <span class="mt-3 inline-block bg-indigo-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-sm">
               Galeriyi Aç
             </span>
           </label>
 
         </div>
 
-        <!-- Option 3: In-Browser Live Camera Viewfinder (Bulletproof Fallback for Android) -->
-        <div class="mt-4 pt-3 border-t border-slate-200 text-center">
-          <button 
-            type="button" 
-            onclick="startLiveCamera()" 
-            class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-xl transition active:scale-95 border border-slate-300"
-          >
-            <span>🎥</span>
-            <span>Tarayıcı İçi Canlı Kamera ile Çek (Alternatif)</span>
-          </button>
-        </div>
-
       </div>
 
-      <!-- Step 1.5: LIVE IN-BROWSER CAMERA -->
+      <!-- Step 1.5: LIVE CAMERA VIEWFINDER -->
       <div id="upload-step-live-camera" class="hidden p-3.5 sm:p-5 flex flex-col flex-1 overflow-y-auto">
-        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 shrink-0">
+        <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 shrink-0 gap-2">
           <div>
             <h4 class="text-xs sm:text-sm font-bold text-slate-800 flex items-center gap-1.5">
-              <span>🎥</span> Canlı Kamera Önizleme
+              <span>📷</span> Kamera Önizleme
             </h4>
-            <p class="text-[11px] text-slate-500">Formu kameraya doğrultun ve "Fotoğrafı Çek" butonuna basın.</p>
+            <p class="text-[11px] text-slate-500">Formu ekrana hizalayın ve "Fotoğrafı Çek" butonuna basın.</p>
           </div>
-          <button type="button" onclick="stopLiveCamera()" class="text-xs text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2.5 py-1 rounded-lg">
-            Kapat
-          </button>
+          <div class="flex items-center gap-1.5">
+            <button type="button" onclick="toggleCameraFacing()" class="text-xs text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg font-semibold flex items-center gap-1">
+              <span>🔄</span> <span class="hidden xs:inline">Çevir</span>
+            </button>
+            <button type="button" onclick="stopLiveCamera()" class="text-xs text-slate-500 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 px-2.5 py-1.5 rounded-lg">
+              Geri
+            </button>
+          </div>
         </div>
 
-        <div class="relative w-full h-[45vh] bg-black rounded-xl overflow-hidden flex items-center justify-center border border-slate-800 shrink-0">
+        <div class="relative w-full h-[46vh] bg-black rounded-xl overflow-hidden flex items-center justify-center border border-slate-800 shrink-0">
           <video id="live-video-stream" autoplay playsinline muted class="w-full h-full object-contain"></video>
         </div>
 
-        <div class="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between gap-2 shrink-0">
-          <button type="button" onclick="stopLiveCamera()" class="text-xs text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-xl hover:bg-slate-100 transition">
-            Vazgeç
-          </button>
-          <button type="button" onclick="captureFromLiveCamera()" class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs font-bold shadow-md shadow-sky-600/30 flex items-center gap-1.5 active:scale-95 transition">
+        <div class="mt-3 pt-2 border-t border-slate-200 flex items-center justify-between gap-2 shrink-0 flex-wrap">
+          <label for="file-input-camera" class="text-[11px] text-slate-600 hover:text-slate-900 font-semibold px-2.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 cursor-pointer transition">
+            📱 Cihaz Kamerası
+          </label>
+          <button type="button" onclick="captureFromLiveCamera()" class="px-6 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-md shadow-sky-600/30 flex items-center gap-1.5 active:scale-95 transition">
             <span>📸</span>
             <span>Fotoğrafı Çek</span>
           </button>
@@ -418,13 +431,32 @@
         <p class="text-xs text-slate-500 mt-1">Yapay zekâ el yazısını okuyor, tekne ve personel bilgilerini ayrıştırıyor.</p>
       </div>
 
-      <!-- Step 3: Verification & Mobile-Friendly Edit Form -->
+      <!-- Step 4: Verification & Mobile-Friendly Edit Form -->
       <div id="upload-step-verify" class="hidden p-3.5 sm:p-5 overflow-y-auto space-y-3.5 flex-1">
         
         <!-- AI SUCCESS NOTIFICATION -->
         <div id="ai-success-banner" class="hidden bg-emerald-50 border border-emerald-200 p-2.5 rounded-xl flex items-center gap-2 text-xs text-emerald-800 font-medium">
           <span class="text-base text-emerald-600 shrink-0">✓</span>
           <span id="ai-success-text" class="truncate">Yapay zekâ formu başarıyla okudu!</span>
+        </div>
+
+        <!-- SIMILAR / DUPLICATE RECORD WARNING BANNER -->
+        <div id="similar-boat-warning" class="hidden bg-amber-50 border-2 border-amber-300 p-3 rounded-xl space-y-2 text-xs text-amber-900">
+          <div class="flex items-start gap-2">
+            <span class="text-base shrink-0">⚠️</span>
+            <div class="min-w-0 flex-1">
+              <p class="font-bold text-amber-950">Benzer Tekne / Mürettebat Kaydı Tespit Edildi!</p>
+              <p id="similar-boat-text" class="text-[11px] text-amber-800 mt-0.5 leading-snug"></p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 pt-1 flex-wrap">
+            <button type="button" onclick="saveVerifiedBoat(true)" class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-lg text-xs shadow-xs transition active:scale-95">
+              🔄 Mevcut Kayıtla Birleştir & Güncelle (Önerilen)
+            </button>
+            <button type="button" onclick="saveVerifiedBoat(false, true)" class="px-2.5 py-1.5 bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 font-semibold rounded-lg text-xs transition">
+              ➕ Yine de Yeni Kayıt Aç
+            </button>
+          </div>
         </div>
 
         <!-- PHOTO THUMBNAIL & NOTICE -->
@@ -436,15 +468,19 @@
           </div>
         </div>
 
-        <!-- BOAT NAME & CAPTAIN FIELDS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <!-- BOAT NAME, CAPTAIN & FORM DATE FIELDS -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1">Tekne Adı *</label>
-            <input type="text" id="verify-boat-name" class="w-full text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none" placeholder="Örn: Ya 79">
+            <input type="text" id="verify-boat-name" oninput="checkSimilarBoatWarning()" class="w-full text-xs sm:text-sm font-semibold rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none" placeholder="Örn: Ya 79">
           </div>
           <div>
-            <label class="block text-xs font-bold text-slate-700 mb-1">Sorumlu Kaptan İsim Soyisim</label>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Sorumlu Kaptan</label>
             <input type="text" id="verify-captain-name" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none" placeholder="Örn: Bekir Temiz">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Form Tarihi</label>
+            <input type="date" id="verify-form-date" class="w-full text-xs sm:text-sm rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
           </div>
         </div>
 
@@ -467,7 +503,7 @@
           <button type="button" onclick="resetUploadModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">
             Vazgeç
           </button>
-          <button type="button" onclick="saveVerifiedBoat()" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-marine-700 hover:bg-marine-800 text-white shadow-md shadow-sky-900/20 flex items-center gap-1.5 active:scale-95 transition">
+          <button type="button" onclick="saveVerifiedBoat(false, false)" class="px-5 py-2.5 rounded-xl text-xs font-bold bg-marine-700 hover:bg-marine-800 text-white shadow-md shadow-sky-900/20 flex items-center gap-1.5 active:scale-95 transition">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             Sisteme Kaydet
           </button>
@@ -475,32 +511,6 @@
 
       </div>
 
-    </div>
-  </div>
-
-  <!-- MODAL 3: SETTINGS -->
-  <div id="settings-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3">
-    <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-5 border border-slate-200">
-      <div class="flex items-center justify-between pb-2.5 border-b border-slate-100">
-        <h3 class="font-bold text-slate-800 text-sm sm:text-base flex items-center gap-2">
-          <span>⚙️</span> Sistem Ayarları
-        </h3>
-        <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-slate-700">✕</button>
-      </div>
-
-      <div class="mt-3 space-y-3">
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Google Gemini API Anahtarı</label>
-          <input type="password" id="settings-gemini-key" placeholder="AIzaSy..." class="w-full text-xs font-mono rounded-xl border border-slate-300 p-2.5 focus:ring-2 focus:ring-sky-500 focus:outline-none">
-          <p id="settings-key-status" class="text-xs font-medium mt-1 text-emerald-600"></p>
-        </div>
-        <p class="text-[11px] text-slate-500">API anahtarınız Render üzerinde aktif durumdadır.</p>
-      </div>
-
-      <div class="mt-4 pt-3 border-t border-slate-100 flex justify-end gap-2">
-        <button onclick="closeSettingsModal()" class="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl">Kapat</button>
-        <button onclick="saveSettings()" class="px-4 py-1.5 text-xs font-bold bg-marine-700 text-white rounded-xl hover:bg-marine-800 shadow">Kaydet</button>
-      </div>
     </div>
   </div>
 
@@ -516,12 +526,42 @@
     let allContacts = [];
     let currentUploadedImageUrl = '';
     let activeTab = 'boats';
+    let currentCameraFacing = 'environment';
+    let matchedSimilarBoatId = null;
+
+    // Register Service Worker for Offline PWA support
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => {
+          console.warn('SW kaydı başarısız:', err);
+        });
+      });
+    }
+
+    function updateOnlineStatusUI() {
+      const badge = document.getElementById('offline-badge');
+      if (!badge) return;
+      if (!navigator.onLine) {
+        badge.classList.remove('hidden');
+      } else {
+        badge.classList.add('hidden');
+      }
+    }
+    window.addEventListener('online', () => {
+      updateOnlineStatusUI();
+      showToast('İnternet bağlantısı yeniden kuruldu.');
+      loadData();
+    });
+    window.addEventListener('offline', () => {
+      updateOnlineStatusUI();
+      showToast('Çevrimdışı mod aktif. Önbellekteki rehber kullanılıyor.', true);
+    });
 
     function getRoleBadge(role) {
       const r = (role || '').toLowerCase();
       if (r.includes('kaptan') || r.includes('süvari')) return 'badge-kaptan';
       if (r.includes('gemici') || r.includes('çarkçı') || r.includes('reis')) return 'badge-gemici';
-      if (r.includes('aşçı') || r.includes('asci') || r.includes('kamara')) return 'badge-asci';
+      if (r.includes('aşçı') || r.includes('asci') || r.includes('kamara') || r.includes('hostes')) return 'badge-asci';
       return 'badge-diger';
     }
 
@@ -531,6 +571,91 @@
       if (cleaned.startsWith('0')) cleaned = '90' + cleaned.substring(1);
       if (!cleaned.startsWith('90') && cleaned.length === 10) cleaned = '90' + cleaned;
       return cleaned;
+    }
+
+    function formatDateTr(dateStr) {
+      if (!dateStr) return 'Belirtilmedi';
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return dateStr;
+      return d.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+
+    // Check if record is older than 6 months (180 days)
+    function isStaleRecord(boat) {
+      if (!boat) return false;
+      const refDateStr = boat.form_date || boat.updated_at || boat.created_at;
+      if (!refDateStr) return false;
+      const refDate = new Date(refDateStr);
+      if (isNaN(refDate.getTime())) return false;
+      const diffMs = Date.now() - refDate.getTime();
+      const sixMonthsMs = 180 * 24 * 60 * 60 * 1000;
+      return diffMs > sixMonthsMs;
+    }
+
+    // One-tap vCard generator (works both online & offline)
+    function triggerVCardDownload(vcfContent, filename) {
+      const blob = new Blob([vcfContent], { type: 'text/vcard;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 300);
+    }
+
+    function downloadPersonVCard(name, surname, role, phone, boatName) {
+      const fullName = `${name || ''} ${surname || ''}`.trim() || 'Mürettebat';
+      const cleanRole = role || 'Mürettebat';
+      const cleanBoat = boatName || 'Tekne';
+      const vcf = [
+        'BEGIN:VCARD',
+        'VERSION:3.0',
+        `FN:${fullName} (${cleanBoat})`,
+        `N:${surname || ''};${name || ''};;;`,
+        `ORG:${cleanBoat} Teknesi`,
+        `TITLE:${cleanRole}`,
+        `TEL;TYPE=CELL,VOICE:${phone || ''}`,
+        `NOTE:${cleanBoat} Teknesi - Görev: ${cleanRole}`,
+        'END:VCARD'
+      ].join('\r\n');
+      const safeFilename = `${fullName}_${cleanBoat}`.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ_-]/g, '_');
+      triggerVCardDownload(vcf, `${safeFilename}.vcf`);
+      showToast(`"${fullName}" rehber dosyası indirildi.`);
+    }
+
+    function downloadBoatVCard(boatId) {
+      const boat = allBoats.find(b => b.id === boatId);
+      if (!boat || !boat.crew || boat.crew.length === 0) {
+        window.location.href = `/api/export-vcard/${boatId}`;
+        return;
+      }
+      let vcf = '';
+      boat.crew.forEach(member => {
+        const fullName = `${member.name || ''} ${member.surname || ''}`.trim();
+        vcf += [
+          'BEGIN:VCARD',
+          'VERSION:3.0',
+          `FN:${fullName} (${boat.name})`,
+          `N:${member.surname || ''};${member.name || ''};;;`,
+          `ORG:${boat.name} Teknesi`,
+          `TITLE:${member.role || 'Mürettebat'}`,
+          `TEL;TYPE=CELL,VOICE:${member.phone || ''}`,
+          `NOTE:${boat.name} Teknesi - Görev: ${member.role || ''}`,
+          'END:VCARD',
+          ''
+        ].join('\r\n');
+      });
+      const safeBoat = (boat.name || 'tekne').replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ_-]/g, '_');
+      triggerVCardDownload(vcf, `${safeBoat}_murettebat.vcf`);
+      showToast(`"${boat.name}" tüm mürettebat rehber dosyası indirildi.`);
+    }
+
+    function escapeJsStr(str) {
+      return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
     }
 
     function showToast(msg, isError = false) {
@@ -546,24 +671,48 @@
     }
 
     async function loadData() {
+      updateOnlineStatusUI();
       try {
         const [boatsRes, contactsRes] = await Promise.all([
           fetch('/api/boats'),
           fetch('/api/contacts')
         ]);
+        if (!boatsRes.ok || !contactsRes.ok) throw new Error('Sunucu yanıt vermedi');
         allBoats = await boatsRes.json();
         allContacts = await contactsRes.json();
 
-        document.getElementById('stat-boat-count').innerText = allBoats.length;
-        document.getElementById('stat-contact-count').innerText = allContacts.length;
-
-        renderBoats(allBoats);
-        renderContacts(allContacts);
-        renderGallery(allBoats);
+        // Save to localStorage for offline marina usage
+        try {
+          localStorage.setItem('marina_boats_cache', JSON.stringify(allBoats));
+          localStorage.setItem('marina_contacts_cache', JSON.stringify(allContacts));
+          localStorage.setItem('marina_cache_time', new Date().toISOString());
+        } catch (storageErr) {
+          console.warn('Önbellek yazılamadı:', storageErr);
+        }
       } catch (err) {
-        console.error('Veri yükleme hatası:', err);
-        showToast('Veriler yüklenirken hata oluştu', true);
+        console.warn('Çevrimdışı önbellekten yükleniyor:', err);
+        try {
+          const cachedBoats = localStorage.getItem('marina_boats_cache');
+          const cachedContacts = localStorage.getItem('marina_contacts_cache');
+          if (cachedBoats && cachedContacts) {
+            allBoats = JSON.parse(cachedBoats);
+            allContacts = JSON.parse(cachedContacts);
+            document.getElementById('offline-badge')?.classList.remove('hidden');
+            showToast('Çevrimdışı mod: Önbellekteki rehber gösteriliyor');
+          } else {
+            showToast('Veriler yüklenirken hata oluştu', true);
+          }
+        } catch (cacheErr) {
+          showToast('Veriler yüklenirken hata oluştu', true);
+        }
       }
+
+      document.getElementById('stat-boat-count').innerText = allBoats.length;
+      document.getElementById('stat-contact-count').innerText = allContacts.length;
+
+      renderBoats(allBoats);
+      renderContacts(allContacts);
+      renderGallery(allBoats);
     }
 
     function switchTab(tab) {
@@ -606,7 +755,7 @@
       renderContacts(filteredContacts);
     }
 
-    // Render Boats View (with full mobile-first responsive layout)
+    // Render Boats View (with Form Date, Last Updated, Stale Badge & 1-Tap vCard)
     function renderBoats(boats) {
       const container = document.getElementById('boats-list');
       const emptyEl = document.getElementById('boats-empty');
@@ -622,9 +771,12 @@
         const captainFull = `${b.captain_name || ''} ${b.captain_surname || ''}`.trim() || 'Belirtilmedi';
         const crewCount = b.crew ? b.crew.length : 0;
         const hasImage = !!b.image_url;
+        const stale = isStaleRecord(b);
+        const formDateFormatted = b.form_date ? formatDateTr(b.form_date) : null;
+        const updatedFormatted = formatDateTr(b.updated_at || b.created_at);
 
         return `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition">
+          <div class="bg-white rounded-2xl shadow-sm border ${stale ? 'border-amber-300' : 'border-slate-200'} overflow-hidden hover:shadow-md transition">
             
             <!-- Card Header -->
             <div class="bg-gradient-to-r from-slate-900 to-marine-950 text-white p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -636,15 +788,24 @@
                   <div class="flex items-center gap-1.5 flex-wrap">
                     <h3 class="text-base sm:text-lg font-extrabold text-white tracking-tight truncate">${b.name}</h3>
                     <span class="text-[10px] bg-sky-500/30 text-sky-200 px-2 py-0.5 rounded-full border border-sky-400/20 font-semibold shrink-0">${crewCount} Kişi</span>
+                    ${stale ? `
+                      <span class="text-[10px] bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-400/40 font-bold shrink-0" title="Son güncelleme veya form tarihi 6 aydan eski">
+                        ⚠️ Eski Veri (&gt;6 Ay)
+                      </span>
+                    ` : ''}
                   </div>
-                  <p class="text-xs text-sky-200 mt-0.5 truncate">
-                    <strong>Kaptan:</strong> ${captainFull}
-                  </p>
+                  <div class="flex items-center gap-2 flex-wrap text-xs text-sky-200 mt-0.5">
+                    <span><strong>Kaptan:</strong> ${captainFull}</span>
+                    <span class="text-sky-400/60">•</span>
+                    <span class="text-[11px] text-slate-300">
+                      ${formDateFormatted ? `📋 Form: <strong>${formDateFormatted}</strong> &bull; ` : ''}🕒 Güncelleme: <strong>${updatedFormatted}</strong>
+                    </span>
+                  </div>
                 </div>
               </div>
 
               <!-- Action Buttons -->
-              <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center">
+              <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center flex-wrap">
                 ${hasImage ? `
                   <button onclick="openPhotoModal('${b.id}')" class="inline-flex items-center gap-1 bg-sky-600/90 hover:bg-sky-500 text-white px-2.5 py-1.5 rounded-xl text-xs font-semibold backdrop-blur transition shadow-sm">
                     <span>🖼️</span>
@@ -652,12 +813,12 @@
                   </button>
                 ` : ''}
 
-                <a href="/api/export-vcard/${b.id}" class="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition text-xs flex items-center gap-1" title="Rehbere Aktar (.vcf)">
-                  <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                  <span class="hidden sm:inline">vCard</span>
-                </a>
+                <button onclick="downloadBoatVCard('${b.id}')" class="px-2.5 py-1.5 bg-emerald-700/80 hover:bg-emerald-600 text-white rounded-xl transition text-xs font-semibold flex items-center gap-1 shadow-sm" title="Tüm Tekneyi Telefon Rehberine Ekle (.vcf)">
+                  <span>📇</span>
+                  <span>Rehbere Aktar</span>
+                </button>
 
-                <button onclick="deleteBoat('${b.id}', '${b.name}')" class="p-1.5 text-rose-400 hover:bg-rose-950/40 rounded-xl transition" title="Tekneyi Sil">
+                <button onclick="deleteBoat('${b.id}', '${escapeJsStr(b.name)}')" class="p-1.5 text-rose-400 hover:bg-rose-950/40 rounded-xl transition" title="Tekneyi Sil">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                 </button>
               </div>
@@ -672,7 +833,7 @@
                     <th class="px-4 py-2.5">İsim Soyisim</th>
                     <th class="px-4 py-2.5">Görev</th>
                     <th class="px-4 py-2.5">Telefon</th>
-                    <th class="px-4 py-2.5 text-right">İletişim</th>
+                    <th class="px-4 py-2.5 text-right">İletişim & Rehber</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -692,6 +853,9 @@
                           <div class="inline-flex items-center gap-1.5">
                             <a href="tel:${cleanTel}" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition">Ara</a>
                             <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg text-xs transition">WhatsApp</a>
+                            <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(b.name)}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition border border-slate-200" title="Kişiyi Telefon Rehberine Ekle">
+                              📇 Rehbere Ekle
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -706,7 +870,7 @@
               ${(b.crew || []).map((m) => {
                 const cleanTel = sanitizePhone(m.phone);
                 return `
-                  <div class="p-3 flex items-center justify-between gap-2.5">
+                  <div class="p-3 flex items-center justify-between gap-2">
                     <div class="min-w-0 flex-1">
                       <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="font-bold text-slate-900 text-xs truncate">${m.name} ${m.surname}</span>
@@ -716,9 +880,12 @@
                         ${m.phone}
                       </div>
                     </div>
-                    <div class="flex items-center gap-1.5 shrink-0">
-                      <a href="tel:${cleanTel}" class="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">Ara</a>
-                      <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">WA</a>
+                    <div class="flex items-center gap-1 shrink-0">
+                      <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">Ara</a>
+                      <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2 py-1 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">WA</a>
+                      <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(b.name)}')" class="px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs shadow-xs active:scale-95" title="Rehbere Ekle">
+                        📇
+                      </button>
                     </div>
                   </div>
                 `;
@@ -745,10 +912,15 @@
       // Desktop table
       tbody.innerHTML = contacts.map(c => {
         const cleanTel = sanitizePhone(c.phone);
+        const boatObj = allBoats.find(b => b.id === c.boat_id);
+        const stale = isStaleRecord(boatObj);
         return `
           <tr class="hover:bg-slate-50 transition">
             <td class="px-5 py-3 font-bold text-slate-900">${c.name} ${c.surname}</td>
-            <td class="px-5 py-3 font-semibold text-marine-800">⛵ ${c.boat_name}</td>
+            <td class="px-5 py-3 font-semibold text-marine-800">
+              <span>⛵ ${c.boat_name}</span>
+              ${stale ? `<span class="ml-1 text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-bold" title="6 aydan eski veri">⚠️ Eski Veri</span>` : ''}
+            </td>
             <td class="px-5 py-3">
               <span class="inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${getRoleBadge(c.role)}">
                 ${c.role}
@@ -759,6 +931,9 @@
               <div class="inline-flex items-center gap-1.5">
                 <a href="tel:${cleanTel}" class="px-2.5 py-1 bg-emerald-600 text-white font-semibold rounded-lg text-xs hover:bg-emerald-700">Ara</a>
                 <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1 bg-green-500 text-white font-semibold rounded-lg text-xs hover:bg-green-600">WhatsApp</a>
+                <button type="button" onclick="downloadPersonVCard('${escapeJsStr(c.name)}', '${escapeJsStr(c.surname)}', '${escapeJsStr(c.role)}', '${escapeJsStr(c.phone)}', '${escapeJsStr(c.boat_name)}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs border border-slate-200">
+                  📇 Rehbere Ekle
+                </button>
               </div>
             </td>
           </tr>
@@ -768,21 +943,27 @@
       // Mobile list
       mobileList.innerHTML = contacts.map(c => {
         const cleanTel = sanitizePhone(c.phone);
+        const boatObj = allBoats.find(b => b.id === c.boat_id);
+        const stale = isStaleRecord(boatObj);
         return `
           <div class="p-3 flex items-center justify-between gap-2">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 flex-wrap">
                 <span class="font-bold text-slate-900 text-xs truncate">${c.name} ${c.surname}</span>
                 <span class="text-[10px] font-semibold text-sky-800 bg-sky-100 px-1.5 py-0.5 rounded">⛵ ${c.boat_name}</span>
+                ${stale ? `<span class="text-[10px] bg-amber-100 text-amber-800 px-1 py-0.2 rounded font-bold">⚠️ Eski</span>` : ''}
               </div>
               <div class="flex items-center gap-2 mt-1">
                 <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-semibold ${getRoleBadge(c.role)}">${c.role}</span>
                 <span class="font-mono text-slate-600 text-xs">${c.phone}</span>
               </div>
             </div>
-            <div class="flex items-center gap-1.5 shrink-0">
-              <a href="tel:${cleanTel}" class="px-2.5 py-1 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm">Ara</a>
-              <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm">WA</a>
+            <div class="flex items-center gap-1 shrink-0">
+              <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm">Ara</a>
+              <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2 py-1 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm">WA</a>
+              <button type="button" onclick="downloadPersonVCard('${escapeJsStr(c.name)}', '${escapeJsStr(c.surname)}', '${escapeJsStr(c.role)}', '${escapeJsStr(c.phone)}', '${escapeJsStr(c.boat_name)}')" class="px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs">
+                📇
+              </button>
             </div>
           </div>
         `;
@@ -800,17 +981,19 @@
       }
 
       grid.innerHTML = boatsWithImages.map(b => {
+        const stale = isStaleRecord(b);
         return `
-          <div onclick="openPhotoModal('${b.id}')" class="bg-white rounded-xl overflow-hidden border border-slate-200 shadow-sm hover:shadow-md transition cursor-pointer group">
+          <div onclick="openPhotoModal('${b.id}')" class="bg-white rounded-xl overflow-hidden border ${stale ? 'border-amber-300' : 'border-slate-200'} shadow-sm hover:shadow-md transition cursor-pointer group">
             <div class="h-32 sm:h-44 bg-slate-900 overflow-hidden relative">
               <img src="${b.image_url}" alt="${b.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end p-2 sm:p-3">
+              <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex items-end justify-between p-2 sm:p-3">
                 <span class="text-white font-extrabold text-xs sm:text-sm tracking-tight drop-shadow truncate">⛵ ${b.name}</span>
+                ${stale ? `<span class="text-[9px] bg-amber-500 text-slate-950 font-bold px-1.5 py-0.5 rounded">Eski Veri</span>` : ''}
               </div>
             </div>
             <div class="p-2 sm:p-2.5 text-[11px] text-slate-600">
               <p class="truncate"><strong>Kaptan:</strong> ${b.captain_name || ''} ${b.captain_surname || ''}</p>
-              <p class="text-slate-400 mt-0.5">${(b.crew || []).length} Mürettebat</p>
+              <p class="text-slate-400 mt-0.5">${(b.crew || []).length} Mürettebat &bull; ${formatDateTr(b.form_date || b.updated_at || b.created_at)}</p>
             </div>
           </div>
         `;
@@ -826,7 +1009,13 @@
       document.getElementById('modal-photo-download').href = boat.image_url;
       document.getElementById('modal-boat-name').innerText = boat.name;
       document.getElementById('modal-captain-name').innerText = `${boat.captain_name || ''} ${boat.captain_surname || ''}`;
-      document.getElementById('modal-date').innerText = new Date(boat.created_at).toLocaleDateString('tr-TR');
+      document.getElementById('modal-form-date').innerText = boat.form_date ? formatDateTr(boat.form_date) : 'Belirtilmedi';
+      document.getElementById('modal-date').innerText = formatDateTr(boat.updated_at || boat.created_at) + (isStaleRecord(boat) ? ' (⚠️ >6 Ay Eski)' : '');
+
+      const vcardBtn = document.getElementById('modal-vcard-boat-btn');
+      if (vcardBtn) {
+        vcardBtn.onclick = () => downloadBoatVCard(boat.id);
+      }
 
       const crewContainer = document.getElementById('modal-crew-list');
       crewContainer.innerHTML = (boat.crew || []).map(m => {
@@ -838,7 +1027,10 @@
               <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-semibold ${getRoleBadge(m.role)}">${m.role}</span>
               <span class="font-mono text-slate-600 text-[11px] ml-1">${m.phone}</span>
             </div>
-            <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold shrink-0">Ara</a>
+            <div class="flex items-center gap-1 shrink-0">
+              <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold">Ara</a>
+              <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(boat.name)}')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-[10px] font-bold" title="Rehbere Ekle">📇</button>
+            </div>
           </div>
         `;
       }).join('');
@@ -879,6 +1071,7 @@
       document.getElementById('upload-step-loading').classList.add('hidden');
       document.getElementById('upload-step-verify').classList.add('hidden');
       document.getElementById('ai-success-banner').classList.add('hidden');
+      document.getElementById('similar-boat-warning').classList.add('hidden');
       document.getElementById('file-input-camera').value = '';
       document.getElementById('file-input-gallery').value = '';
       if (cropperInstance) {
@@ -888,19 +1081,25 @@
       currentUploadedImageUrl = '';
       rawSelectedBase64 = '';
       base90Angle = 0;
+      matchedSimilarBoatId = null;
     }
 
-    // Live WebRTC camera for Android / Web browsers
+    // Live WebRTC camera for Android & iOS
     async function startLiveCamera() {
       document.getElementById('upload-step-pick').classList.add('hidden');
       document.getElementById('upload-step-live-camera').classList.remove('hidden');
+
+      if (liveMediaStream) {
+        liveMediaStream.getTracks().forEach(track => track.stop());
+        liveMediaStream = null;
+      }
 
       const video = document.getElementById('live-video-stream');
 
       try {
         const constraints = {
           video: {
-            facingMode: { ideal: 'environment' },
+            facingMode: { ideal: currentCameraFacing },
             width: { ideal: 1920 },
             height: { ideal: 1080 }
           },
@@ -910,17 +1109,23 @@
         video.srcObject = liveMediaStream;
         await video.play();
       } catch (err) {
-        console.warn('Rear camera error, falling back to any camera:', err);
+        console.warn('Primary camera constraint error, falling back to default video:', err);
         try {
           liveMediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
           video.srcObject = liveMediaStream;
           await video.play();
         } catch (fallbackErr) {
           console.error('Camera access failed:', fallbackErr);
-          alert('Kamera açılamadı. Lütfen tarayıcı ayarlarından kamera iznini kontrol edin veya normal "Kameradan Çek" seçeneğini kullanın.');
+          alert('Kamera doğrudan açılamadı. Cihazınızın standart kamera uygulaması açılıyor...');
           stopLiveCamera();
+          document.getElementById('file-input-camera')?.click();
         }
       }
+    }
+
+    function toggleCameraFacing() {
+      currentCameraFacing = currentCameraFacing === 'environment' ? 'user' : 'environment';
+      startLiveCamera();
     }
 
     function stopLiveCamera() {
@@ -994,7 +1199,6 @@
         };
         img.onerror = () => {
           URL.revokeObjectURL(objectUrl);
-          // Fallback to FileReader if objectURL failed
           const reader = new FileReader();
           reader.onload = (e) => resolve(e.target.result);
           reader.onerror = reject;
@@ -1008,7 +1212,26 @@
       const file = event.target.files?.[0];
       if (!file) return;
 
-      showToast('Görsel yükleniyor...');
+      // Client-side file type & size check
+      const allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
+      if (file.type && !allowedMime.includes(file.type.toLowerCase()) && !file.type.startsWith('image/')) {
+        showToast('Sadece fotoğraf dosyaları (JPG, PNG, WEBP) yüklenebilir.', true);
+        event.target.value = '';
+        return;
+      }
+      if (file.size > 20 * 1024 * 1024) {
+        showToast('Dosya boyutu çok büyük (Maksimum 20 MB seçilebilir).', true);
+        event.target.value = '';
+        return;
+      }
+
+      if (liveMediaStream) {
+        liveMediaStream.getTracks().forEach(track => track.stop());
+        liveMediaStream = null;
+      }
+      document.getElementById('upload-step-live-camera').classList.add('hidden');
+
+      showToast('Görsel hazırlanıyor...');
 
       try {
         const resizedBase64 = await readFileAndDownscale(file, 2200);
@@ -1131,8 +1354,13 @@
         });
         const result = await res.json();
 
+        if (!res.ok) {
+          throw new Error(result.error || 'Yükleme reddedildi');
+        }
+
         currentUploadedImageUrl = result.imageUrl;
         document.getElementById('verify-preview-img').src = result.imageUrl;
+        const todayIso = new Date().toISOString().slice(0, 10);
 
         if (result.data) {
           document.getElementById('ai-success-banner').classList.remove('hidden');
@@ -1140,11 +1368,13 @@
 
           document.getElementById('verify-boat-name').value = result.data.boat_name || '';
           document.getElementById('verify-captain-name').value = `${result.data.captain_name || ''} ${result.data.captain_surname || ''}`.trim();
+          document.getElementById('verify-form-date').value = result.data.form_date || todayIso;
           renderVerifyCrewCards(result.data.crew || []);
           showToast('Form başarıyla tarandı!');
         } else {
           document.getElementById('verify-boat-name').value = '';
           document.getElementById('verify-captain-name').value = '';
+          document.getElementById('verify-form-date').value = todayIso;
           renderVerifyCrewCards([
             { name: '', surname: '', role: 'Kaptan', phone: '05' },
             { name: '', surname: '', role: 'Gemici', phone: '05' }
@@ -1154,9 +1384,10 @@
 
         document.getElementById('upload-step-loading').classList.add('hidden');
         document.getElementById('upload-step-verify').classList.remove('hidden');
+        checkSimilarBoatWarning();
       } catch (err) {
         console.error(err);
-        showToast('Fotoğraf işlenirken hata oluştu: ' + (err.message || 'Bilinmeyen hata'), true);
+        showToast(err.message || 'Fotoğraf işlenirken hata oluştu', true);
         resetUploadModal();
       }
     }
@@ -1177,7 +1408,7 @@
       const div = document.createElement('div');
       div.className = 'crew-item bg-slate-50 border border-slate-200 rounded-xl p-2.5 space-y-2 relative shadow-xs';
       div.innerHTML = `
-        <button type="button" onclick="this.closest('.crew-item').remove()" class="absolute top-1.5 right-2 text-rose-500 hover:text-rose-700 font-bold p-1 text-sm" title="Sil">✕</button>
+        <button type="button" onclick="this.closest('.crew-item').remove(); checkSimilarBoatWarning();" class="absolute top-1.5 right-2 text-rose-500 hover:text-rose-700 font-bold p-1 text-sm" title="Sil">✕</button>
         <div class="grid grid-cols-2 gap-2 pr-7">
           <div>
             <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">İsim</label>
@@ -1195,27 +1426,88 @@
           </div>
           <div>
             <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Telefon</label>
-            <input type="text" class="crew-phone w-full border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-medium focus:ring-1 focus:ring-sky-500" value="${data.phone || ''}" placeholder="05XX XXX XX XX">
+            <input type="text" oninput="checkSimilarBoatWarning()" class="crew-phone w-full border border-slate-300 rounded-lg p-1.5 text-xs font-mono font-medium focus:ring-1 focus:ring-sky-500" value="${data.phone || ''}" placeholder="05XX XXX XX XX">
           </div>
         </div>
       `;
       container.appendChild(div);
     }
 
-    async function saveVerifiedBoat() {
+    // Client-side similarity checker ("Benzer kayıt var" uyarısı)
+    function normalizeKeyClient(str) {
+      if (!str) return '';
+      return str
+        .toLocaleLowerCase('tr-TR')
+        .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+        .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+        .replace(/[^a-z0-9]/g, '');
+    }
+
+    function normalizePhoneDigitsClient(phone) {
+      const digits = String(phone || '').replace(/[^0-9]/g, '');
+      if (digits.length >= 10) return digits.slice(-10);
+      return '';
+    }
+
+    function findSimilarBoat(boatName, crewPhones) {
+      const targetKey = normalizeKeyClient(boatName);
+      for (const existing of allBoats) {
+        const existingKey = normalizeKeyClient(existing.name);
+        if (targetKey && existingKey && (targetKey === existingKey || (targetKey.length >= 4 && existingKey.includes(targetKey)) || (existingKey.length >= 4 && targetKey.includes(existingKey)))) {
+          return {
+            boat: existing,
+            reason: `"${existing.name}" isimli tekne rehberde zaten kayıtlı (${(existing.crew || []).length} personel)`
+          };
+        }
+        // Also check matching crew phone numbers
+        if (crewPhones && crewPhones.length > 0) {
+          for (const member of (existing.crew || [])) {
+            const mPhone = normalizePhoneDigitsClient(member.phone);
+            if (mPhone && crewPhones.includes(mPhone)) {
+              return {
+                boat: existing,
+                reason: `${member.name} ${member.surname} (${member.phone}) numarası "${existing.name}" teknesinde kayıtlı`
+              };
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    function checkSimilarBoatWarning() {
+      const boatName = document.getElementById('verify-boat-name')?.value?.trim() || '';
+      const phoneInputs = document.querySelectorAll('.crew-phone');
+      const crewPhones = [];
+      phoneInputs.forEach(inp => {
+        const p = normalizePhoneDigitsClient(inp.value);
+        if (p) crewPhones.push(p);
+      });
+
+      const match = findSimilarBoat(boatName, crewPhones);
+      const banner = document.getElementById('similar-boat-warning');
+      const textEl = document.getElementById('similar-boat-text');
+
+      if (match) {
+        matchedSimilarBoatId = match.boat.id;
+        textEl.innerText = `${match.reason}. Tekrarlı kayıt oluşmaması için mevcut tekne kaydıyla birleştirebilirsiniz.`;
+        banner.classList.remove('hidden');
+      } else {
+        matchedSimilarBoatId = null;
+        banner.classList.add('hidden');
+      }
+    }
+
+    async function saveVerifiedBoat(mergeWithExisting = false, forceNew = false) {
       const boatName = document.getElementById('verify-boat-name').value.trim();
       if (!boatName) {
         alert('Lütfen tekne adını girin.');
         return;
       }
 
-      const captainRaw = document.getElementById('verify-captain-name').value.trim();
-      const parts = captainRaw.split(' ');
-      const captainSurname = parts.length > 1 ? parts.pop() : '';
-      const captainName = parts.join(' ') || captainRaw;
-
       const crewItems = document.querySelectorAll('.crew-item');
       const crew = [];
+      const crewPhones = [];
       crewItems.forEach(row => {
         const name = row.querySelector('.crew-name').value.trim();
         const surname = row.querySelector('.crew-surname').value.trim();
@@ -1223,16 +1515,42 @@
         const phone = row.querySelector('.crew-phone').value.trim();
         if (name || surname || phone) {
           crew.push({ name, surname, role, phone });
+          const pKey = normalizePhoneDigitsClient(phone);
+          if (pKey) crewPhones.push(pKey);
         }
       });
+
+      // Check for similar record before saving if user clicked standard "Sisteme Kaydet"
+      const match = findSimilarBoat(boatName, crewPhones);
+      if (match && !mergeWithExisting && !forceNew) {
+        matchedSimilarBoatId = match.boat.id;
+        checkSimilarBoatWarning();
+        const wantMerge = confirm(
+          `⚠️ BENZER KAYIT UYARISI:\n${match.reason}.\n\nMevcut "${match.boat.name}" kaydıyla birleştirip güncellemek için TAMAM'a basın.\n(İptal'e basarsanız üstteki sarı kutudan seçim yapabilirsiniz.)`
+        );
+        if (wantMerge) {
+          mergeWithExisting = true;
+        } else {
+          document.getElementById('similar-boat-warning')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          return;
+        }
+      }
+
+      const captainRaw = document.getElementById('verify-captain-name').value.trim();
+      const parts = captainRaw.split(' ');
+      const captainSurname = parts.length > 1 ? parts.pop() : '';
+      const captainName = parts.join(' ') || captainRaw;
+      const formDate = document.getElementById('verify-form-date').value || new Date().toISOString().slice(0, 10);
 
       const payload = {
         name: boatName,
         captain_name: captainName,
         captain_surname: captainSurname,
         captain_title: 'KAPTAN',
+        form_date: formDate,
         image_url: currentUploadedImageUrl,
-        crew: crew
+        crew: crew,
+        mergeWithBoatId: (mergeWithExisting && matchedSimilarBoatId) ? matchedSimilarBoatId : null
       };
 
       try {
@@ -1241,12 +1559,13 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+        const result = await res.json();
         if (res.ok) {
           closeUploadModal();
-          showToast(`"${boatName}" başarıyla kaydedildi!`);
+          showToast(result.merged ? `"${result.boat.name}" mevcut kayıtla birleştirildi ve güncellendi!` : `"${result.boat.name}" başarıyla kaydedildi!`);
           loadData();
         } else {
-          showToast('Kayıt başarısız oldu.', true);
+          showToast(result.error || 'Kayıt başarısız oldu.', true);
         }
       } catch (e) {
         showToast('Sunucu hatası', true);
@@ -1268,43 +1587,6 @@
       }
     }
 
-    async function openSettingsModal() {
-      try {
-        const res = await fetch('/api/settings');
-        const data = await res.json();
-        const statusEl = document.getElementById('settings-key-status');
-        if (data.hasGeminiApiKey) {
-          statusEl.innerText = `Mevcut Anahtar: ${data.maskedKey || 'Tanımlı (Aktif)'}`;
-        } else {
-          statusEl.innerText = 'Henüz API anahtarı girilmedi.';
-        }
-      } catch (e) {}
-      document.getElementById('settings-modal').classList.remove('hidden');
-    }
-
-    function closeSettingsModal() {
-      document.getElementById('settings-modal').classList.add('hidden');
-    }
-
-    async function saveSettings() {
-      const key = document.getElementById('settings-gemini-key').value.trim();
-      if (!key) {
-        closeSettingsModal();
-        return;
-      }
-      try {
-        await fetch('/api/settings', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ gemini_api_key: key })
-        });
-        showToast('API Anahtarı kaydedildi.');
-        closeSettingsModal();
-      } catch (e) {
-        showToast('Ayarlar kaydedilemedi.', true);
-      }
-    }
-
     function viewPhotoInNewTab(url) {
       window.open(url, '_blank');
     }
@@ -1314,3 +1596,4 @@
 
 </body>
 </html>
+
