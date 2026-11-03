@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "acc0f248-b367-4ca5-8b7e-488c61098aa7",
+      "name": "M - TECH (M/Y)",
+      "captain_title": "KAPTAN",
+      "captain_name": "RECEP TAYYİP",
+      "captain_surname": "YALÇINTEPE",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701895573_394509ff.jpg",
+      "created_at": "2026-11-03T10:32:01.413Z",
+      "crew": [
+        {
+          "id": "ee91ce46-4f40-4e15-857f-1de8ae0d1cde",
+          "name": "RECEP TAYYİP",
+          "surname": "YALÇINTEPE",
+          "role": "KAPTAN",
+          "phone": "0542 815 54 47",
+          "sort_order": 1
+        },
+        {
+          "id": "4a4db145-98ba-4700-a24b-92395b946d44",
+          "name": "KAMİL",
+          "surname": "SEZGÜN",
+          "role": "KAPTAN",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "e7041bc8-5ac9-455f-b0e0-841c46fc5e84",
+          "name": "HÜSEYİN CAN",
+          "surname": "DÖNMEZ",
+          "role": "GEMİCİ",
+          "phone": "0533 498 02 11",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "59a07359-a247-4c0a-9dfb-2d3acffa755a",
       "name": "SILENCE III",
       "captain_title": "KAPTAN",
