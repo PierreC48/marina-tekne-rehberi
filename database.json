@@ -1,6 +1,26 @@
 {
   "boats": [
     {
+      "id": "a36b17d2-dec7-4b0d-a36e-37a69d3a2707",
+      "name": "MERVE CEYLAN (MG)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702551599_36d6101d.jpg",
+      "created_at": "2026-11-03T10:42:45.462Z",
+      "crew": [
+        {
+          "id": "a7fdb0c1-a236-4c7c-a99a-bf6e14c86885",
+          "name": "Teoman",
+          "surname": "Derin",
+          "role": "Kaptan",
+          "phone": "0532 201 58 41",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "61b74a3c-abb7-42d5-b173-591257313fbf",
       "name": "TURMEPA-3 (Atık Teknesi)",
       "captain_title": "KAPTAN",
