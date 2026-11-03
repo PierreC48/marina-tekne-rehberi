@@ -1,6 +1,34 @@
 {
   "boats": [
     {
+      "id": "4d4b00c1-4011-45d2-973b-5b3ef7f41849",
+      "name": "Dolphin  (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701319068_0b513e07.jpg",
+      "created_at": "2026-11-03T10:23:05.614Z",
+      "crew": [
+        {
+          "id": "7da32f41-5174-4c07-a176-ed2fd7e3e8d1",
+          "name": "Victor",
+          "surname": "",
+          "role": "Kaptan",
+          "phone": "",
+          "sort_order": 1
+        },
+        {
+          "id": "0ff9d7a2-aa13-48a3-a7a6-48a6d15ddd63",
+          "name": "Ekrem",
+          "surname": "GÜLEÇ",
+          "role": "moda Yat tekneyle ilgilenecek kişi",
+          "phone": "0531 289 48 44",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "baab05be-657e-406b-a17d-b1dd5c304323",
       "name": "THİRTY EİGTH (MY)",
       "captain_title": "KAPTAN",
