@@ -1,6 +1,26 @@
 {
   "boats": [
     {
+      "id": "8bd0e073-6b41-4b42-95cf-ffa17c42741f",
+      "name": "Ares (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Muhammed Sad",
+      "captain_surname": "Yalar",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702756202_17fa0f4d.jpg",
+      "created_at": "2026-11-03T10:46:11.275Z",
+      "crew": [
+        {
+          "id": "9204e638-0617-4e8e-9adb-d009f82d53ac",
+          "name": "Süleyman",
+          "surname": "Kılıç",
+          "role": "Kaptan",
+          "phone": "",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "9c495167-80b8-45fb-9dae-c5711a371c52",
       "name": "Swordfish 68 (MY)",
       "captain_title": "KAPTAN",
