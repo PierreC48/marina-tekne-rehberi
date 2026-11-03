@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "6f89ae49-fef5-4637-a0f5-6eb79930e0bc",
+      "name": "OCEAN'S FIVE",
+      "captain_title": "KAPTAN",
+      "captain_name": "İKNUR",
+      "captain_surname": "ADAR",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702593350_3cff283d.jpg",
+      "created_at": "2026-11-03T10:43:28.746Z",
+      "crew": [
+        {
+          "id": "e7cf8793-204d-4d42-bfee-7f4ee7fd5a80",
+          "name": "Maksut",
+          "surname": "URAL KADIOĞLU",
+          "role": "Gemici",
+          "phone": "0544 651 5049",
+          "sort_order": 1
+        },
+        {
+          "id": "4895bdf5-2b7a-4efd-814f-bb3001a55299",
+          "name": "BÜŞRA",
+          "surname": "ÇELİK",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "6ffe2afc-f472-4bd6-85dc-eb175b6f9e56",
+          "name": "OĞUZHAN",
+          "surname": "ÇELİK",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "6a1b0728-9c8e-4f7e-b5fa-34b97b885498",
       "name": "SWING (my)",
       "captain_title": "KAPTAN",
