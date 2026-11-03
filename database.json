@@ -37,34 +37,6 @@
       ]
     },
     {
-      "id": "cda91d95-b248-4f5e-851b-852aa45c1338",
-      "name": "Thirty eight",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "",
-      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793691728733_e96031a3.jpg",
-      "created_at": "2026-11-03T07:43:07.393Z",
-      "crew": [
-        {
-          "id": "f27c14a4-de6b-4ba5-b533-bcffd97feb12",
-          "name": "",
-          "surname": "",
-          "role": "Kaptan",
-          "phone": "05",
-          "sort_order": 1
-        },
-        {
-          "id": "7ec83055-27e9-40a0-a7ef-41f9e650fef1",
-          "name": "",
-          "surname": "",
-          "role": "Gemici",
-          "phone": "05",
-          "sort_order": 2
-        }
-      ]
-    },
-    {
       "id": "ce4f71d7-49ae-4da3-b08e-5537d39fd945",
       "name": "EYLÜL (MD)",
       "captain_title": "KAPTAN",
