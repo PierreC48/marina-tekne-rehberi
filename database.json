@@ -1,6 +1,26 @@
 {
   "boats": [
     {
+      "id": "ba4fcaba-976f-400c-99e8-1f79ce703575",
+      "name": "ANTONİNA (MY)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Emre",
+      "captain_surname": "TÜRKMEN",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701949480_4ff3dd6d.jpg",
+      "created_at": "2026-11-03T10:32:44.776Z",
+      "crew": [
+        {
+          "id": "fa3927ac-748f-403a-b83b-bafb8adf4a7a",
+          "name": "Yunus Emre",
+          "surname": "DENİZ",
+          "role": "Gemici",
+          "phone": "0534 395 76 86",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "ef2bd001-beb4-49b1-90f1-d4abf022ea34",
       "name": "MADCAT (MB)",
       "captain_title": "KAPTAN",
