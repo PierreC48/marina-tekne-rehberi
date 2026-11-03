@@ -1,6 +1,26 @@
 {
   "boats": [
     {
+      "id": "346286c9-b564-4bc8-80c2-edbed155aeb3",
+      "name": "Angel II (y)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Coşkun",
+      "captain_surname": "Kaplan",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701734571_7fae5075.jpg",
+      "created_at": "2026-11-03T10:29:27.025Z",
+      "crew": [
+        {
+          "id": "546d0923-50f8-465f-8210-6a52c95edb5f",
+          "name": "Coşkun",
+          "surname": "Kaplan",
+          "role": "Kaptan",
+          "phone": "05335037488",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "bff3f6cb-1243-4b36-ba0b-c6679114a3d8",
       "name": "MADCAT (MB)",
       "captain_title": "KAPTAN",
