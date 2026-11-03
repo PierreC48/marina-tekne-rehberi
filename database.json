@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "5dccbdd8-2e18-4590-9ec4-8b40cc6b94ca",
+      "name": "EYLÜL (MD)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ali Rıza",
+      "captain_surname": "Fidenağaç",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702727280_7e1772c4.jpg",
+      "created_at": "2026-11-03T10:45:40.137Z",
+      "crew": [
+        {
+          "id": "4d1373fb-81a6-4807-865b-fd136c867cb4",
+          "name": "Ali Rıza",
+          "surname": "Fidenağaç",
+          "role": "Kaptan",
+          "phone": "0507 139 86 15",
+          "sort_order": 1
+        },
+        {
+          "id": "fbb695cb-76c4-429f-8330-0f8425f67d60",
+          "name": "İbrahim",
+          "surname": "Ongün",
+          "role": "Gemici",
+          "phone": "0544 423 15 19",
+          "sort_order": 2
+        },
+        {
+          "id": "e0011028-7580-4513-9865-770e38efa195",
+          "name": "Gürkay",
+          "surname": "Işık",
+          "role": "Gemici",
+          "phone": "0537 402 28 39",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "324655a9-7a9e-4d04-bb27-3de7bf8ad81d",
       "name": "Nourth & South",
       "captain_title": "KAPTAN",
