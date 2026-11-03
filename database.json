@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "9c495167-80b8-45fb-9dae-c5711a371c52",
+      "name": "Swordfish 68 (MY)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Mehmet",
+      "captain_surname": "Uzun",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702737332_507af6d8.jpg",
+      "created_at": "2026-11-03T10:45:59.788Z",
+      "crew": [
+        {
+          "id": "974ef3be-1a5a-446f-a518-d27cdc8e3b2c",
+          "name": "Mehmet",
+          "surname": "Uzun",
+          "role": "Kaptan",
+          "phone": "0532 777 94 50",
+          "sort_order": 1
+        },
+        {
+          "id": "50f7b78c-0c6d-4326-9cf4-221303ef0874",
+          "name": "Atıca",
+          "surname": "Korkmaz",
+          "role": "Gemici",
+          "phone": "0530 030 38 40",
+          "sort_order": 2
+        },
+        {
+          "id": "71d4ad18-257b-4f83-aa10-0449cf7be7d2",
+          "name": "Cem",
+          "surname": "Aykan",
+          "role": "Gemici",
+          "phone": "0536 752 33 73",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "5dccbdd8-2e18-4590-9ec4-8b40cc6b94ca",
       "name": "EYLÜL (MD)",
       "captain_title": "KAPTAN",
