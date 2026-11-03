@@ -137,34 +137,6 @@
       ]
     },
     {
-      "id": "1e705bed-ba4e-425e-b18a-679b0763d764",
-      "name": "Sılence",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "",
-      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701564523_29bd58e8.jpg",
-      "created_at": "2026-11-03T10:27:14.578Z",
-      "crew": [
-        {
-          "id": "bde3ab54-652b-4ec9-9e20-541cae0e208e",
-          "name": "",
-          "surname": "",
-          "role": "Kaptan",
-          "phone": "05",
-          "sort_order": 1
-        },
-        {
-          "id": "de1d2ff4-325c-4f9e-bf05-5f75d87b0dbf",
-          "name": "",
-          "surname": "",
-          "role": "Gemici",
-          "phone": "05",
-          "sort_order": 2
-        }
-      ]
-    },
-    {
       "id": "935ed00a-3f3c-408c-a3a3-a7f6da923e69",
       "name": "Yaşar 79 (M/Y)",
       "captain_title": "KAPTAN",
