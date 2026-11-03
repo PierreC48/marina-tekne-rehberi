@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "6a1b0728-9c8e-4f7e-b5fa-34b97b885498",
+      "name": "SWING (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Nazmi",
+      "captain_surname": "AYDIN",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702511778_16d540a5.jpg",
+      "created_at": "2026-11-03T10:43:15.980Z",
+      "crew": [
+        {
+          "id": "da9627ad-0cd4-4a6c-b74e-365190510362",
+          "name": "Kerem Onur",
+          "surname": "KARACA",
+          "role": "Gemici",
+          "phone": "541 781 19 92",
+          "sort_order": 1
+        },
+        {
+          "id": "5d460c1a-fd8d-4738-9c33-05bcc7cece28",
+          "name": "Bilal",
+          "surname": "ÖZDEN",
+          "role": "Gemici",
+          "phone": "542 728 38 39",
+          "sort_order": 2
+        },
+        {
+          "id": "59e86e6a-817e-4020-8562-2d6318447d59",
+          "name": "Nazmi",
+          "surname": "Aydın",
+          "role": "Kaptan",
+          "phone": "05326918208",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "a36b17d2-dec7-4b0d-a36e-37a69d3a2707",
       "name": "MERVE CEYLAN (MG)",
       "captain_title": "KAPTAN",
