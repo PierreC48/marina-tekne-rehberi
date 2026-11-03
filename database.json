@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "02c5e34f-b082-41df-8664-05dae790b00a",
+      "name": "Speranza Azzurra",
+      "captain_title": "KAPTAN",
+      "captain_name": "Hasan",
+      "captain_surname": "Cakir",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702620792_d9f5e452.jpg",
+      "created_at": "2026-11-03T10:44:20.040Z",
+      "crew": [
+        {
+          "id": "67b2a610-c5de-4860-8fc9-28f9a3d734ca",
+          "name": "Hasan",
+          "surname": "Cakir",
+          "role": "Kaptan",
+          "phone": "05353424311",
+          "sort_order": 1
+        },
+        {
+          "id": "674e4586-3543-4daf-ad04-e3cc1190bd9c",
+          "name": "Vejdet",
+          "surname": "Karaduman",
+          "role": "Gemici",
+          "phone": "05415820262",
+          "sort_order": 2
+        },
+        {
+          "id": "a16199e5-1c5b-4eb9-8f37-ca8de1f4b6af",
+          "name": "Erkan",
+          "surname": "Erdem",
+          "role": "Gemici",
+          "phone": "05396962865",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "5110c35b-6787-432a-be18-9c5b263c30db",
       "name": "Gof",
       "captain_title": "KAPTAN",
