@@ -1,4 +1,4 @@
-// server.js - Marina Tekne ve Mürettebat Rehberi (100% Taşınabilir & Bağımsız Node.js Sunucusu)
+// server.js - Marina Tekne ve Mürettebat Rehberi (Kalıcı Bulut Depolamalı)
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -9,11 +9,22 @@ const DATA_DIR = path.join(__dirname, 'data');
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
 const DB_FILE = path.join(DATA_DIR, 'rehber.json');
 
-// Ensure directories exist
+// Supabase Configuration (Permanent Storage)
+const SUPABASE_URL = process.env.SUPABASE_URL || 'https://cxepumcfugqnxixznvir.supabase.co';
+const SUPABASE_KEY = process.env.SUPABASE_KEY || 'sb_publishable_80esJnSeEstFkWVztcCgdg_VGXC5yO0';
+const SUPABASE_BUCKET = 'marina-croquis';
+
+// GitHub Sync Configuration (Branch: data-storage)
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
+const GITHUB_REPO = 'PierreC48/marina-tekne-rehberi';
+const GITHUB_BRANCH = 'data-storage';
+const GITHUB_FILE = 'database.json';
+
+// Ensure local directories exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
 if (!fs.existsSync(UPLOADS_DIR)) fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 
-// Initial seed data if rehber.json does not exist
+// Initial seed data
 const initialData = {
   boats: [
     {
@@ -23,7 +34,7 @@ const initialData = {
       captain_name: 'Bekir',
       captain_surname: 'Temiz',
       notes: 'Setur Marinas Mürettebat Bilgi Formu',
-      image_url: '/uploads/ya79_form.jpg',
+      image_url: 'https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/ya79_form.jpg',
       created_at: new Date().toISOString(),
       crew: [
         { id: 'c1', name: 'Bekir', surname: 'Temiz', role: 'Kaptan', phone: '0532 553 51 11' },
@@ -40,7 +51,7 @@ const initialData = {
       captain_name: 'Aytaç',
       captain_surname: 'Akboyun',
       notes: 'Setur Marinas Formu',
-      image_url: '/uploads/form_1793614609974_7ff6bd63.jpg',
+      image_url: 'https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/turmepa_form.jpg',
       created_at: new Date().toISOString(),
       crew: [
         { id: 'c6', name: 'İbrahim Aytaç', surname: 'Akboyun', role: 'Kaptan', phone: '0543 395 50 73' }
@@ -52,8 +63,10 @@ const initialData = {
   }
 };
 
-// Database helper functions (JSON based, 100% portable on all Node versions)
-function readDb() {
+let inMemoryDb = null;
+
+// Read local cache
+function readLocalDb() {
   if (!fs.existsSync(DB_FILE)) {
     fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2), 'utf-8');
     return initialData;
@@ -62,17 +75,126 @@ function readDb() {
     const raw = fs.readFileSync(DB_FILE, 'utf-8');
     return JSON.parse(raw);
   } catch (err) {
-    console.error('Veritabanı okuma hatası, yedek yükleniyor:', err);
     return initialData;
   }
 }
 
-function writeDb(data) {
-  fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
+// Fetch permanent database from GitHub (data-storage branch)
+async function fetchCloudDb() {
+  if (!GITHUB_TOKEN) return null;
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'Marina-App'
+      }
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const content = Buffer.from(data.content, 'base64').toString('utf-8');
+    const parsed = JSON.parse(content);
+    if (parsed && Array.isArray(parsed.boats)) {
+      console.log(`☁️ Buluttan ${parsed.boats.length} tekne kaydı yüklendi.`);
+      return parsed;
+    }
+  } catch (err) {
+    console.error('Bulut veritabanı okuma hatası:', err.message);
+  }
+  return null;
 }
 
-// Initialize DB file
-readDb();
+// Sync in-memory DB to GitHub (data-storage branch)
+let isSyncing = false;
+async function syncToCloud() {
+  if (!GITHUB_TOKEN || isSyncing) return;
+  isSyncing = true;
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_FILE}`;
+    let sha = null;
+    const getRes = await fetch(`${url}?ref=${GITHUB_BRANCH}`, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'Marina-App'
+      }
+    });
+    if (getRes.ok) {
+      const d = await getRes.json();
+      sha = d.sha;
+    }
+
+    const payload = {
+      message: 'Otomatik Veritabanı Güncellemesi (Kalıcı Kayıt)',
+      branch: GITHUB_BRANCH,
+      content: Buffer.from(JSON.stringify(inMemoryDb, null, 2)).toString('base64'),
+      sha: sha || undefined
+    };
+
+    const putRes = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'Marina-App',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (putRes.ok) {
+      console.log('✓ Bulut veritabanı GitHub data-storage dalına kalıcı olarak yazıldı.');
+    }
+  } catch (err) {
+    console.error('Buluta yazma hatası:', err.message);
+  } finally {
+    isSyncing = false;
+  }
+}
+
+// Save locally and trigger cloud sync
+function saveDb() {
+  try {
+    fs.writeFileSync(DB_FILE, JSON.stringify(inMemoryDb, null, 2), 'utf-8');
+  } catch (e) {}
+  syncToCloud();
+}
+
+// Initialize database
+(async () => {
+  inMemoryDb = readLocalDb();
+  const cloudData = await fetchCloudDb();
+  if (cloudData && Array.isArray(cloudData.boats)) {
+    inMemoryDb.boats = cloudData.boats;
+    fs.writeFileSync(DB_FILE, JSON.stringify(inMemoryDb, null, 2), 'utf-8');
+  }
+})();
+
+// Helper: Upload image buffer to Supabase Storage
+async function uploadToSupabaseStorage(filename, buffer, mimeType = 'image/jpeg') {
+  try {
+    const uploadUrl = `${SUPABASE_URL}/storage/v1/object/${SUPABASE_BUCKET}/${encodeURIComponent(filename)}`;
+    const res = await fetch(uploadUrl, {
+      method: 'POST',
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': mimeType,
+        'cache-control': '31536000'
+      },
+      body: buffer
+    });
+
+    if (res.ok) {
+      const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/${SUPABASE_BUCKET}/${encodeURIComponent(filename)}`;
+      console.log('✓ Görsel Supabase CDN kalıcı bulutuna yüklendi:', publicUrl);
+      return publicUrl;
+    } else {
+      console.warn('Supabase storage yükleme yanıtı:', res.status, await res.text());
+    }
+  } catch (err) {
+    console.error('Supabase storage hatası:', err.message);
+  }
+  return null;
+}
 
 // MIME types helper
 const MIME_TYPES = {
@@ -218,19 +340,19 @@ const server = http.createServer(async (req, res) => {
   const pathname = parsedUrl.pathname;
 
   try {
-    const db = readDb();
+    if (!inMemoryDb) inMemoryDb = readLocalDb();
 
     // API: GET /api/boats
     if (req.method === 'GET' && pathname === '/api/boats') {
       res.writeHead(200, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify(db.boats || []));
+      res.end(JSON.stringify(inMemoryDb.boats || []));
       return;
     }
 
     // API: GET /api/contacts
     if (req.method === 'GET' && pathname === '/api/contacts') {
       const contacts = [];
-      (db.boats || []).forEach(b => {
+      (inMemoryDb.boats || []).forEach(b => {
         (b.crew || []).forEach(c => {
           contacts.push({
             ...c,
@@ -271,8 +393,8 @@ const server = http.createServer(async (req, res) => {
         }))
       };
 
-      db.boats.unshift(newBoat);
-      writeDb(db);
+      inMemoryDb.boats.unshift(newBoat);
+      saveDb();
 
       res.writeHead(201, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({ success: true, id: boatId }));
@@ -282,18 +404,11 @@ const server = http.createServer(async (req, res) => {
     // API: DELETE /api/boats/:id
     if (req.method === 'DELETE' && pathname.startsWith('/api/boats/')) {
       const boatId = pathname.replace('/api/boats/', '');
-      const boatIndex = db.boats.findIndex(b => b.id === boatId);
+      const boatIndex = inMemoryDb.boats.findIndex(b => b.id === boatId);
       
       if (boatIndex !== -1) {
-        const boat = db.boats[boatIndex];
-        if (boat.image_url && boat.image_url.startsWith('/uploads/')) {
-          const imgFile = path.join(__dirname, 'public', boat.image_url);
-          if (fs.existsSync(imgFile) && !boat.image_url.includes('ya79_form.jpg') && !boat.image_url.includes('7ff6bd63')) {
-            try { fs.unlinkSync(imgFile); } catch (e) {}
-          }
-        }
-        db.boats.splice(boatIndex, 1);
-        writeDb(db);
+        inMemoryDb.boats.splice(boatIndex, 1);
+        saveDb();
       }
 
       res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -315,11 +430,16 @@ const server = http.createServer(async (req, res) => {
       const filename = `form_${Date.now()}_${crypto.randomBytes(4).toString('hex')}.${ext}`;
       const filePath = path.join(UPLOADS_DIR, filename);
       const cleanBase64 = body.image.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+      const imageBuffer = Buffer.from(cleanBase64, 'base64');
 
-      fs.writeFileSync(filePath, Buffer.from(cleanBase64, 'base64'));
-      const imageUrl = `/uploads/${filename}`;
+      // Save locally as temporary/cache
+      fs.writeFileSync(filePath, imageBuffer);
 
-      const apiKey = body.apiKey || req.headers['x-gemini-api-key'] || db.settings?.gemini_api_key || process.env.GEMINI_API_KEY;
+      // Upload to Supabase Storage for permanent global CDN URL
+      const permanentCloudUrl = await uploadToSupabaseStorage(filename, imageBuffer, `image/${ext === 'jpg' ? 'jpeg' : ext}`);
+      const imageUrl = permanentCloudUrl || `/uploads/${filename}`;
+
+      const apiKey = body.apiKey || req.headers['x-gemini-api-key'] || inMemoryDb.settings?.gemini_api_key || process.env.GEMINI_API_KEY;
 
       if (!apiKey || apiKey.trim() === '') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -350,52 +470,10 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // API: POST /api/analyze-existing
-    if (req.method === 'POST' && pathname === '/api/analyze-existing') {
-      const body = await parseJsonBody(req);
-      if (!body.imageUrl) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Görsel URL bulunamadı.' }));
-        return;
-      }
-
-      const filePath = path.join(__dirname, 'public', body.imageUrl);
-      if (!fs.existsSync(filePath)) {
-        res.writeHead(404, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'Dosya bulunamadı.' }));
-        return;
-      }
-
-      const fileBuffer = fs.readFileSync(filePath);
-      const cleanBase64 = fileBuffer.toString('base64');
-      const ext = path.extname(filePath).toLowerCase().replace('.', '') || 'jpeg';
-
-      const apiKey = body.apiKey || db.settings?.gemini_api_key || process.env.GEMINI_API_KEY;
-
-      if (!apiKey) {
-        res.writeHead(400, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: 'API anahtarı bulunamadı.' }));
-        return;
-      }
-
-      try {
-        const analyzedData = await analyzeImageWithGemini(cleanBase64, `image/${ext === 'jpg' ? 'jpeg' : ext}`, apiKey);
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          imageUrl: body.imageUrl,
-          data: analyzedData
-        }));
-      } catch (aiErr) {
-        res.writeHead(500, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({ error: aiErr.message }));
-      }
-      return;
-    }
-
     // API: GET /api/settings / POST /api/settings
     if (pathname === '/api/settings') {
       if (req.method === 'GET') {
-        const activeKey = db.settings?.gemini_api_key || process.env.GEMINI_API_KEY || '';
+        const activeKey = inMemoryDb.settings?.gemini_api_key || process.env.GEMINI_API_KEY || '';
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           hasGeminiApiKey: activeKey.length > 5,
@@ -406,9 +484,9 @@ const server = http.createServer(async (req, res) => {
       if (req.method === 'POST') {
         const body = await parseJsonBody(req);
         if (body.gemini_api_key !== undefined) {
-          db.settings = db.settings || {};
-          db.settings.gemini_api_key = body.gemini_api_key.trim();
-          writeDb(db);
+          inMemoryDb.settings = inMemoryDb.settings || {};
+          inMemoryDb.settings.gemini_api_key = body.gemini_api_key.trim();
+          saveDb();
         }
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ success: true }));
@@ -419,7 +497,7 @@ const server = http.createServer(async (req, res) => {
     // API: GET /api/export-vcard/:id
     if (req.method === 'GET' && pathname.startsWith('/api/export-vcard/')) {
       const boatId = pathname.replace('/api/export-vcard/', '');
-      const boat = db.boats.find(b => b.id === boatId);
+      const boat = inMemoryDb.boats.find(b => b.id === boatId);
       if (!boat) {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Tekne bulunamadı');
@@ -450,7 +528,7 @@ const server = http.createServer(async (req, res) => {
     // API: GET /api/export-csv
     if (req.method === 'GET' && pathname === '/api/export-csv') {
       let csv = '\uFEFFTekne Adı;Sorumlu Kaptan;Personel İsim;Personel Soyisim;Görev;Telefon\r\n';
-      (db.boats || []).forEach(b => {
+      (inMemoryDb.boats || []).forEach(b => {
         const kaptan = `${b.captain_name || ''} ${b.captain_surname || ''}`.trim();
         (b.crew || []).forEach(c => {
           csv += `"${b.name || ''}";"${kaptan}";"${c.name || ''}";"${c.surname || ''}";"${c.role || ''}";"${c.phone || ''}"\r\n`;
