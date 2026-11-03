@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "4a718462-f3d1-4b04-a29e-0ac2ffcccf26",
+      "name": "Hawk",
+      "captain_title": "KAPTAN",
+      "captain_name": "Volkan",
+      "captain_surname": "Arslan",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701992122_6b8dec1e.jpg",
+      "created_at": "2026-11-03T10:34:04.663Z",
+      "crew": [
+        {
+          "id": "9dfb451a-f0fc-4e8b-82d3-cb70b7a06f71",
+          "name": "Utku",
+          "surname": "Sarıkaya",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 1
+        },
+        {
+          "id": "62b8949e-173e-4da3-b142-b9d8202de167",
+          "name": "Talat",
+          "surname": "Kalaağası",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "bb657648-9d9f-472e-bf6d-47603ee386b1",
+          "name": "Volkan",
+          "surname": "Arslan",
+          "role": "Kaptan",
+          "phone": "05411337200",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "2463d81e-317a-4179-8b13-49b94566c6d9",
       "name": "My Rose (my)",
       "captain_title": "KAPTAN",
