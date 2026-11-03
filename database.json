@@ -1,6 +1,58 @@
 {
   "boats": [
     {
+      "id": "ea5377ed-80cf-4cdc-b88b-5a196aa0d9a3",
+      "name": "Era-11",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ali",
+      "captain_surname": "ŞENER",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702778180_9945ee8f.jpg",
+      "created_at": "2026-11-03T10:46:34.674Z",
+      "crew": [
+        {
+          "id": "9270f5b3-3382-4a19-aeaa-f3d3a50e74ee",
+          "name": "Tuncay",
+          "surname": "Karakartal",
+          "role": "Şef",
+          "phone": "0532 467 91 34",
+          "sort_order": 1
+        },
+        {
+          "id": "618c73d4-e430-41f5-be1d-07e939640d23",
+          "name": "Furkan",
+          "surname": "İnceler",
+          "role": "Gemici",
+          "phone": "0538 082 08 51",
+          "sort_order": 2
+        },
+        {
+          "id": "03e325a5-fd0d-4119-ab92-6d15e1afaa95",
+          "name": "Tekin",
+          "surname": "Yavuz",
+          "role": "Gemici",
+          "phone": "0555 714 78 76",
+          "sort_order": 3
+        },
+        {
+          "id": "4867c3fe-b5e2-48ee-9f36-982a5bad0a38",
+          "name": "Yusuf",
+          "surname": "Yılmaz",
+          "role": "Gemici",
+          "phone": "0537 560 48 00",
+          "sort_order": 4
+        },
+        {
+          "id": "9cd2016a-7a5b-470b-abd2-186920bc1513",
+          "name": "Gonca Gül",
+          "surname": "Selçuk",
+          "role": "Gemici",
+          "phone": "0535 410 28 32",
+          "sort_order": 5
+        }
+      ]
+    },
+    {
       "id": "8bd0e073-6b41-4b42-95cf-ffa17c42741f",
       "name": "Ares (my)",
       "captain_title": "KAPTAN",
