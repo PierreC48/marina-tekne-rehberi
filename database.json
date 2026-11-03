@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "d6b27f0d-51d2-4d4b-b899-9b56bc44d178",
+      "name": "OCEAN (MY)",
+      "captain_title": "KAPTAN",
+      "captain_name": "VLADIMIRS",
+      "captain_surname": "SIZOV",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702232528_c8bb33e9.jpg",
+      "created_at": "2026-11-03T10:37:43.644Z",
+      "crew": [
+        {
+          "id": "c1908d8b-9ac0-417f-9a82-5d2c6a456a35",
+          "name": "ALEKSANDR",
+          "surname": "SALO",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 1
+        },
+        {
+          "id": "7e1ce7a1-62cb-4d4d-92ba-b815b26138c2",
+          "name": "ILONA",
+          "surname": "AVDIENKO",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "5ffef7f4-91b1-4ece-abe4-63e442f04993",
+          "name": "RITA",
+          "surname": "MOTVIENKO",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "7a5bf05e-25c7-418e-9a20-54871a98b322",
       "name": "DAPHNE (MY)",
       "captain_title": "KAPTAN",
