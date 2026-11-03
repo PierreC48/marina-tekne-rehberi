@@ -1,6 +1,50 @@
 {
   "boats": [
     {
+      "id": "5110c35b-6787-432a-be18-9c5b263c30db",
+      "name": "Gof",
+      "captain_title": "KAPTAN",
+      "captain_name": "Kamil",
+      "captain_surname": "Sezgin",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793702620262_24df7518.jpg",
+      "created_at": "2026-11-03T10:44:02.680Z",
+      "crew": [
+        {
+          "id": "792b2e29-47d6-4289-8d59-3d5c8a835945",
+          "name": "Kamil",
+          "surname": "Sezgin",
+          "role": "Kaptan",
+          "phone": "05337710350",
+          "sort_order": 1
+        },
+        {
+          "id": "f4203f86-2463-408b-ae3b-c08ce19abaf8",
+          "name": "Toprak",
+          "surname": "İnanç",
+          "role": "Gemici",
+          "phone": "05347064876",
+          "sort_order": 2
+        },
+        {
+          "id": "eaa2a18e-2118-4397-b8b2-791f3d5bd59d",
+          "name": "Recep Tayyip",
+          "surname": "Yakıntepe",
+          "role": "2.Kaptan",
+          "phone": "05428155447",
+          "sort_order": 3
+        },
+        {
+          "id": "6a992b48-06ab-4bdb-ae17-ae844cf48cc3",
+          "name": "Gamze",
+          "surname": "Aşkın",
+          "role": "Hostes",
+          "phone": "05423500609",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
       "id": "6f89ae49-fef5-4637-a0f5-6eb79930e0bc",
       "name": "OCEAN'S FIVE",
       "captain_title": "KAPTAN",
