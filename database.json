@@ -1,6 +1,66 @@
 {
   "boats": [
     {
+      "id": "0b3de62e-d6f1-464c-b35d-21120b367ceb",
+      "name": "MYS Tere AB",
+      "captain_title": "KAPTAN",
+      "captain_name": "Hüsnü Teoman",
+      "captain_surname": "DERİN",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701669217_d0c8af95.jpg",
+      "created_at": "2026-11-03T10:28:21.919Z",
+      "crew": [
+        {
+          "id": "9aeb617c-9357-4890-a461-e87be4fbcdd3",
+          "name": "Hüsnü Teoman",
+          "surname": "Derin",
+          "role": "Kaptan",
+          "phone": "0532 201 58 41",
+          "sort_order": 1
+        },
+        {
+          "id": "6f1848c1-502d-4ca7-bef7-0ea5e2c754e1",
+          "name": "Bahattin",
+          "surname": "Kaplan",
+          "role": "Gemici",
+          "phone": "0532 171 37 67",
+          "sort_order": 2
+        },
+        {
+          "id": "aa80facd-d86b-4b2b-beb8-2ac0d334968b",
+          "name": "Yiğit",
+          "surname": "Sönder",
+          "role": "Personel",
+          "phone": "0536 475 24 47",
+          "sort_order": 3
+        },
+        {
+          "id": "616ca1ee-3c23-4eb8-be13-c22c58f01ea2",
+          "name": "Yusuf",
+          "surname": "Kibar",
+          "role": "Personel",
+          "phone": "",
+          "sort_order": 4
+        },
+        {
+          "id": "d8b04afe-4e2f-451f-ba6b-4cb02d858bf5",
+          "name": "Serhat",
+          "surname": "Kambur",
+          "role": "Personel",
+          "phone": "",
+          "sort_order": 5
+        },
+        {
+          "id": "9384cab1-3cdf-44c3-8b8a-2a7e8261d1f1",
+          "name": "Hüseyin",
+          "surname": "Cömert",
+          "role": "Personel",
+          "phone": "",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
       "id": "1e705bed-ba4e-425e-b18a-679b0763d764",
       "name": "Sılence",
       "captain_title": "KAPTAN",
