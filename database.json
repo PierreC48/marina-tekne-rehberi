@@ -1,6 +1,26 @@
 {
   "boats": [
     {
+      "id": "15be56df-4434-4df8-9de8-8a88667be3e2",
+      "name": "TURMEPA - 30",
+      "captain_title": "KAPTAN",
+      "captain_name": "AYTAÇ",
+      "captain_surname": "AKKOYUN",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793684142083_27c5555c.jpg",
+      "created_at": "2026-11-03T05:36:15.289Z",
+      "crew": [
+        {
+          "id": "aee40704-401e-4d0c-beb5-ec1f24aa1c19",
+          "name": "AYTAÇ",
+          "surname": "AKBOYUN",
+          "role": "KAPTAN",
+          "phone": "0543 395 50 73",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "0025f309-4b3c-4bfe-80b0-a98ca9698419",
       "name": "Ares (m/y)",
       "captain_title": "KAPTAN",
