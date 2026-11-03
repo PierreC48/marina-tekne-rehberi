@@ -239,9 +239,10 @@ async function analyzeImageWithGemini(base64Data, mimeType = 'image/jpeg', apiKe
 
   const prompt = `Sen denizcilik ve marina belgeleri konusunda uzman bir asistansın.
 Ekli görsel Setur Marinas veya benzeri bir "Mürettebat Bilgi Formu" el yazısı belgesidir.
-Görseldeki el yazısını dikkatlice oku ve JSON formatında döndür.
 
-Önemli Not: Bazen formdaki "Soyisim" alanına parantez içinde görev (örn: Temiz (Kaptan), Esen (Gemici)), "Görev" alanına ise telefon numarası yazılmış olabilir.
+ÇOK ÖNEMLİ TALİMATLAR:
+1. Görsel yamuk, açılı, ters veya yan çekilmiş olabilir, perspektif bozulması veya gölge bulunabilir. Metinlerin yönü ve açısı ne olursa olsun belgedeki tüm el yazılarını dikkatlice tara, zihninde doğrult ve oku.
+2. Bazen formdaki "Soyisim" alanına parantez içinde görev (örn: Temiz (Kaptan), Esen (Gemici)), "Görev" alanına ise telefon numarası yazılmış olabilir.
 Bunu akıllıca tespit et:
 - Telefon numarasını mutlaka "phone" alanına koy.
 - Görevi (Kaptan, Gemici, Aşçı, vb.) "role" alanına koy.
