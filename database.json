@@ -1,6 +1,42 @@
 {
   "boats": [
     {
+      "id": "fcea0efb-5e4b-471f-b5bd-46197225432e",
+      "name": "SHENA (M/Y)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ömer",
+      "captain_surname": "Kırandağ",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701793357_e388d1ad.jpg",
+      "created_at": "2026-11-03T10:30:11.907Z",
+      "crew": [
+        {
+          "id": "853f879c-008d-480f-bf19-7661dc820c2f",
+          "name": "Ömer",
+          "surname": "Kırandağ",
+          "role": "Kaptan",
+          "phone": "0536 773 66 79",
+          "sort_order": 1
+        },
+        {
+          "id": "838e1983-3642-4e4d-9e50-467ddff4c4c6",
+          "name": "Barış",
+          "surname": "Günal",
+          "role": "Gemici",
+          "phone": "0533 025 97 10",
+          "sort_order": 2
+        },
+        {
+          "id": "0982bcc2-56f7-456e-a58f-b10886c5d3b5",
+          "name": "Özgür",
+          "surname": "Çelik",
+          "role": "Teknisyen",
+          "phone": "0533 557 36 98",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "346286c9-b564-4bc8-80c2-edbed155aeb3",
       "name": "Angel II (y)",
       "captain_title": "KAPTAN",
