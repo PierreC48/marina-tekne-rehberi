@@ -1,6 +1,28 @@
 {
   "boats": [
     {
+      "id": "18377704-d2c5-4977-8659-ae2fca3c36f5",
+      "name": "Eros",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ibrahım",
+      "captain_surname": "Karaman",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793795436699_cf0f7de9.jpg",
+      "form_date": "2026-11-04",
+      "created_at": "2026-11-04T12:30:49.906Z",
+      "updated_at": "2026-11-04T12:30:49.906Z",
+      "crew": [
+        {
+          "id": "9f392bcc-7d1f-4ed6-b9bb-7c2738168e5e",
+          "name": "Ibrahım",
+          "surname": "Karaman",
+          "role": "Kaptan",
+          "phone": "",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "f2f110fc-3b52-413f-90a1-2e13c44e531c",
       "name": "Avcı D",
       "captain_title": "KAPTAN",
@@ -1455,5 +1477,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-04T12:30:15.650Z"
+  "last_backup_at": "2026-11-04T12:30:49.915Z"
 }
