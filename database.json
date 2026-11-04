@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "f2f110fc-3b52-413f-90a1-2e13c44e531c",
+      "name": "Avcı D",
+      "captain_title": "KAPTAN",
+      "captain_name": "Hasan",
+      "captain_surname": "Menekşe",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793795381872_79e05853.jpg",
+      "form_date": "2026-11-04",
+      "created_at": "2026-11-04T12:30:15.642Z",
+      "updated_at": "2026-11-04T12:30:15.642Z",
+      "crew": [
+        {
+          "id": "5880b1c5-3388-412b-8b13-e6fb683c6f09",
+          "name": "Hasan",
+          "surname": "Menekse",
+          "role": "Kaptan",
+          "phone": "0545 594 71 05",
+          "sort_order": 1
+        },
+        {
+          "id": "d7993bb7-1aa7-4977-9eae-6422087d6bae",
+          "name": "Engın",
+          "surname": "Ozden",
+          "role": "Gemici",
+          "phone": "0546 682 27 62",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "ca9643f6-0f4f-4988-9fd7-f60b91f8c62c",
       "name": "Sanjır",
       "captain_title": "KAPTAN",
@@ -1425,5 +1455,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-04T12:29:19.192Z"
+  "last_backup_at": "2026-11-04T12:30:15.650Z"
 }
