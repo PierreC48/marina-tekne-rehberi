@@ -1,11 +1,8 @@
-const CACHE_NAME = 'marina-rehber-v2';
+const CACHE_NAME = 'marina-rehber-v4';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/manifest.json',
-  'https://cdn.tailwindcss.com',
-  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css',
-  'https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js'
+  '/manifest.json'
 ];
 
 self.addEventListener('install', (event) => {
@@ -33,10 +30,13 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Network-First with Cache Fallback for navigation & GET API requests
+// Network-First with Cache Fallback ONLY for same-origin GET requests
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
 
   event.respondWith(
     fetch(request)

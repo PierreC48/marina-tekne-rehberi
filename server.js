@@ -533,26 +533,34 @@ function checkRateLimit(req, res, bucket, maxRequests, windowMs) {
   return true;
 }
 
-const MAX_IMAGE_BYTES = 8 * 1024 * 1024; // 8 MB max decoded image size
-const MIN_IMAGE_BYTES = 1024; // 1 KB min decoded image size
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB max decoded image size
+const MIN_IMAGE_BYTES = 512; // 512 B min decoded image size
 
 function validateImagePayload(imageDataUrl) {
   if (!imageDataUrl || typeof imageDataUrl !== 'string') {
     return { valid: false, status: 400, error: 'Görsel verisi bulunamadı.' };
   }
 
-  // 1. Validate Data URL format & allowed MIME types
-  const match = imageDataUrl.match(/^data:image\/(jpeg|jpg|png|webp);base64,([A-Za-z0-9+/=\r\n]+)$/);
-  if (!match) {
-    return {
-      valid: false,
-      status: 400,
-      error: 'Geçersiz dosya formatı. Yalnızca JPEG, PNG veya WEBP formatında fotoğraf yüklenebilir.'
-    };
-  }
+  // 1. Fast header split without running giant regex over multi-MB base64 string
+  const commaIdx = imageDataUrl.indexOf(',');
+  let rawFormat = 'jpeg';
+  let cleanBase64 = imageDataUrl;
 
-  const rawFormat = match[1].toLowerCase();
-  const cleanBase64 = match[2];
+  if (commaIdx !== -1) {
+    const header = imageDataUrl.slice(0, commaIdx).toLowerCase();
+    cleanBase64 = imageDataUrl.slice(commaIdx + 1).trim();
+    const mimeMatch = header.match(/data:image\/([a-z0-9+.-]+)/);
+    if (!mimeMatch && !header.includes('base64')) {
+      return {
+        valid: false,
+        status: 400,
+        error: 'Geçersiz dosya formatı. Yalnızca fotoğraf (JPEG, PNG, WEBP) yüklenebilir.'
+      };
+    }
+    if (mimeMatch) rawFormat = mimeMatch[1];
+  } else {
+    cleanBase64 = imageDataUrl.trim();
+  }
 
   // 2. Decode base64 and check byte size
   const buffer = Buffer.from(cleanBase64, 'base64');
@@ -560,14 +568,14 @@ function validateImagePayload(imageDataUrl) {
     return {
       valid: false,
       status: 400,
-      error: 'Yüklenen görsel dosyası çok küçük veya bozuk (Minimum 1 KB).'
+      error: 'Yüklenen görsel dosyası çok küçük veya bozuk.'
     };
   }
   if (buffer.length > MAX_IMAGE_BYTES) {
     return {
       valid: false,
       status: 413,
-      error: 'Görsel boyutu çok büyük. Maksimum 8 MB fotoğraf yüklenebilir.'
+      error: 'Görsel boyutu çok büyük. Maksimum 15 MB fotoğraf yüklenebilir.'
     };
   }
 
@@ -675,7 +683,7 @@ function parseJsonBody(req, maxBytes = 1024 * 1024) {
       receivedBytes += chunk.length;
       if (receivedBytes > maxBytes) {
         aborted = true;
-        const err = new Error('Gönderilen veri boyutu sınırı aşıldı (Maksimum 8 MB görsel).');
+        const err = new Error('Gönderilen veri boyutu sınırı aşıldı (Maksimum 15 MB görsel).');
         err.statusCode = 413;
         reject(err);
         return;
@@ -696,10 +704,176 @@ function parseJsonBody(req, maxBytes = 1024 * 1024) {
   });
 }
 
-// Gemini Vision API parser with model fallback (Strictly uses server environment GEMINI_API_KEY)
+// ==========================================
+// GEMINI VISION ENGINE WITH SMART MODEL POOL & COOLDOWN
+// ==========================================
+const modelCooldownUntil = new Map();
+
+const VISION_MODELS_POOL = [
+  'gemini-3.5-flash-lite',
+  'gemini-3.6-flash',
+  'gemini-2.5-flash',
+  'gemini-2.5-flash-lite',
+  'gemini-3-flash-preview',
+  'gemini-flash-lite-latest',
+  'gemini-2.5-pro',
+  'gemini-3.1-pro-preview',
+  'gemini-4-argon',
+  'gemma-4-31b-it',
+  'gemma-4-26b-a4b-it',
+  'gemini-3.1-flash-lite',
+  'gemini-3.5-flash',
+  'gemini-3.7-flash',
+  'gemini-3.8-flash',
+  'gemini-pro-latest'
+];
+
+function extractPhoneFromText(str) {
+  if (!str) return { cleanText: '', phone: '' };
+  const s = String(str).trim();
+  const phoneRegex = /(\+?\d[\d\s()-]{8,16}\d)/;
+  const match = s.match(phoneRegex);
+  if (match) {
+    const digits = match[1].replace(/\D/g, '');
+    if (digits.length >= 9) {
+      const cleanText = s.replace(match[0], '').replace(/[()/-]/g, ' ').replace(/\s+/g, ' ').trim();
+      return { cleanText, phone: match[1].trim() };
+    }
+  }
+  return { cleanText: s, phone: '' };
+}
+
+function postProcessGeminiFormOutput(parsed) {
+  if (Array.isArray(parsed)) {
+    parsed = parsed[0] || {};
+  }
+  if (!parsed || typeof parsed !== 'object') {
+    parsed = {};
+  }
+
+  let capName = String(parsed.captain_name || '').trim();
+  let capSurname = String(parsed.captain_surname || '').trim();
+  let capPhone = String(parsed.captain_phone || '').trim();
+  let capTitle = String(parsed.captain_title || 'KAPTAN').trim();
+
+  // Check if a phone number was written inside captain_name or captain_surname (e.g. Ocean's Five or Ocean MY forms)
+  const nameExtracted = extractPhoneFromText(capName);
+  if (nameExtracted.phone) {
+    if (!capPhone) capPhone = nameExtracted.phone;
+    capName = nameExtracted.cleanText;
+  }
+  const surnameExtracted = extractPhoneFromText(capSurname);
+  if (surnameExtracted.phone) {
+    if (!capPhone) capPhone = surnameExtracted.phone;
+    capSurname = surnameExtracted.cleanText;
+  }
+
+  // If captain_surname became empty because the phone number was written on the SOYİSİM line, split captain_name
+  if (capName && !capSurname && capName.includes(' ')) {
+    const parts = capName.split(/\s+/);
+    capSurname = parts.pop() || '';
+    capName = parts.join(' ');
+  }
+
+  const rawCrew = Array.isArray(parsed.crew) ? parsed.crew : [];
+  const cleanedCrew = [];
+
+  for (const item of rawCrew) {
+    if (!item || typeof item !== 'object') continue;
+    let cName = String(item.name || '').trim();
+    let cSurname = String(item.surname || '').trim();
+    let cRole = String(item.role || '').trim();
+    let cPhone = String(item.phone || '').trim();
+
+    // Check if role in parentheses is inside surname, e.g. "Temiz (Kaptan)"
+    const parenMatch = cSurname.match(/\(([^)]+)\)/);
+    if (parenMatch) {
+      const inside = parenMatch[1].trim();
+      cSurname = cSurname.replace(parenMatch[0], '').trim();
+      if (!cRole || /\d{4}/.test(cRole)) {
+        cRole = inside;
+      }
+    }
+
+    // Check if phone number was placed inside cRole (since Setur form's 3rd column is titled "Görev")
+    const rolePhone = extractPhoneFromText(cRole);
+    if (rolePhone.phone) {
+      if (!cPhone) cPhone = rolePhone.phone;
+      cRole = rolePhone.cleanText || 'Gemici';
+    }
+
+    // Check if phone number was placed inside cSurname
+    const surPhone = extractPhoneFromText(cSurname);
+    if (surPhone.phone) {
+      if (!cPhone) cPhone = surPhone.phone;
+      cSurname = surPhone.cleanText;
+    }
+
+    // Check if cName has full name while cSurname is empty
+    if (cName && !cSurname && cName.includes(' ')) {
+      const p = cName.split(/\s+/);
+      cSurname = p.pop() || '';
+      cName = p.join(' ');
+    }
+
+    // If this person matches the Captain in the top section, assign Kaptan role & captain's phone if missing
+    const isSameAsCaptain = capName &&
+      cName.toLocaleLowerCase('tr-TR') === capName.toLocaleLowerCase('tr-TR') &&
+      (!capSurname || !cSurname || cSurname.toLocaleLowerCase('tr-TR') === capSurname.toLocaleLowerCase('tr-TR'));
+
+    if (isSameAsCaptain) {
+      if (!cRole || cRole.toLocaleLowerCase('tr-TR') === 'mürettebat' || cRole.toLocaleLowerCase('tr-TR') === 'gemici') {
+        cRole = capTitle || 'Kaptan';
+      }
+      if (!cPhone && capPhone) {
+        cPhone = capPhone;
+      }
+    }
+
+    cleanedCrew.push({
+      name: cName,
+      surname: cSurname,
+      role: cRole || (isSameAsCaptain ? 'Kaptan' : 'Gemici'),
+      phone: cPhone
+    });
+  }
+
+  // Ensure the Captain / Responsible person from top section is included in crew list if not already present
+  if (capName || capSurname || capPhone) {
+    const capFullLower = `${capName} ${capSurname}`.toLocaleLowerCase('tr-TR').trim();
+    const capPhoneKey = getPhoneDigitsKey(capPhone);
+    const alreadyInCrew = cleanedCrew.some(c => {
+      const cFullLower = `${c.name} ${c.surname}`.toLocaleLowerCase('tr-TR').trim();
+      const cPhoneKey = getPhoneDigitsKey(c.phone);
+      return (capFullLower && cFullLower === capFullLower) || (capPhoneKey && capPhoneKey.length >= 7 && cPhoneKey === capPhoneKey);
+    });
+
+    if (!alreadyInCrew && (capName || capSurname)) {
+      cleanedCrew.unshift({
+        name: capName,
+        surname: capSurname,
+        role: normalizeRole(capTitle || 'Kaptan'),
+        phone: capPhone
+      });
+    }
+  }
+
+  return {
+    boat_name: parsed.boat_name ? normalizeBoatName(parsed.boat_name) : '',
+    form_date: parsed.form_date ? normalizeFormDate(parsed.form_date) : new Date().toISOString().slice(0, 10),
+    captain_title: 'KAPTAN',
+    captain_name: normalizePersonName(capName),
+    captain_surname: normalizePersonName(capSurname),
+    notes: String(parsed.notes || '').trim(),
+    crew: deduplicateCrewList(cleanedCrew)
+  };
+}
+
+// Gemini Vision API parser with multi-model pool & cooldown memory
 async function analyzeImageWithGemini(cleanBase64, mimeType = 'image/jpeg') {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey.trim() === '') {
+  const rawKeys = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
+  const apiKeys = rawKeys.split(',').map(k => k.trim()).filter(Boolean);
+  if (apiKeys.length === 0) {
     throw new Error('Sunucu ortam değişkeninde (env) GEMINI_API_KEY tanımlı değil.');
   }
 
@@ -707,100 +881,125 @@ async function analyzeImageWithGemini(cleanBase64, mimeType = 'image/jpeg') {
 Ekli görsel Setur Marinas veya benzeri bir "Mürettebat Bilgi Formu" el yazısı belgesidir.
 
 ÇOK ÖNEMLİ TALİMATLAR:
-1. Görsel yamuk, açılı, ters veya yan çekilmiş olabilir, perspektif bozulması veya gölge bulunabilir. Metinlerin yönü ve açısı ne olursa olsun belgedeki tüm el yazılarını dikkatlice tara, zihninde doğrult ve oku.
-2. Bazen formdaki "Soyisim" alanına parantez içinde görev (örn: Temiz (Kaptan), Esen (Gemici)), "Görev" alanına ise telefon numarası yazılmış olabilir.
-Bunu akıllıca tespit et:
-- Telefon numarasını mutlaka "phone" alanına koy (05XX XXX XX XX formatında).
-- Görevi (Kaptan, Gemici, Aşçı, vb.) "role" alanına koy.
-- Soyismini parantez içindeki görevden arındırarak "surname" alanına koy.
-3. Formun üst veya alt kısmında "Tarih" alanı varsa YYYY-MM-DD formatına çevirerek "form_date" alanına yaz (yoksa "" bırak).
+1. Görsel yamuk, 90 derece yan (dikey/yatay), baş aşağı ters veya perspektif bozukluğu ile çekilmiş olabilir. Metinlerin yönü ve açısı ne olursa olsun belgedeki tüm el yazılarını zihninde doğru yöne çevir ve eksiksiz oku.
+2. Form iki ana bölümden oluşur:
+   - ÜST BÖLÜM ("TEKNE SAHİBİ / KAPTANI / SORUMLUSU BİLGİLERİ"): Burada TEKNE ADI, ÜNVAN, İSİM ve SOYİSİM satırları bulunur. Çok dikkat et: Kaptanlar bazen telefon numarasını üst bölümdeki İSİM veya SOYİSİM satırına yazarlar (örneğin İSİM satırına "İknur Adar", SOYİSİM satırına "0533 308 26 53" veya İSİM satırına "Vladimirs +37129691803"). Üst bölümde telefon numarası varsa bunu mutlaka "captain_phone" alanına yaz ve üst bölümdeki kaptanı/sorumluyu aşağıdaki "crew" (mürettebat) listesine de ilk sıradan ekle!
+   - ALT BÖLÜM ("MÜRETTEBAT BİLGİLERİ"): Tabloda "İsim", "Soyisim" ve "Görev" sütunları vardır. Basılı formda "Telefon" sütunu olmadığı için kaptanlar telefon numaralarını genellikle "Görev" sütununa yazarlar, görevi ise ya Soyisim'in yanına parantez içinde yazarlar ya da boş bırakırlar.
+   - Telefon numarasını mutlaka "phone" alanına koy (Türk numarası ise 05XX XXX XX XX formatında, yabancı numara ise + ülke koduyla).
+   - Görev belirtilmemişse ve kişi üst bölümdeki kaptan ise görevine "Kaptan", diğer kişiler ise görevine "Gemici" yaz.
+3. Formun altında veya üstünde "TARİH" alanı varsa YYYY-MM-DD formatına çevirerek "form_date" alanına yaz (yoksa "" bırak).
 
-Yalnızca şu JSON formatında cevap ver, Markdown kod bloğu veya başka bir metin ekleme:
+Yalnızca şu JSON formatında cevap ver, Markdown kod bloğu veya açıklama ekleme:
 {
   "boat_name": "Tekne Adı",
   "form_date": "YYYY-MM-DD",
   "captain_title": "Ünvan (örn: KAPTAN)",
   "captain_name": "Sorumlu İsim",
   "captain_surname": "Sorumlu Soyisim",
+  "captain_phone": "Varsa Sorumlu/Kaptan Telefonu",
   "notes": "Varsa notlar",
   "crew": [
     {
       "name": "İsim",
       "surname": "Soyisim",
-      "role": "Görev (Kaptan, Gemici, Aşçı, vb.)",
+      "role": "Görev (Kaptan, Gemici, Aşçı, Çarkçı, Kamarot / Hostes)",
       "phone": "05XX XXX XX XX"
     }
   ]
 }`;
 
-  const payload = {
-    contents: [
-      {
-        parts: [
-          { text: prompt },
-          {
-            inlineData: {
-              mimeType: mimeType,
-              data: cleanBase64
-            }
-          }
-        ]
-      }
-    ],
-    generationConfig: {
-      temperature: 0.1,
-      responseMimeType: "application/json"
-    }
-  };
+  const now = Date.now();
+  // Sort models: available (not on cooldown) models first, then models with earliest cooldown expiration
+  const orderedModels = [...VISION_MODELS_POOL].sort((a, b) => {
+    const cdA = modelCooldownUntil.get(a) || 0;
+    const cdB = modelCooldownUntil.get(b) || 0;
+    const activeA = cdA <= now ? 0 : cdA;
+    const activeB = cdB <= now ? 0 : cdB;
+    return activeA - activeB;
+  });
 
-  const models = ['gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-3.1-flash-lite', 'gemini-flash-latest'];
   let lastError = null;
 
-  for (const model of models) {
-    try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey.trim()}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        lastError = new Error(`Gemini (${model}) Hatası HTTP ${response.status}: ${errText}`);
-        continue;
-      }
-
-      const result = await response.json();
-      const textOutput = result.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!textOutput) {
-        lastError = new Error('Yapay zekadan yanıt metni alınamadı.');
-        continue;
-      }
-
-      let parsed;
+  for (const apiKey of apiKeys) {
+    for (const model of orderedModels) {
       try {
-        parsed = JSON.parse(textOutput);
-      } catch (e) {
-        const cleaned = textOutput.replace(/```json/g, '').replace(/```/g, '').trim();
-        parsed = JSON.parse(cleaned);
-      }
+        const isGemma = model.startsWith('gemma-');
+        // Note: Do NOT include deprecated 'temperature' parameter (causes HTTP 400 on Gemini 3.5-flash-lite / 3.6-flash+)
+        const payload = {
+          contents: [
+            {
+              parts: [
+                { text: prompt },
+                {
+                  inlineData: {
+                    mimeType: mimeType,
+                    data: cleanBase64
+                  }
+                }
+              ]
+            }
+          ],
+          ...(isGemma ? {} : {
+            generationConfig: {
+              responseMimeType: 'application/json'
+            }
+          })
+        };
 
-      // Normalize AI output before returning
-      return {
-        boat_name: parsed.boat_name ? normalizeBoatName(parsed.boat_name) : '',
-        form_date: parsed.form_date ? normalizeFormDate(parsed.form_date) : new Date().toISOString().slice(0, 10),
-        captain_title: 'KAPTAN',
-        captain_name: normalizePersonName(parsed.captain_name || ''),
-        captain_surname: normalizePersonName(parsed.captain_surname || ''),
-        notes: String(parsed.notes || '').trim(),
-        crew: deduplicateCrewList(parsed.crew || [])
-      };
-    } catch (e) {
-      lastError = e;
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+          const errText = await response.text();
+          if (response.status === 429) {
+            // If daily quota exhausted on this model, put on 60-minute cooldown so next requests skip it in 0ms
+            const isDaily = errText.includes('PerDay') || errText.includes('retryDelay');
+            modelCooldownUntil.set(model, Date.now() + (isDaily ? 60 * 60 * 1000 : 45 * 1000));
+          } else if (response.status === 404 || response.status === 400) {
+            modelCooldownUntil.set(model, Date.now() + 30 * 60 * 1000);
+          }
+          lastError = new Error(`Gemini (${model}) Hatası HTTP ${response.status}`);
+          continue;
+        }
+
+        const result = await response.json();
+        const parts = result.candidates?.[0]?.content?.parts || [];
+        const textPart = parts.find(p => typeof p.text === 'string' && p.text.trim().length > 0);
+        const textOutput = textPart?.text;
+
+        if (!textOutput) {
+          lastError = new Error(`Model (${model}) boş yanıt döndürdü.`);
+          continue;
+        }
+
+        let parsed;
+        try {
+          parsed = JSON.parse(textOutput);
+        } catch (e) {
+          const cleaned = textOutput.replace(/```json/gi, '').replace(/```/g, '').trim();
+          const firstBrace = cleaned.indexOf('{');
+          const lastBrace = cleaned.lastIndexOf('}');
+          if (firstBrace !== -1 && lastBrace > firstBrace) {
+            parsed = JSON.parse(cleaned.slice(firstBrace, lastBrace + 1));
+          } else {
+            parsed = JSON.parse(cleaned);
+          }
+        }
+
+        // Clear any cooldown on success
+        modelCooldownUntil.delete(model);
+        console.log(`✓ Form "${model}" modeli ile başarıyla okundu.`);
+        return postProcessGeminiFormOutput(parsed);
+      } catch (e) {
+        lastError = e;
+      }
     }
   }
 
-  throw lastError || new Error('Gemini API isteği başarısız oldu.');
+  throw lastError || new Error('Yapay zekâ servisi şu an yanıt veremedi, lütfen tekrar deneyin.');
 }
 
 // HTTP Server
@@ -852,7 +1051,7 @@ const server = http.createServer(async (req, res) => {
 
     // API: POST /api/boats (Create or Merge & Normalize)
     if (req.method === 'POST' && pathname === '/api/boats') {
-      if (!checkRateLimit(req, res, 'write-boats', 30, 5 * 60 * 1000)) return;
+      if (!checkRateLimit(req, res, 'write-boats', 200, 5 * 60 * 1000)) return;
 
       const body = await parseJsonBody(req, 512 * 1024);
       const rawName = String(body.name || '').trim().slice(0, 120);
@@ -887,7 +1086,7 @@ const server = http.createServer(async (req, res) => {
           saveDb();
 
           res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify({ success: true, id: mergedBoat.id, merged: true }));
+          res.end(JSON.stringify({ success: true, id: mergedBoat.id, merged: true, boat: mergedBoat }));
           return;
         }
       }
@@ -911,13 +1110,13 @@ const server = http.createServer(async (req, res) => {
       saveDb();
 
       res.writeHead(201, { 'Content-Type': 'application/json' });
-      res.end(JSON.stringify({ success: true, id: boatId }));
+      res.end(JSON.stringify({ success: true, id: boatId, merged: false, boat: newBoat }));
       return;
     }
 
     // API: DELETE /api/boats/:id
     if (req.method === 'DELETE' && pathname.startsWith('/api/boats/')) {
-      if (!checkRateLimit(req, res, 'delete-boats', 30, 5 * 60 * 1000)) return;
+      if (!checkRateLimit(req, res, 'delete-boats', 100, 5 * 60 * 1000)) return;
 
       const boatId = pathname.replace('/api/boats/', '');
       const boatIndex = inMemoryDb.boats.findIndex(b => b.id === boatId);
@@ -932,13 +1131,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // API: POST /api/upload-and-analyze (Rate Limited + Strict File Validation + Server Env API Key Only)
+    // API: POST /api/upload-and-analyze (Rate Limited + File Validation + Server Env API Key Only)
     if (req.method === 'POST' && pathname === '/api/upload-and-analyze') {
-      // Rate Limit: Max 10 uploads per 15 minutes per IP
-      if (!checkRateLimit(req, res, 'upload-analyze', 10, 15 * 60 * 1000)) return;
+      // Rate Limit: Max 120 uploads per 15 minutes per IP (supports bulk scanning at marina)
+      if (!checkRateLimit(req, res, 'upload-analyze', 120, 15 * 60 * 1000)) return;
 
-      // Max 12 MB JSON payload (~8 MB binary image)
-      const body = await parseJsonBody(req, 12 * 1024 * 1024);
+      // Max 20 MB JSON payload (~15 MB binary image)
+      const body = await parseJsonBody(req, 20 * 1024 * 1024);
 
       // Strict file check (MIME, size, magic bytes)
       const validation = validateImagePayload(body.image);
@@ -960,7 +1159,7 @@ const server = http.createServer(async (req, res) => {
       const imageUrl = permanentCloudUrl || `/uploads/${filename}`;
 
       // API Key strictly from Server Environment Variable
-      if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY.trim() === '') {
+      if (!process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEYS) {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           imageUrl,
