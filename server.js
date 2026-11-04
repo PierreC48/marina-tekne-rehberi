@@ -1255,6 +1255,20 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // Helper: Verify Admin Password for sensitive exports (Backup & Excel)
+    if (req.method === 'GET' && (pathname === '/api/backup' || pathname === '/api/export-csv')) {
+      const expectedPassword = (process.env.ADMIN_PASSWORD || 'Setur2026').trim();
+      const providedPassword = String(
+        req.headers['x-admin-password'] || parsedUrl.searchParams.get('pwd') || ''
+      ).trim();
+
+      if (!providedPassword || providedPassword !== expectedPassword) {
+        res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Yetkisiz erişim: Şifre hatalı veya girilmedi.' }));
+        return;
+      }
+    }
+
     // API: GET /api/backup (Download Full Database JSON Backup)
     if (req.method === 'GET' && pathname === '/api/backup') {
       const today = new Date().toISOString().slice(0, 10);
