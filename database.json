@@ -1,6 +1,44 @@
 {
   "boats": [
     {
+      "id": "8cbf05bd-d8f5-4a8a-96cb-b5c682d9c43d",
+      "name": "Sen (london)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Sercan",
+      "captain_surname": "Karadayı",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793867499444_51cba939.jpg",
+      "form_date": "2026-11-05",
+      "created_at": "2026-11-05T08:32:23.525Z",
+      "updated_at": "2026-11-05T08:32:23.525Z",
+      "crew": [
+        {
+          "id": "0c12b011-e675-48d5-b28c-ec73bc0810d8",
+          "name": "Sercan",
+          "surname": "Karadayı",
+          "role": "Kaptan",
+          "phone": "0505 285 38 97",
+          "sort_order": 1
+        },
+        {
+          "id": "d0d4e6cc-87b2-4bfb-b5ac-0e4379abc9f9",
+          "name": "Hakan Burak",
+          "surname": "İnan",
+          "role": "Gemici",
+          "phone": "0537 386 96 48",
+          "sort_order": 2
+        },
+        {
+          "id": "07a212ad-4122-45fb-920e-501b3b2ac5ca",
+          "name": "Buse Deniz",
+          "surname": "Temel",
+          "role": "Kamarot / Hostes",
+          "phone": "",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "4b096548-150f-4170-9c65-d8006691ce97",
       "name": "Dusky Ve M.y. Era II",
       "captain_title": "KAPTAN",
@@ -1525,5 +1563,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-05T08:31:55.223Z"
+  "last_backup_at": "2026-11-05T08:32:23.538Z"
 }
