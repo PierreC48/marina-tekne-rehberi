@@ -1,6 +1,44 @@
 {
   "boats": [
     {
+      "id": "3da2e4c0-4e3f-4d9d-a852-ba2be53541f2",
+      "name": "Karma",
+      "captain_title": "KAPTAN",
+      "captain_name": "Umut",
+      "captain_surname": "Çelik",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793872526345_4f9fa49d.jpg",
+      "form_date": "2026-11-05",
+      "created_at": "2026-11-05T09:56:06.468Z",
+      "updated_at": "2026-11-05T09:56:06.468Z",
+      "crew": [
+        {
+          "id": "bf8ac6d8-3631-42c4-8643-1a5ff3697c71",
+          "name": "Umut",
+          "surname": "Çelik",
+          "role": "Kaptan",
+          "phone": "0541 548 09 48",
+          "sort_order": 1
+        },
+        {
+          "id": "df04d2fd-1f11-4d95-b3ac-035c04a97ecd",
+          "name": "Maquela Cumana",
+          "surname": "Sanchez",
+          "role": "Gemici",
+          "phone": "0531 897 76 22",
+          "sort_order": 2
+        },
+        {
+          "id": "c437491b-d299-4ac6-8fa6-0488c53bb8f1",
+          "name": "Yiğit Osman",
+          "surname": "Akyol",
+          "role": "Gemici",
+          "phone": "0541 371 98 32",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "8cbf05bd-d8f5-4a8a-96cb-b5c682d9c43d",
       "name": "Sen (london)",
       "captain_title": "KAPTAN",
@@ -1563,5 +1601,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-05T08:32:23.538Z"
+  "last_backup_at": "2026-11-05T09:56:06.478Z"
 }
