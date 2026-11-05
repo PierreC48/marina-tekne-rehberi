@@ -283,6 +283,7 @@ const initialData = {
       ]
     }
   ]),
+  reminders: [],
   last_backup_at: new Date().toISOString()
 };
 
@@ -299,6 +300,7 @@ function readLocalDb() {
     const parsed = JSON.parse(raw);
     return {
       boats: deduplicateAndNormalizeBoats(parsed.boats || initialData.boats),
+      reminders: Array.isArray(parsed.reminders) ? parsed.reminders : [],
       last_backup_at: parsed.last_backup_at || new Date().toISOString()
     };
   } catch (err) {
@@ -309,6 +311,7 @@ function readLocalDb() {
 // Fetch permanent database from Supabase Storage & GitHub
 async function fetchCloudDb() {
   const collectedBoats = [];
+  const collectedRemindersMap = new Map();
 
   // 1. Try Supabase Storage permanent DB
   try {
@@ -319,6 +322,9 @@ async function fetchCloudDb() {
       if (parsed && Array.isArray(parsed.boats)) {
         console.log(`☁️ Supabase Bulut Veritabanından ${parsed.boats.length} tekne kaydı yüklendi.`);
         collectedBoats.push(...parsed.boats);
+      }
+      if (parsed && Array.isArray(parsed.reminders)) {
+        parsed.reminders.forEach(r => { if (r && r.id) collectedRemindersMap.set(r.id, r); });
       }
     }
   } catch (err) {
@@ -343,14 +349,20 @@ async function fetchCloudDb() {
           console.log(`☁️ GitHub Bulut Veritabanından ${parsed.boats.length} tekne kaydı yüklendi.`);
           collectedBoats.push(...parsed.boats);
         }
+        if (parsed && Array.isArray(parsed.reminders)) {
+          parsed.reminders.forEach(r => { if (r && r.id && !collectedRemindersMap.has(r.id)) collectedRemindersMap.set(r.id, r); });
+        }
       }
     } catch (err) {
       console.error('GitHub veritabanı okuma hatası:', err.message);
     }
   }
 
-  if (collectedBoats.length > 0) {
-    return { boats: deduplicateAndNormalizeBoats(collectedBoats) };
+  if (collectedBoats.length > 0 || collectedRemindersMap.size > 0) {
+    return {
+      boats: deduplicateAndNormalizeBoats(collectedBoats),
+      reminders: Array.from(collectedRemindersMap.values())
+    };
   }
   return null;
 }
@@ -446,6 +458,7 @@ function saveDb() {
   if (!inMemoryDb) return;
   if (inMemoryDb.settings) delete inMemoryDb.settings;
   inMemoryDb.boats = deduplicateAndNormalizeBoats(inMemoryDb.boats || []);
+  if (!Array.isArray(inMemoryDb.reminders)) inMemoryDb.reminders = [];
   inMemoryDb.last_backup_at = new Date().toISOString();
   try {
     fs.writeFileSync(DB_FILE, JSON.stringify(inMemoryDb, null, 2), 'utf-8');
@@ -464,13 +477,22 @@ setInterval(() => {
 (async () => {
   inMemoryDb = readLocalDb();
   const cloudData = await fetchCloudDb();
-  if (cloudData && Array.isArray(cloudData.boats)) {
-    inMemoryDb.boats = deduplicateAndNormalizeBoats([
-      ...cloudData.boats,
-      ...(inMemoryDb.boats || [])
-    ]);
+  if (cloudData) {
+    if (Array.isArray(cloudData.boats)) {
+      inMemoryDb.boats = deduplicateAndNormalizeBoats([
+        ...cloudData.boats,
+        ...(inMemoryDb.boats || [])
+      ]);
+    }
+    if (Array.isArray(cloudData.reminders)) {
+      const remMap = new Map();
+      cloudData.reminders.forEach(r => { if (r && r.id) remMap.set(r.id, r); });
+      (inMemoryDb.reminders || []).forEach(r => { if (r && r.id) remMap.set(r.id, r); });
+      inMemoryDb.reminders = Array.from(remMap.values());
+    }
   } else {
     inMemoryDb.boats = deduplicateAndNormalizeBoats(inMemoryDb.boats || []);
+    inMemoryDb.reminders = Array.isArray(inMemoryDb.reminders) ? inMemoryDb.reminders : [];
   }
   saveDb();
 })();
@@ -549,15 +571,15 @@ function validateImagePayload(imageDataUrl) {
   if (commaIdx !== -1) {
     const header = imageDataUrl.slice(0, commaIdx).toLowerCase();
     cleanBase64 = imageDataUrl.slice(commaIdx + 1).trim();
-    const mimeMatch = header.match(/data:image\/([a-z0-9+.-]+)/);
+    const mimeMatch = header.match(/data:(?:image\/([a-z0-9+.-]+)|application\/(pdf))/);
     if (!mimeMatch && !header.includes('base64')) {
       return {
         valid: false,
         status: 400,
-        error: 'Geçersiz dosya formatı. Yalnızca fotoğraf (JPEG, PNG, WEBP) yüklenebilir.'
+        error: 'Geçersiz dosya formatı. Yalnızca fotoğraf (JPEG, PNG, WEBP) veya PDF yüklenebilir.'
       };
     }
-    if (mimeMatch) rawFormat = mimeMatch[1];
+    if (mimeMatch) rawFormat = mimeMatch[1] || mimeMatch[2];
   } else {
     cleanBase64 = imageDataUrl.trim();
   }
@@ -568,14 +590,14 @@ function validateImagePayload(imageDataUrl) {
     return {
       valid: false,
       status: 400,
-      error: 'Yüklenen görsel dosyası çok küçük veya bozuk.'
+      error: 'Yüklenen dosya çok küçük veya bozuk.'
     };
   }
   if (buffer.length > MAX_IMAGE_BYTES) {
     return {
       valid: false,
       status: 413,
-      error: 'Görsel boyutu çok büyük. Maksimum 15 MB fotoğraf yüklenebilir.'
+      error: 'Dosya boyutu çok büyük. Maksimum 15 MB fotoğraf veya PDF yüklenebilir.'
     };
   }
 
@@ -599,17 +621,26 @@ function validateImagePayload(imageDataUrl) {
     buffer.toString('ascii', 0, 4) === 'RIFF' &&
     buffer.toString('ascii', 8, 12) === 'WEBP';
 
-  if (!isJpeg && !isPng && !isWebp) {
+  const isPdf = buffer.length >= 4 &&
+    buffer[0] === 0x25 && // %
+    buffer[1] === 0x50 && // P
+    buffer[2] === 0x44 && // D
+    buffer[3] === 0x46;   // F
+
+  if (!isJpeg && !isPng && !isWebp && !isPdf) {
     return {
       valid: false,
       status: 400,
-      error: 'Dosya içeriği doğrulanamadı. Lütfen geçerli bir resim dosyası (JPG, PNG, WEBP) yükleyin.'
+      error: 'Dosya içeriği doğrulanamadı. Lütfen geçerli bir resim (JPG, PNG, WEBP) veya PDF dosyası yükleyin.'
     };
   }
 
   let ext = 'jpg';
   let mimeType = 'image/jpeg';
-  if (isPng) {
+  if (isPdf) {
+    ext = 'pdf';
+    mimeType = 'application/pdf';
+  } else if (isPng) {
     ext = 'png';
     mimeType = 'image/png';
   } else if (isWebp) {
@@ -668,6 +699,7 @@ const MIME_TYPES = {
   '.jpeg': 'image/jpeg',
   '.svg': 'image/svg+xml',
   '.webp': 'image/webp',
+  '.pdf': 'application/pdf',
   '.ico': 'image/x-icon'
 };
 
@@ -869,25 +901,30 @@ function postProcessGeminiFormOutput(parsed) {
   };
 }
 
-// Gemini Vision API parser with multi-model pool & cooldown memory
-async function analyzeImageWithGemini(cleanBase64, mimeType = 'image/jpeg') {
+// Gemini Vision & Document API parser with multi-model pool & cooldown memory
+async function analyzeImageWithGemini(cleanBase64, mimeType = 'image/jpeg', pdfTextHint = '') {
   const rawKeys = process.env.GEMINI_API_KEYS || process.env.GEMINI_API_KEY || '';
   const apiKeys = rawKeys.split(',').map(k => k.trim()).filter(Boolean);
   if (apiKeys.length === 0) {
     throw new Error('Sunucu ortam değişkeninde (env) GEMINI_API_KEY tanımlı değil.');
   }
 
+  const trimmedHint = String(pdfTextHint || '').trim();
+  const extraHintBlock = trimmedHint
+    ? `\n\n4. EK PDF METİN KATMANI İPUCU (PDF dosyasının içinden okunan dijital metin aşağıdadır; görsel/belge ile birlikte değerlendirerek tüm alanları eksiksiz doldur):\n"""\n${trimmedHint.slice(0, 6000)}\n"""`
+    : '';
+
   const prompt = `Sen denizcilik ve marina belgeleri konusunda uzman bir asistansın.
-Ekli görsel Setur Marinas veya benzeri bir "Mürettebat Bilgi Formu" el yazısı belgesidir.
+Ekli belge/görsel Setur Marinas veya benzeri bir "Mürettebat Bilgi Formu" (el yazısı, taranmış PDF veya dijital PDF) belgesidir.
 
 ÇOK ÖNEMLİ TALİMATLAR:
-1. Görsel yamuk, 90 derece yan (dikey/yatay), baş aşağı ters veya perspektif bozukluğu ile çekilmiş olabilir. Metinlerin yönü ve açısı ne olursa olsun belgedeki tüm el yazılarını zihninde doğru yöne çevir ve eksiksiz oku.
+1. Belge yamuk, 90 derece yan (dikey/yatay), baş aşağı ters veya perspektif bozukluğu ile taranmış/çekilmiş olabilir. Metinlerin yönü ve açısı ne olursa olsun belgedeki tüm el yazılarını ve metinleri zihninde doğru yöne çevir ve eksiksiz oku.
 2. Form iki ana bölümden oluşur:
    - ÜST BÖLÜM ("TEKNE SAHİBİ / KAPTANI / SORUMLUSU BİLGİLERİ"): Burada TEKNE ADI, ÜNVAN, İSİM ve SOYİSİM satırları bulunur. Çok dikkat et: Kaptanlar bazen telefon numarasını üst bölümdeki İSİM veya SOYİSİM satırına yazarlar (örneğin İSİM satırına "İknur Adar", SOYİSİM satırına "0533 308 26 53" veya İSİM satırına "Vladimirs +37129691803"). Üst bölümde telefon numarası varsa bunu mutlaka "captain_phone" alanına yaz ve üst bölümdeki kaptanı/sorumluyu aşağıdaki "crew" (mürettebat) listesine de ilk sıradan ekle!
    - ALT BÖLÜM ("MÜRETTEBAT BİLGİLERİ"): Tabloda "İsim", "Soyisim" ve "Görev" sütunları vardır. Basılı formda "Telefon" sütunu olmadığı için kaptanlar telefon numaralarını genellikle "Görev" sütununa yazarlar, görevi ise ya Soyisim'in yanına parantez içinde yazarlar ya da boş bırakırlar.
    - Telefon numarasını mutlaka "phone" alanına koy (Türk numarası ise 05XX XXX XX XX formatında, yabancı numara ise + ülke koduyla).
    - Görev belirtilmemişse ve kişi üst bölümdeki kaptan ise görevine "Kaptan", diğer kişiler ise görevine "Gemici" yaz.
-3. Formun altında veya üstünde "TARİH" alanı varsa YYYY-MM-DD formatına çevirerek "form_date" alanına yaz (yoksa "" bırak).
+3. Formun altında veya üstünde "TARİH" alanı varsa YYYY-MM-DD formatına çevirerek "form_date" alanına yaz (yoksa "" bırak).${extraHintBlock}
 
 Yalnızca şu JSON formatında cevap ver, Markdown kod bloğu veya açıklama ekleme:
 {
@@ -924,6 +961,10 @@ Yalnızca şu JSON formatında cevap ver, Markdown kod bloğu veya açıklama ek
     for (const model of orderedModels) {
       try {
         const isGemma = model.startsWith('gemma-');
+        // Gemma models only support image/* inlineData; skip Gemma if raw application/pdf is sent
+        if (isGemma && mimeType === 'application/pdf') {
+          continue;
+        }
         // Note: Do NOT include deprecated 'temperature' parameter (causes HTTP 400 on Gemini 3.5-flash-lite / 3.6-flash+)
         const payload = {
           contents: [
@@ -1178,6 +1219,109 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // API: GET /api/reminders
+    if (req.method === 'GET' && pathname === '/api/reminders') {
+      const list = Array.isArray(inMemoryDb.reminders) ? inMemoryDb.reminders : [];
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify(list));
+      return;
+    }
+
+    // API: POST /api/reminders (Create a task / reminder)
+    if (req.method === 'POST' && pathname === '/api/reminders') {
+      if (!checkRateLimit(req, res, 'write-reminders', 200, 5 * 60 * 1000)) return;
+      const body = await parseJsonBody(req, 256 * 1024);
+      const title = String(body.title || '').trim().slice(0, 200);
+      if (!title) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Görev başlığı zorunludur.' }));
+        return;
+      }
+
+      if (!Array.isArray(inMemoryDb.reminders)) inMemoryDb.reminders = [];
+      const nowIso = new Date().toISOString();
+      const newReminder = {
+        id: crypto.randomUUID(),
+        title,
+        notes: String(body.notes || '').trim().slice(0, 500),
+        boat_id: String(body.boat_id || '').trim(),
+        boat_name: String(body.boat_name || '').trim().slice(0, 120),
+        captain_name: String(body.captain_name || '').trim().slice(0, 120),
+        captain_phone: String(body.captain_phone || '').trim().slice(0, 40),
+        due_at: body.due_at ? String(body.due_at).trim() : nowIso,
+        repeat: ['none', 'daily', 'weekly', 'monthly'].includes(body.repeat) ? body.repeat : 'none',
+        priority: ['normal', 'high', 'urgent'].includes(body.priority) ? body.priority : 'normal',
+        completed: false,
+        completed_at: null,
+        notified_due_at: null,
+        created_at: nowIso,
+        updated_at: nowIso
+      };
+
+      inMemoryDb.reminders.unshift(newReminder);
+      saveDb();
+
+      res.writeHead(201, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, reminder: newReminder }));
+      return;
+    }
+
+    // API: PUT /api/reminders/:id (Update / Complete / Snooze a reminder)
+    if (req.method === 'PUT' && pathname.startsWith('/api/reminders/')) {
+      if (!checkRateLimit(req, res, 'write-reminders', 200, 5 * 60 * 1000)) return;
+      const remId = pathname.replace('/api/reminders/', '');
+      if (!Array.isArray(inMemoryDb.reminders)) inMemoryDb.reminders = [];
+      const idx = inMemoryDb.reminders.findIndex(r => r.id === remId);
+      if (idx === -1) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Hatırlatma bulunamadı.' }));
+        return;
+      }
+
+      const body = await parseJsonBody(req, 256 * 1024);
+      const existing = inMemoryDb.reminders[idx];
+      const nowIso = new Date().toISOString();
+
+      const updated = {
+        ...existing,
+        title: body.title !== undefined ? String(body.title).trim().slice(0, 200) : existing.title,
+        notes: body.notes !== undefined ? String(body.notes).trim().slice(0, 500) : existing.notes,
+        boat_id: body.boat_id !== undefined ? String(body.boat_id).trim() : existing.boat_id,
+        boat_name: body.boat_name !== undefined ? String(body.boat_name).trim().slice(0, 120) : existing.boat_name,
+        captain_name: body.captain_name !== undefined ? String(body.captain_name).trim().slice(0, 120) : existing.captain_name,
+        captain_phone: body.captain_phone !== undefined ? String(body.captain_phone).trim().slice(0, 40) : existing.captain_phone,
+        due_at: body.due_at !== undefined ? String(body.due_at).trim() : existing.due_at,
+        repeat: body.repeat !== undefined && ['none', 'daily', 'weekly', 'monthly'].includes(body.repeat) ? body.repeat : existing.repeat,
+        priority: body.priority !== undefined && ['normal', 'high', 'urgent'].includes(body.priority) ? body.priority : existing.priority,
+        completed: body.completed !== undefined ? Boolean(body.completed) : existing.completed,
+        completed_at: body.completed !== undefined ? (body.completed ? nowIso : null) : existing.completed_at,
+        notified_due_at: body.notified_due_at !== undefined ? body.notified_due_at : existing.notified_due_at,
+        updated_at: nowIso
+      };
+
+      inMemoryDb.reminders[idx] = updated;
+      saveDb();
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, reminder: updated }));
+      return;
+    }
+
+    // API: DELETE /api/reminders/:id
+    if (req.method === 'DELETE' && pathname.startsWith('/api/reminders/')) {
+      const remId = pathname.replace('/api/reminders/', '');
+      if (Array.isArray(inMemoryDb.reminders)) {
+        const idx = inMemoryDb.reminders.findIndex(r => r.id === remId);
+        if (idx !== -1) {
+          inMemoryDb.reminders.splice(idx, 1);
+          saveDb();
+        }
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true }));
+      return;
+    }
+
     // API: POST /api/upload-and-analyze (Rate Limited + File Validation + Server Env API Key Only)
     if (req.method === 'POST' && pathname === '/api/upload-and-analyze') {
       // Rate Limit: Max 120 uploads per 15 minutes per IP (supports bulk scanning at marina)
@@ -1217,7 +1361,7 @@ const server = http.createServer(async (req, res) => {
       }
 
       try {
-        const analyzedData = await analyzeImageWithGemini(cleanBase64, mimeType);
+        const analyzedData = await analyzeImageWithGemini(cleanBase64, mimeType, body.pdfText || '');
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           imageUrl,

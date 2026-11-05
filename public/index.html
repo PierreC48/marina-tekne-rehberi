@@ -34,6 +34,13 @@
   <!-- Cropper.js for image straightening & cropping -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+  <!-- PDF.js for client-side PDF rendering & text extraction -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    }
+  </script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body { 
@@ -117,6 +124,10 @@
         <button id="tab-gallery" onclick="switchTab('gallery')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span>🖼️ Orijinal Formlar</span>
         </button>
+        <button id="tab-reminders" onclick="switchTab('reminders')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-amber-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>🔔 Görevler</span>
+          <span id="stat-reminder-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
+        </button>
       </div>
 
     </div>
@@ -180,6 +191,69 @@
       <div id="gallery-grid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         <!-- Rendered via JS -->
       </div>
+    </div>
+
+    <!-- VIEW 4: TASKS & REMINDERS (GÖREV & SESLİ HATIRLATMA SİSTEMİ) -->
+    <div id="view-reminders" class="hidden space-y-4">
+      
+      <!-- Top Control Bar -->
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900">🔔 Görev & Sesli Hatırlatma Takibi</h2>
+            <span id="audio-status-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+              🔊 Sesli Alarm Aktif
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">
+            Belirlenen tarih ve saat geldiğinde telefonunuza <strong>sesli alarm + Türkçe sesli okuma + bildirim</strong> gönderilir.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2 flex-wrap shrink-0">
+          <button type="button" onclick="testReminderSoundAndNotification()" class="inline-flex items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 px-3 py-2 rounded-xl text-xs font-bold transition active:scale-95" title="Telefonda sesli uyarıyı ve bildirimi test et">
+            <span>🔊</span>
+            <span>Ses & Bildirim Testi</span>
+          </button>
+          <button type="button" onclick="openReminderModal()" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold shadow-md shadow-amber-600/20 transition active:scale-95">
+            <span>＋</span>
+            <span>Yeni Görev / Hatırlatma</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Filter Pills -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+        <button type="button" id="rem-filter-pending" onclick="setReminderFilter('pending')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-marine-900 text-white shadow-xs transition whitespace-nowrap">
+          ⏳ Bekleyen Görevler (<span id="rem-count-pending">0</span>)
+        </button>
+        <button type="button" id="rem-filter-overdue" onclick="setReminderFilter('overdue')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-rose-700 border border-rose-200 hover:bg-rose-50 transition whitespace-nowrap">
+          🚨 Zamanı Gelen / Geciken (<span id="rem-count-overdue">0</span>)
+        </button>
+        <button type="button" id="rem-filter-completed" onclick="setReminderFilter('completed')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition whitespace-nowrap">
+          ✅ Tamamlananlar (<span id="rem-count-completed">0</span>)
+        </button>
+        <button type="button" id="rem-filter-all" onclick="setReminderFilter('all')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-white text-slate-600 border border-slate-200 hover:bg-slate-50 transition whitespace-nowrap">
+          📋 Tümü
+        </button>
+      </div>
+
+      <!-- Reminders List -->
+      <div id="reminders-list" class="grid grid-cols-1 gap-3">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="reminders-empty" class="hidden text-center py-12 bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+        <div class="text-4xl mb-2">🔔</div>
+        <h3 class="text-base font-bold text-slate-800">Bu listede henüz görev / hatırlatma yok</h3>
+        <p class="text-xs text-slate-500 mt-1 mb-4">Teknelere özel veya genel marina görevleri ekleyip zamanı geldiğinde sesli bildirim alabilirsiniz.</p>
+        <button type="button" onclick="openReminderModal()" class="inline-flex items-center gap-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold px-4 py-2 rounded-xl text-xs transition shadow-sm">
+          <span>＋</span>
+          <span>İlk Hatırlatmayı Ekle</span>
+        </button>
+      </div>
+
     </div>
 
   </main>
@@ -252,65 +326,88 @@
           <span id="upload-modal-icon" class="text-lg">📸</span>
           <div>
             <h3 id="upload-modal-title" class="font-bold text-sm sm:text-base text-white">Yeni Mürettebat Formu Ekle</h3>
-            <p id="upload-modal-subtitle" class="text-[11px] text-sky-200">Kameradan çekin veya galerinizden seçin (Maks. 8 MB - JPG/PNG/WEBP)</p>
+            <p id="upload-modal-subtitle" class="text-[11px] text-sky-200">Kameradan çekin, galeriden fotoğraf seçin veya PDF form yükleyin</p>
           </div>
         </div>
         <button onclick="closeUploadModal()" class="text-sky-300 hover:text-white p-1 rounded-lg text-lg">✕</button>
       </div>
 
-      <!-- Step 1: CAMERA OR GALLERY OPTIONS -->
+      <!-- Step 1: CAMERA, GALLERY OR PDF OPTIONS -->
       <div id="upload-step-pick" class="p-4 sm:p-6 overflow-y-auto">
         
         <p class="text-xs text-slate-600 mb-4 text-center font-medium">
           Lütfen formu yüklemek için aşağıdaki seçeneklerden birini kullanın:
         </p>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           
           <!-- Option 1: Direct Live Camera (Works 100% on Android & iOS) -->
           <button 
             type="button"
             onclick="startLiveCamera()"
-            class="border-2 border-dashed border-sky-300 hover:border-sky-500 bg-sky-50/70 hover:bg-sky-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 group shadow-xs"
+            class="border-2 border-dashed border-sky-300 hover:border-sky-500 bg-sky-50/70 hover:bg-sky-50 rounded-2xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 group shadow-xs"
           >
-            <div class="w-14 h-14 rounded-2xl bg-sky-600 text-white flex items-center justify-center text-2xl mb-2.5 shadow-md shadow-sky-600/30 group-hover:scale-105 transition">
+            <div class="w-12 h-12 rounded-2xl bg-sky-600 text-white flex items-center justify-center text-2xl mb-2 shadow-md shadow-sky-600/30 group-hover:scale-105 transition">
               📷
             </div>
-            <h4 class="text-sm font-bold text-slate-900">Kameradan Çek</h4>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900">Kameradan Çek</h4>
             <p class="text-[11px] text-slate-500 mt-1">
               Canlı kamerayı açarak formun fotoğrafını anında çekip okutun.
             </p>
-            <span class="mt-3 inline-block bg-sky-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-sm">
+            <span class="mt-2.5 inline-block bg-sky-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm">
               Canlı Kamerayı Aç
             </span>
           </button>
 
-          <!-- Option 2: Gallery / Files -->
+          <!-- Option 2: Gallery / Photos -->
           <label 
-            class="relative border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/70 hover:bg-indigo-50 rounded-2xl p-5 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 overflow-hidden group shadow-xs"
+            class="relative border-2 border-dashed border-indigo-300 hover:border-indigo-500 bg-indigo-50/70 hover:bg-indigo-50 rounded-2xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 overflow-hidden group shadow-xs"
           >
             <input 
               type="file" 
               id="file-input-gallery" 
-              accept="image/*" 
+              accept="image/*,.pdf,application/pdf" 
               class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
               onchange="handleFileSelected(event)"
             />
-            <div class="w-14 h-14 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-2.5 shadow-md shadow-indigo-600/30 group-hover:scale-105 transition pointer-events-none">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-2xl mb-2 shadow-md shadow-indigo-600/30 group-hover:scale-105 transition pointer-events-none">
               🖼️
             </div>
-            <h4 class="text-sm font-bold text-slate-900 pointer-events-none">Galeriden / Dosyadan Seç</h4>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 pointer-events-none">Galeriden Fotoğraf</h4>
             <p class="text-[11px] text-slate-500 mt-1 pointer-events-none">
-              Telefonunuzdaki fotoğraflardan veya albümden önceden çekilmiş formu seçin.
+              Telefonunuzdaki fotoğraflardan veya albümden formu seçin.
             </p>
-            <span class="mt-3 inline-block bg-indigo-600 text-white text-xs font-semibold px-3.5 py-1.5 rounded-lg shadow-sm pointer-events-none">
+            <span class="mt-2.5 inline-block bg-indigo-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm pointer-events-none">
               Galeriyi Aç
+            </span>
+          </label>
+
+          <!-- Option 3: PDF Form Upload -->
+          <label 
+            class="relative border-2 border-dashed border-rose-300 hover:border-rose-500 bg-rose-50/70 hover:bg-rose-50 rounded-2xl p-4 text-center cursor-pointer transition flex flex-col items-center justify-center active:scale-95 overflow-hidden group shadow-xs"
+          >
+            <input 
+              type="file" 
+              id="file-input-pdf" 
+              accept=".pdf,application/pdf" 
+              class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20" 
+              onchange="handleFileSelected(event)"
+            />
+            <div class="w-12 h-12 rounded-2xl bg-rose-600 text-white flex items-center justify-center text-2xl mb-2 shadow-md shadow-rose-600/30 group-hover:scale-105 transition pointer-events-none">
+              📄
+            </div>
+            <h4 class="text-xs sm:text-sm font-bold text-slate-900 pointer-events-none">PDF Form Yükle</h4>
+            <p class="text-[11px] text-slate-500 mt-1 pointer-events-none">
+              Taranmış veya bilgisayar ortamında hazırlanmış PDF formu okutun.
+            </p>
+            <span class="mt-2.5 inline-block bg-rose-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg shadow-sm pointer-events-none">
+              PDF Dosyası Seç
             </span>
           </label>
 
         </div>
 
-        <!-- Option 3: Native Phone Camera App (Direct Autofocus for iPhone & Android) -->
+        <!-- Option 4: Native Phone Camera App (Direct Autofocus for iPhone & Android) -->
         <div class="mt-3.5 pt-3 border-t border-slate-200 text-center">
           <label class="relative inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold rounded-xl transition active:scale-95 border border-slate-300 cursor-pointer overflow-hidden">
             <input 
@@ -489,7 +586,7 @@
             </div>
           </div>
           <button type="button" onclick="switchToPhotoPicker()" class="px-2.5 py-1.5 bg-white hover:bg-sky-100 text-sky-800 border border-sky-300 rounded-lg text-[11px] font-bold shrink-0 transition">
-            📷 Yeni Fotoğraf
+            📁 Yeni Fotoğraf / PDF
           </button>
         </div>
 
@@ -578,6 +675,197 @@
     </div>
   </div>
 
+  <!-- MODAL 4: ADD / EDIT REMINDER MODAL -->
+  <div id="reminder-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-2.5 sm:p-4">
+    <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[94vh] border border-slate-200">
+      <div class="px-4 py-3 bg-gradient-to-r from-marine-950 to-slate-900 text-white flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-lg">⏰</span>
+          <div>
+            <h3 id="reminder-modal-title" class="font-bold text-sm text-white">Yeni Görev & Sesli Hatırlatma</h3>
+            <p class="text-[11px] text-sky-300">Belirlenen saatte telefona sesli uyarı ve bildirim gelir</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeReminderModal()" class="text-sky-300 hover:text-white p-1.5 rounded-lg text-base">✕</button>
+      </div>
+
+      <form onsubmit="saveReminder(event)" class="p-4 space-y-3.5 overflow-y-auto">
+        <!-- Task Title -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Görev / Hatırlatma Başlığı *</label>
+          <input
+            type="text"
+            id="reminder-title-input"
+            required
+            placeholder="Örn: ARES teknesi sözleşme yenileme kontrolü, Palamar tahsilatı..."
+            class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+        </div>
+
+        <!-- Quick Presets for Title -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <span class="text-[10px] font-bold text-slate-400 uppercase">Hızlı Başlık:</span>
+          <button type="button" onclick="setQuickReminderTitle('Mürettebat formu güncelleme kontrolü')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-semibold transition">📋 Form Güncelleme</button>
+          <button type="button" onclick="setQuickReminderTitle('Elektrik / Su sayaç okuma ve kontrol')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-semibold transition">⚡ Elektrik/Su</button>
+          <button type="button" onclick="setQuickReminderTitle('Kaptan ile iletişime geçilecek')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-semibold transition">📞 Kaptanı Ara</button>
+          <button type="button" onclick="setQuickReminderTitle('Palamar / Bağlama kontrolü')" class="text-[11px] bg-slate-100 hover:bg-slate-200 text-slate-700 px-2 py-0.5 rounded-lg font-semibold transition">⚓ Bağlama Kontrol</button>
+        </div>
+
+        <!-- Optional Boat Link -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">İlgili Tekne (İsteğe Bağlı)</label>
+            <select
+              id="reminder-boat-select"
+              onchange="onReminderBoatChange()"
+              class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+            >
+              <option value="">— Genel Marina Görevi (Teknesiz) —</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">İlgili Kişi / Telefon</label>
+            <input
+              type="text"
+              id="reminder-contact-input"
+              placeholder="Kaptan adı veya tel..."
+              class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+            />
+          </div>
+        </div>
+
+        <!-- Due Date & Time + Quick Time Buttons -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="block text-xs font-extrabold text-amber-950">🔔 Hatırlatma Zamanı (Tarih & Saat) *</label>
+            <span class="text-[10px] font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-md">Sesli Alarm</span>
+          </div>
+          <input
+            type="datetime-local"
+            id="reminder-due-input"
+            required
+            class="w-full border border-amber-300 rounded-xl px-3 py-2 text-xs sm:text-sm font-bold text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500"
+          />
+          <div class="flex items-center gap-1.5 flex-wrap pt-1">
+            <span class="text-[10px] font-bold text-amber-800">Hızlı Seç:</span>
+            <button type="button" onclick="setReminderQuickTime(1)" class="text-[11px] bg-amber-500 hover:bg-amber-600 text-slate-950 px-2 py-1 rounded-lg font-extrabold shadow-xs transition">⚡ 1 Dk Sonra (Test)</button>
+            <button type="button" onclick="setReminderQuickTime(15)" class="text-[11px] bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 px-2 py-1 rounded-lg font-bold transition">15 Dk</button>
+            <button type="button" onclick="setReminderQuickTime(60)" class="text-[11px] bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 px-2 py-1 rounded-lg font-bold transition">1 Saat</button>
+            <button type="button" onclick="setReminderQuickTime('tomorrow9')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 px-2 py-1 rounded-lg font-bold transition">🌅 Yarın 09:00</button>
+            <button type="button" onclick="setReminderQuickTime('tomorrow14')" class="text-[11px] bg-white hover:bg-amber-100 text-amber-900 border border-amber-300 px-2 py-1 rounded-lg font-bold transition">☀️ Yarın 14:00</button>
+          </div>
+        </div>
+
+        <!-- Priority & Repeat -->
+        <div class="grid grid-cols-2 gap-2.5">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Öncelik Seviyesi</label>
+            <select id="reminder-priority-select" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="normal">🔵 Normal</option>
+              <option value="high">🟠 Önemli</option>
+              <option value="urgent">🔴 Acil (Yüksek Sesli)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Tekrarlama</label>
+            <select id="reminder-repeat-select" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+              <option value="none">Tek Seferlik</option>
+              <option value="daily">🔄 Her Gün</option>
+              <option value="weekly">📅 Her Hafta</option>
+              <option value="monthly">🗓️ Her Ay</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Görev Notu / Detay (Sesli Okunacak Metin)</label>
+          <textarea
+            id="reminder-notes-input"
+            rows="2"
+            placeholder="Ek detaylar veya hatırlatma sırasında ekranda/seste belirtilecek not..."
+            class="w-full border border-slate-300 rounded-xl px-3 py-2 text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500"
+          ></textarea>
+        </div>
+
+        <div class="pt-2 border-t border-slate-200 flex items-center justify-end gap-2">
+          <button type="button" onclick="closeReminderModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100">
+            Vazgeç
+          </button>
+          <button type="submit" class="px-5 py-2.5 rounded-xl text-xs font-extrabold bg-amber-500 hover:bg-amber-400 text-slate-950 shadow-md flex items-center gap-1.5 active:scale-95 transition">
+            <span>🔔</span>
+            <span id="reminder-save-btn-text">Hatırlatmayı Kur</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 5: ACTIVE SOUND ALARM & VOICE NOTIFICATION MODAL -->
+  <div id="alarm-modal" class="fixed inset-0 z-[60] hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden border-2 border-amber-400 animate-bounce-once">
+      <div class="bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 text-white p-5 text-center relative">
+        <div class="w-16 h-16 rounded-full bg-white/20 backdrop-blur mx-auto flex items-center justify-center text-4xl mb-2 animate-pulse">
+          🔔
+        </div>
+        <span id="alarm-priority-badge" class="inline-block text-[10px] font-extrabold uppercase tracking-wider bg-slate-950/40 text-white px-2.5 py-0.5 rounded-full mb-1">
+          MARİNA GÖREV HATIRLATMASI
+        </span>
+        <h3 id="alarm-title" class="text-lg sm:text-xl font-black text-white leading-snug">Görev Başlığı</h3>
+        <p id="alarm-time" class="text-xs text-amber-100 mt-1 font-semibold"></p>
+      </div>
+
+      <div class="p-5 space-y-4">
+        <div id="alarm-boat-box" class="hidden bg-sky-50 border border-sky-200 rounded-2xl p-3.5 flex items-center justify-between gap-2">
+          <div class="min-w-0">
+            <p class="text-[10px] font-bold text-sky-700 uppercase">İlgili Tekne & Kişi</p>
+            <p id="alarm-boat-name" class="text-sm font-extrabold text-slate-900 truncate"></p>
+            <p id="alarm-contact-info" class="text-xs text-slate-600 font-medium mt-0.5"></p>
+          </div>
+          <div id="alarm-contact-actions" class="flex items-center gap-1.5 shrink-0"></div>
+        </div>
+
+        <div id="alarm-notes-box" class="hidden bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-700 leading-relaxed"></div>
+
+        <!-- Repeat Voice Button -->
+        <div class="flex items-center justify-center">
+          <button type="button" onclick="repeatCurrentAlarmVoice()" class="text-xs font-bold text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition">
+            <span>🗣️</span>
+            <span>Görevi Tekrar Sesli Oku</span>
+          </button>
+        </div>
+
+        <!-- Snooze & Complete Buttons -->
+        <div class="space-y-2 pt-1">
+          <button
+            type="button"
+            onclick="completeActiveAlarm()"
+            class="w-full py-3 px-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 active:scale-95 transition"
+          >
+            <span>✅</span>
+            <span>Görevi Tamamla ve Alarmı Kapat</span>
+          </button>
+
+          <div class="grid grid-cols-3 gap-2">
+            <button type="button" onclick="snoozeActiveAlarm(5)" class="py-2 px-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs transition">
+              💤 5 Dk Ertele
+            </button>
+            <button type="button" onclick="snoozeActiveAlarm(15)" class="py-2 px-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs transition">
+              💤 15 Dk Ertele
+            </button>
+            <button type="button" onclick="snoozeActiveAlarm(60)" class="py-2 px-2 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs transition">
+              💤 1 Saat Ertele
+            </button>
+          </div>
+
+          <button type="button" onclick="dismissAlarmModalOnly()" class="w-full py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 transition">
+            Sesi Sustur (Görev Listede Beklemeye Devam Etsin)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-5 sm:w-auto z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
     <span id="toast-icon">✓</span>
@@ -588,11 +876,23 @@
   <script>
     let allBoats = [];
     let allContacts = [];
+    let allReminders = [];
+    let currentReminderFilter = 'pending';
+    let editingReminderId = null;
+    let activeAlarmReminder = null;
+    let alarmIntervalTimer = null;
+    let sharedAudioCtx = null;
     let currentUploadedImageUrl = '';
     let activeTab = 'boats';
     let currentCameraFacing = 'environment';
     let matchedSimilarBoatId = null;
     let pendingExportType = null;
+    const REMINDERS_UI_ACTIVE =
+      window.location.hostname === 'localhost' ||
+      window.location.hostname === '127.0.0.1' ||
+      window.location.hostname.startsWith('10.') ||
+      window.location.hostname.startsWith('192.168.') ||
+      new URLSearchParams(window.location.search).get('reminders') === '1';
 
     function openProtectedExport(type) {
       pendingExportType = type;
@@ -822,18 +1122,23 @@
     async function loadData() {
       updateOnlineStatusUI();
       try {
-        const [boatsRes, contactsRes] = await Promise.all([
+        const [boatsRes, contactsRes, remindersRes] = await Promise.all([
           fetch('/api/boats'),
-          fetch('/api/contacts')
+          fetch('/api/contacts'),
+          fetch('/api/reminders').catch(() => null)
         ]);
         if (!boatsRes.ok || !contactsRes.ok) throw new Error('Sunucu yanıt vermedi');
         allBoats = await boatsRes.json();
         allContacts = await contactsRes.json();
+        if (remindersRes && remindersRes.ok) {
+          allReminders = await remindersRes.json();
+        }
 
         // Save to localStorage for offline marina usage
         try {
           localStorage.setItem('marina_boats_cache', JSON.stringify(allBoats));
           localStorage.setItem('marina_contacts_cache', JSON.stringify(allContacts));
+          localStorage.setItem('marina_reminders_cache', JSON.stringify(allReminders));
           localStorage.setItem('marina_cache_time', new Date().toISOString());
         } catch (storageErr) {
           console.warn('Önbellek yazılamadı:', storageErr);
@@ -843,6 +1148,10 @@
         try {
           const cachedBoats = localStorage.getItem('marina_boats_cache');
           const cachedContacts = localStorage.getItem('marina_contacts_cache');
+          const cachedReminders = localStorage.getItem('marina_reminders_cache');
+          if (cachedReminders) {
+            allReminders = JSON.parse(cachedReminders);
+          }
           if (cachedBoats && cachedContacts) {
             allBoats = JSON.parse(cachedBoats);
             allContacts = JSON.parse(cachedContacts);
@@ -862,19 +1171,22 @@
       renderBoats(allBoats);
       renderContacts(allContacts);
       renderGallery(allBoats);
+      renderReminders();
+      checkDueRemindersNow();
     }
 
     function switchTab(tab) {
       activeTab = tab;
-      const tabs = ['boats', 'contacts', 'gallery'];
+      const tabs = ['boats', 'contacts', 'reminders', 'gallery'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const view = document.getElementById(`view-${t}`);
+        if (!btn || !view) return;
         if (t === tab) {
-          btn.className = "flex-1 py-2 px-3 rounded-lg font-semibold transition text-white bg-marine-700 shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap";
+          btn.className = "flex-1 py-2 px-3 rounded-lg font-semibold transition text-white bg-marine-700 shadow-sm flex items-center justify-center gap-1.5 whitespace-nowrap relative";
           view.classList.remove('hidden');
         } else {
-          btn.className = "flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap";
+          btn.className = "flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap relative";
           view.classList.add('hidden');
         }
       });
@@ -902,6 +1214,7 @@
                (c.phone || '').includes(q);
       });
       renderContacts(filteredContacts);
+      renderReminders(q);
     }
 
     // Render Boats View (with Form Date, Last Updated, Stale Badge & 1-Tap vCard)
@@ -923,6 +1236,7 @@
         const stale = isStaleRecord(b);
         const formDateFormatted = b.form_date ? formatDateTr(b.form_date) : null;
         const updatedFormatted = formatDateTr(b.updated_at || b.created_at);
+        const activeBoatReminders = allReminders.filter(r => !r.completed && r.boat_id === b.id).length;
 
         return `
           <div class="bg-white rounded-2xl shadow-sm border ${stale ? 'border-amber-300' : 'border-slate-200'} overflow-hidden hover:shadow-md transition">
@@ -937,6 +1251,11 @@
                   <div class="flex items-center gap-1.5 flex-wrap">
                     <h3 class="text-base sm:text-lg font-extrabold text-white tracking-tight truncate">${b.name}</h3>
                     <span class="text-[10px] bg-sky-500/30 text-sky-200 px-2 py-0.5 rounded-full border border-sky-400/20 font-semibold shrink-0">${crewCount} Kişi</span>
+                    ${REMINDERS_UI_ACTIVE && activeBoatReminders > 0 ? `
+                      <button onclick="switchTab('reminders')" class="text-[10px] bg-amber-500 text-slate-950 px-2 py-0.5 rounded-full font-extrabold shrink-0 flex items-center gap-1">
+                        🔔 ${activeBoatReminders} Görev
+                      </button>
+                    ` : ''}
                     ${stale ? `
                       <span class="text-[10px] bg-amber-500/25 text-amber-200 px-2 py-0.5 rounded-full border border-amber-400/40 font-bold shrink-0" title="Son güncelleme veya form tarihi 6 aydan eski">
                         ⚠️ Eski Veri (&gt;6 Ay)
@@ -955,6 +1274,13 @@
 
               <!-- Action Buttons -->
               <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center flex-wrap">
+                ${REMINDERS_UI_ACTIVE ? `
+                  <button onclick="openReminderModal(null, '${b.id}')" class="inline-flex items-center gap-1 bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition shadow-sm" title="Bu Tekne İçin Sesli Hatırlatma / Görev Kur">
+                    <span>⏰</span>
+                    <span>Hatırlat</span>
+                  </button>
+                ` : ''}
+
                 <button onclick="openEditBoatModal('${b.id}')" class="inline-flex items-center gap-1 bg-amber-500 hover:bg-amber-400 text-slate-950 px-2.5 py-1.5 rounded-xl text-xs font-extrabold transition shadow-sm" title="Tekne ve Mürettebat Bilgilerini Düzenle">
                   <span>✏️</span>
                   <span>Düzenle</span>
@@ -1277,6 +1603,8 @@
       document.getElementById('upload-modal').classList.add('hidden');
     }
 
+    let lastExtractedPdfText = '';
+
     function resetUploadModal() {
       if (liveMediaStream) {
         liveMediaStream.getTracks().forEach(track => track.stop());
@@ -1287,10 +1615,10 @@
 
       document.getElementById('upload-modal-icon').innerText = '📸';
       document.getElementById('upload-modal-title').innerText = 'Yeni Mürettebat Formu Ekle';
-      document.getElementById('upload-modal-subtitle').innerText = 'Kameradan çekin veya galerinizden seçin (Maks. 8 MB - JPG/PNG/WEBP)';
+      document.getElementById('upload-modal-subtitle').innerText = 'Kameradan çekin, galeriden fotoğraf seçin veya PDF form yükleyin';
       document.getElementById('verify-save-btn-text').innerText = 'Sisteme Kaydet';
       document.getElementById('verify-preview-img')?.classList.remove('hidden');
-      document.getElementById('verify-photo-title').innerText = 'Form Görseli Yüklendi';
+      document.getElementById('verify-photo-title').innerText = 'Form Belgesi Yüklendi';
       document.getElementById('verify-photo-desc').innerText = 'Alanları kontrol edin, gerekirse düzeltip kaydedin.';
 
       document.getElementById('upload-step-pick').classList.remove('hidden');
@@ -1303,6 +1631,8 @@
       document.getElementById('similar-boat-warning').classList.add('hidden');
       document.getElementById('file-input-camera').value = '';
       document.getElementById('file-input-gallery').value = '';
+      const pdfInp = document.getElementById('file-input-pdf');
+      if (pdfInp) pdfInp.value = '';
       if (cropperInstance) {
         cropperInstance.destroy();
         cropperInstance = null;
@@ -1311,6 +1641,7 @@
       currentUploadedImageUrl = '';
       rawSelectedBase64 = '';
       lastAnalyzedBase64 = '';
+      lastExtractedPdfText = '';
       base90Angle = 0;
       matchedSimilarBoatId = null;
     }
@@ -1404,6 +1735,7 @@
 
       document.getElementById('upload-step-live-camera').classList.add('hidden');
       rawSelectedBase64 = dataUrl;
+      lastExtractedPdfText = '';
 
       if (directAnalyze) {
         startAnalyzing(dataUrl);
@@ -1452,14 +1784,89 @@
       });
     }
 
+    // Render PDF file pages into a high-resolution image + extract embedded text layer
+    async function renderPdfFileToImageAndText(file) {
+      if (!window.pdfjsLib) {
+        // Fallback: read raw PDF as base64 data URL for server-side Gemini PDF reading
+        const rawPdfUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        return { dataUrl: rawPdfUrl, extractedText: '', isRawPdf: true };
+      }
+
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await window.pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const numPagesToProcess = Math.min(pdfDoc.numPages, 2); // Up to 2 pages stitched
+      const pageCanvases = [];
+      const textParts = [];
+
+      for (let pageNum = 1; pageNum <= numPagesToProcess; pageNum++) {
+        const page = await pdfDoc.getPage(pageNum);
+
+        // Extract digital text if PDF has a text layer
+        try {
+          const textContent = await page.getTextContent();
+          const pageText = (textContent.items || []).map(item => item.str || '').join(' ').trim();
+          if (pageText) textParts.push(pageText);
+        } catch (txtErr) {
+          console.warn('PDF metin katmanı okunamadı:', txtErr);
+        }
+
+        // Render page to high-resolution canvas (target max dimension ~2000px)
+        const unscaledViewport = page.getViewport({ scale: 1 });
+        const targetScale = Math.min(2.6, Math.max(1.5, 2000 / Math.max(unscaledViewport.width, unscaledViewport.height)));
+        const viewport = page.getViewport({ scale: targetScale });
+
+        const pageCanvas = document.createElement('canvas');
+        pageCanvas.width = Math.round(viewport.width);
+        pageCanvas.height = Math.round(viewport.height);
+        const pageCtx = pageCanvas.getContext('2d');
+        pageCtx.fillStyle = '#ffffff';
+        pageCtx.fillRect(0, 0, pageCanvas.width, pageCanvas.height);
+
+        await page.render({ canvasContext: pageCtx, viewport }).promise;
+        pageCanvases.push(pageCanvas);
+      }
+
+      let finalCanvas = pageCanvases[0];
+      if (pageCanvases.length > 1) {
+        const totalWidth = Math.max(...pageCanvases.map(c => c.width));
+        const totalHeight = pageCanvases.reduce((sum, c) => sum + c.height, 0);
+        finalCanvas = document.createElement('canvas');
+        finalCanvas.width = totalWidth;
+        finalCanvas.height = totalHeight;
+        const ctx = finalCanvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, totalWidth, totalHeight);
+        let yOffset = 0;
+        for (const c of pageCanvases) {
+          ctx.drawImage(c, 0, yOffset);
+          yOffset += c.height;
+        }
+      }
+
+      return {
+        dataUrl: finalCanvas.toDataURL('image/jpeg', 0.92),
+        extractedText: textParts.join('\n'),
+        isRawPdf: false
+      };
+    }
+
     async function handleFileSelected(event) {
       const file = event.target.files?.[0];
       if (!file) return;
 
+      const fileNameLower = (file.name || '').toLowerCase();
+      const fileTypeLower = (file.type || '').toLowerCase();
+      const isPdfFile = fileTypeLower === 'application/pdf' || fileNameLower.endsWith('.pdf');
+
       // Client-side file type & size check
-      const allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif'];
-      if (file.type && !allowedMime.includes(file.type.toLowerCase()) && !file.type.startsWith('image/')) {
-        showToast('Sadece fotoğraf dosyaları (JPG, PNG, WEBP) yüklenebilir.', true);
+      const allowedMime = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
+      if (!isPdfFile && file.type && !allowedMime.includes(fileTypeLower) && !fileTypeLower.startsWith('image/')) {
+        showToast('Sadece fotoğraf (JPG, PNG, WEBP) veya PDF dosyaları yüklenebilir.', true);
         event.target.value = '';
         return;
       }
@@ -1475,7 +1882,38 @@
       }
       document.getElementById('upload-step-live-camera').classList.add('hidden');
 
+      if (isPdfFile) {
+        showToast('📄 PDF formu okunuyor ve analiz ediliyor...');
+        document.getElementById('upload-step-pick').classList.add('hidden');
+        document.getElementById('upload-step-loading').classList.remove('hidden');
+
+        try {
+          const pdfResult = await renderPdfFileToImageAndText(file);
+          rawSelectedBase64 = pdfResult.dataUrl;
+          lastExtractedPdfText = pdfResult.extractedText || '';
+          await startAnalyzing(pdfResult.dataUrl);
+        } catch (pdfErr) {
+          console.warn('PDF.js render hatası, doğrudan PDF gönderiliyor:', pdfErr);
+          try {
+            const rawPdfBase64 = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = (e) => resolve(e.target.result);
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+            rawSelectedBase64 = rawPdfBase64;
+            lastExtractedPdfText = '';
+            await startAnalyzing(rawPdfBase64);
+          } catch (fallbackErr) {
+            showToast('PDF dosyası işlenirken hata oluştu: ' + (fallbackErr.message || ''), true);
+            resetUploadModal();
+          }
+        }
+        return;
+      }
+
       showToast('Görsel hazırlanıyor...');
+      lastExtractedPdfText = '';
 
       try {
         const resizedBase64 = await readFileAndDownscale(file, 2200);
@@ -1557,6 +1995,8 @@
       document.getElementById('upload-step-pick').classList.remove('hidden');
       document.getElementById('file-input-camera').value = '';
       document.getElementById('file-input-gallery').value = '';
+      const pdfInp = document.getElementById('file-input-pdf');
+      if (pdfInp) pdfInp.value = '';
     }
 
     function skipCropAndAnalyze() {
@@ -1608,7 +2048,10 @@
         const res = await fetch('/api/upload-and-analyze', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64Data })
+          body: JSON.stringify({
+            image: base64Data,
+            pdfText: lastExtractedPdfText || ''
+          })
         });
         const result = await res.json();
 
@@ -1617,7 +2060,14 @@
         }
 
         currentUploadedImageUrl = result.imageUrl;
-        document.getElementById('verify-preview-img').src = result.imageUrl;
+        const previewImg = document.getElementById('verify-preview-img');
+        if (result.imageUrl && result.imageUrl.toLowerCase().endsWith('.pdf')) {
+          previewImg.src = "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%23e11d48'/><text y='.62em' x='50%' text-anchor='middle' font-size='45'>📄</text><text y='88' x='50%' text-anchor='middle' font-size='16' fill='white' font-family='sans-serif' font-weight='bold'>PDF</text></svg>";
+          previewImg.onclick = () => viewPhotoInNewTab(result.imageUrl);
+        } else {
+          previewImg.src = result.imageUrl;
+          previewImg.onclick = () => viewPhotoInNewTab(result.imageUrl);
+        }
         const todayIso = new Date().toISOString().slice(0, 10);
 
         if (result.data) {
@@ -1896,9 +2346,832 @@
       window.open(url, '_blank');
     }
 
-    window.addEventListener('DOMContentLoaded', loadData);
+    // ============================================================================
+    // 🔔 GÖREV TAKİP & TELEFON SESLİ HATIRLATMA SİSTEMİ
+    // ============================================================================
+
+    function getOrCreateAudioContext() {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return null;
+      if (!sharedAudioCtx) {
+        sharedAudioCtx = new AudioCtx();
+      }
+      if (sharedAudioCtx.state === 'suspended') {
+        sharedAudioCtx.resume().catch(() => {});
+      }
+      return sharedAudioCtx;
+    }
+
+    // Unlock mobile audio on first interaction
+    function unlockMobileAudioOnce() {
+      try {
+        const ctx = getOrCreateAudioContext();
+        if (ctx && ctx.state === 'suspended') {
+          ctx.resume().catch(() => {});
+        }
+      } catch (e) {}
+    }
+    window.addEventListener('touchstart', unlockMobileAudioOnce, { once: true, passive: true });
+    window.addEventListener('click', unlockMobileAudioOnce, { once: true, passive: true });
+
+    // Play loud, unmistakable multi-tone marina alarm chime via Web Audio API
+    function playAlarmChime(urgent = false) {
+      try {
+        const ctx = getOrCreateAudioContext();
+        if (!ctx) return;
+
+        const now = ctx.currentTime;
+        const notes = urgent
+          ? [880, 1318.5, 880, 1318.5, 1046.5, 1567.98]
+          : [587.33, 880, 1174.66, 880, 1318.5];
+        const spacing = urgent ? 0.16 : 0.20;
+
+        notes.forEach((freq, idx) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = urgent ? 'sawtooth' : 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * spacing);
+
+          gain.gain.setValueAtTime(0.001, now + idx * spacing);
+          gain.gain.exponentialRampToValueAtTime(0.45, now + idx * spacing + 0.02);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * spacing + spacing - 0.01);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+
+          osc.start(now + idx * spacing);
+          osc.stop(now + idx * spacing + spacing);
+        });
+      } catch (err) {
+        console.warn('Ses çalınamadı:', err);
+      }
+
+      // Vibrate phone if supported
+      if ('vibrate' in navigator) {
+        try {
+          navigator.vibrate(urgent ? [500, 150, 500, 150, 700] : [350, 120, 350]);
+        } catch (e) {}
+      }
+    }
+
+    // Speak Turkish reminder text out loud on phone/computer
+    function speakTurkishReminder(text) {
+      if (!('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.lang = 'tr-TR';
+        utter.rate = 0.98;
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
+
+        const voices = window.speechSynthesis.getVoices() || [];
+        const trVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('tr'));
+        if (trVoice) utter.voice = trVoice;
+
+        window.speechSynthesis.speak(utter);
+      } catch (e) {
+        console.warn('Sesli okuma başarısız:', e);
+      }
+    }
+
+    // Trigger system notification on mobile / desktop
+    async function sendPhoneSystemNotification(title, body, reminderId = null) {
+      if (!('Notification' in window)) return;
+      try {
+        if (Notification.permission === 'default') {
+          await Notification.requestPermission();
+        }
+        if (Notification.permission !== 'granted') return;
+
+        const options = {
+          body: body,
+          icon: 'https://cdn-icons-png.flaticon.com/512/2942/2942076.png',
+          badge: 'https://cdn-icons-png.flaticon.com/512/2942/2942076.png',
+          vibrate: [400, 150, 400, 150, 600],
+          requireInteraction: true,
+          tag: reminderId ? `marina-reminder-${reminderId}` : 'marina-reminder-test',
+          renotify: true,
+          data: { reminderId }
+        };
+
+        if ('serviceWorker' in navigator) {
+          const reg = await navigator.serviceWorker.getRegistration();
+          if (reg && reg.showNotification) {
+            await reg.showNotification(title, options);
+            return;
+          }
+        }
+        new Notification(title, options);
+      } catch (e) {
+        console.warn('Bildirim gönderilemedi:', e);
+      }
+    }
+
+    function updateNotificationPermissionBanner() {
+      const banner = document.getElementById('notif-permission-banner');
+      if (!banner || !('Notification' in window)) return;
+      if (Notification.permission !== 'granted') {
+        banner.classList.remove('hidden');
+      } else {
+        banner.classList.add('hidden');
+      }
+    }
+
+    async function requestNotificationPermissionManual() {
+      playAlarmChime(false);
+      if ('Notification' in window) {
+        const perm = await Notification.requestPermission();
+        updateNotificationPermissionBanner();
+        if (perm === 'granted') {
+          showToast('Bildirim ve ses izinleri aktif edildi!');
+          sendPhoneSystemNotification('🔔 Marina Görev Bildirimi Aktif', 'Belirlediğiniz görev saatlerinde telefonunuza sesli bildirim gelecektir.');
+        } else {
+          showToast('Tarayıcı bildirim izni kapalı. Uygulama açıkken sesli alarm yine de çalacaktır.', true);
+        }
+      } else {
+        showToast('Sesli alarm sistemi aktif edildi!');
+      }
+    }
+
+    async function testReminderSoundAndNotification() {
+      playAlarmChime(true);
+      setTimeout(() => {
+        speakTurkishReminder('Marina görev takip ve sesli hatırlatma sistemi aktif. Belirlediğiniz saatte bu şekilde sesli bildirim alacaksınız.');
+      }, 950);
+      await sendPhoneSystemNotification(
+        '🔔 Sesli Hatırlatma Testi Başarılı!',
+        'Görev saati geldiğinde telefonunuz sesli uyarı verecek ve görevi okuyacaktır.'
+      );
+      updateNotificationPermissionBanner();
+      showToast('🔊 Sesli alarm ve telefon bildirimi test edildi!');
+    }
+
+    function formatDateTimeTr(isoStr) {
+      if (!isoStr) return '-';
+      const d = new Date(isoStr);
+      if (isNaN(d.getTime())) return isoStr;
+      return d.toLocaleString('tr-TR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function toLocalDatetimeInputValue(dateObj) {
+      const d = new Date(dateObj.getTime() - dateObj.getTimezoneOffset() * 60000);
+      return d.toISOString().slice(0, 16);
+    }
+
+    function getRelativeTimeBadge(dueIso, completed) {
+      if (completed) {
+        return { text: '✅ Tamamlandı', cls: 'bg-emerald-100 text-emerald-800 border-emerald-200' };
+      }
+      const dueMs = new Date(dueIso).getTime();
+      const diffMin = Math.round((dueMs - Date.now()) / 60000);
+      if (diffMin < 0) {
+        const absMin = Math.abs(diffMin);
+        if (absMin < 60) return { text: `🚨 ${absMin} dk gecikti`, cls: 'bg-red-100 text-red-800 border-red-300 animate-pulse' };
+        const hrs = Math.round(absMin / 60);
+        return { text: `🚨 ${hrs} saat gecikti`, cls: 'bg-red-100 text-red-800 border-red-300 animate-pulse' };
+      }
+      if (diffMin === 0) {
+        return { text: '🔔 Şimdi!', cls: 'bg-amber-400 text-slate-950 border-amber-500 animate-pulse' };
+      }
+      if (diffMin < 60) {
+        return { text: `⏳ ${diffMin} dk kaldı`, cls: 'bg-amber-100 text-amber-900 border-amber-300' };
+      }
+      if (diffMin < 1440) {
+        const hrs = Math.floor(diffMin / 60);
+        const mins = diffMin % 60;
+        return { text: `🕒 ${hrs} sa ${mins > 0 ? mins + ' dk ' : ''}kaldı`, cls: 'bg-sky-100 text-sky-900 border-sky-200' };
+      }
+      const days = Math.floor(diffMin / 1440);
+      return { text: `📅 ${days} gün kaldı`, cls: 'bg-slate-100 text-slate-700 border-slate-200' };
+    }
+
+    function setReminderFilter(filter) {
+      currentReminderFilter = filter;
+      const filters = ['pending', 'overdue', 'today', 'completed', 'all'];
+      filters.forEach(f => {
+        const btn = document.getElementById(`rem-filter-${f}`);
+        if (!btn) return;
+        if (f === filter) {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-marine-700 text-white shadow-xs whitespace-nowrap';
+        } else {
+          btn.className = 'px-3 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:bg-slate-100 whitespace-nowrap';
+        }
+      });
+      renderReminders();
+    }
+
+    function renderReminders(searchQuery = '') {
+      updateNotificationPermissionBanner();
+      const now = Date.now();
+      const todayStr = new Date().toLocaleDateString('tr-TR');
+
+      const pendingList = allReminders.filter(r => !r.completed);
+      const overdueList = pendingList.filter(r => new Date(r.due_at).getTime() <= now);
+      const todayList = pendingList.filter(r => new Date(r.due_at).toLocaleDateString('tr-TR') === todayStr);
+      const completedList = allReminders.filter(r => r.completed);
+
+      // Update stats
+      const statPending = document.getElementById('rem-stat-pending');
+      const statOverdue = document.getElementById('rem-stat-overdue');
+      const statToday = document.getElementById('rem-stat-today');
+      const statCompleted = document.getElementById('rem-stat-completed');
+      const headerStat = document.getElementById('stat-reminder-count');
+      const tabBadge = document.getElementById('tab-reminders-badge');
+
+      if (statPending) statPending.innerText = pendingList.length;
+      if (statOverdue) statOverdue.innerText = overdueList.length;
+      if (statToday) statToday.innerText = todayList.length;
+      if (statCompleted) statCompleted.innerText = completedList.length;
+      if (headerStat) headerStat.innerText = pendingList.length;
+
+      if (tabBadge) {
+        if (overdueList.length > 0) {
+          tabBadge.innerText = overdueList.length;
+          tabBadge.className = 'bg-red-500 text-white text-[10px] font-extrabold px-1.5 py-0.2 rounded-full animate-pulse';
+        } else if (pendingList.length > 0) {
+          tabBadge.innerText = pendingList.length;
+          tabBadge.className = 'bg-amber-400 text-slate-950 text-[10px] font-extrabold px-1.5 py-0.2 rounded-full';
+        } else {
+          tabBadge.classList.add('hidden');
+        }
+      }
+
+      // Filter list
+      let list = [...allReminders];
+      if (currentReminderFilter === 'pending') list = pendingList;
+      else if (currentReminderFilter === 'overdue') list = overdueList;
+      else if (currentReminderFilter === 'today') list = todayList;
+      else if (currentReminderFilter === 'completed') list = completedList;
+
+      const q = (searchQuery || document.getElementById('search-input')?.value || '').trim().toLowerCase();
+      if (q) {
+        list = list.filter(r =>
+          (r.title || '').toLowerCase().includes(q) ||
+          (r.notes || '').toLowerCase().includes(q) ||
+          (r.boat_name || '').toLowerCase().includes(q) ||
+          (r.contact_name || '').toLowerCase().includes(q)
+        );
+      }
+
+      // Sort: uncompleted first by due_at asc, completed by completed_at desc
+      list.sort((a, b) => {
+        if (a.completed !== b.completed) return a.completed ? 1 : -1;
+        return new Date(a.due_at).getTime() - new Date(b.due_at).getTime();
+      });
+
+      const container = document.getElementById('reminders-list');
+      const emptyEl = document.getElementById('reminders-empty');
+      if (!container || !emptyEl) return;
+
+      if (list.length === 0) {
+        container.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+      emptyEl.classList.add('hidden');
+
+      const repeatLabels = {
+        none: '',
+        daily: '🔄 Her Gün',
+        weekly: '📅 Her Hafta',
+        monthly: '🗓️ Her Ay'
+      };
+      const priorityStyles = {
+        normal: { badge: 'bg-sky-50 text-sky-700 border-sky-200', label: 'Normal', border: 'border-slate-200' },
+        high: { badge: 'bg-amber-50 text-amber-800 border-amber-300', label: '🟠 Önemli', border: 'border-amber-300' },
+        urgent: { badge: 'bg-red-50 text-red-700 border-red-300', label: '🔴 Acil', border: 'border-red-300' }
+      };
+
+      container.innerHTML = list.map(r => {
+        const rel = getRelativeTimeBadge(r.due_at, r.completed);
+        const pStyle = priorityStyles[r.priority] || priorityStyles.normal;
+        const isOverdue = !r.completed && new Date(r.due_at).getTime() <= now;
+        const cleanTel = sanitizePhone(r.contact_phone);
+        const repeatTag = repeatLabels[r.repeat] || '';
+
+        return `
+          <div class="bg-white rounded-2xl shadow-sm border ${isOverdue ? 'border-red-400 ring-2 ring-red-100' : pStyle.border} p-3.5 sm:p-4 transition hover:shadow-md ${r.completed ? 'opacity-70 bg-slate-50/60' : ''}">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              
+              <!-- Left Info -->
+              <div class="flex items-start gap-3 min-w-0">
+                <button
+                  type="button"
+                  onclick="toggleReminderComplete('${r.id}')"
+                  class="mt-0.5 w-6 h-6 rounded-lg border-2 ${r.completed ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 hover:border-emerald-500 text-transparent'} flex items-center justify-center font-bold text-xs shrink-0 transition"
+                  title="${r.completed ? 'Tekrar Bekleyene Al' : 'Görevi Tamamlandı İşaretle'}"
+                >
+                  ✓
+                </button>
+
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full border ${rel.cls}">${rel.text}</span>
+                    ${r.priority !== 'normal' ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${pStyle.badge}">${pStyle.label}</span>` : ''}
+                    ${repeatTag ? `<span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">${repeatTag}</span>` : ''}
+                    ${r.boat_name ? `
+                      <span class="text-[11px] font-extrabold bg-marine-900 text-sky-200 px-2 py-0.5 rounded-lg">
+                        ⛵ ${r.boat_name}
+                      </span>
+                    ` : ''}
+                  </div>
+
+                  <h4 class="text-sm sm:text-base font-extrabold text-slate-900 mt-1.5 ${r.completed ? 'line-through text-slate-500' : ''}">
+                    ${r.title}
+                  </h4>
+
+                  ${r.notes ? `<p class="text-xs text-slate-600 mt-1 leading-relaxed">${r.notes}</p>` : ''}
+
+                  <div class="flex items-center gap-3 flex-wrap text-[11px] text-slate-500 mt-2">
+                    <span>🔔 <strong>Alarm:</strong> ${formatDateTimeTr(r.due_at)}</span>
+                    ${r.contact_name || r.contact_phone ? `
+                      <span>👤 <strong>İlgili:</strong> ${r.contact_name || ''} ${r.contact_phone || ''}</span>
+                    ` : ''}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right Actions -->
+              <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center flex-wrap">
+                ${cleanTel ? `
+                  <a href="tel:${cleanTel}" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
+                    📞 Ara
+                  </a>
+                  <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-bold transition shadow-xs">
+                    WA
+                  </a>
+                ` : ''}
+
+                <button
+                  type="button"
+                  onclick="speakReminderCard('${r.id}')"
+                  class="px-2.5 py-1.5 bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 rounded-xl text-xs font-bold transition"
+                  title="Görevi Sesli Oku"
+                >
+                  🔊 Sesli Oku
+                </button>
+
+                ${!r.completed ? `
+                  <button
+                    type="button"
+                    onclick="snoozeReminder('${r.id}', 15)"
+                    class="px-2.5 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 rounded-xl text-xs font-bold transition"
+                    title="15 Dakika Ertele"
+                  >
+                    💤 +15 Dk
+                  </button>
+                ` : ''}
+
+                <button
+                  type="button"
+                  onclick="openReminderModal('${r.id}')"
+                  class="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition"
+                  title="Görevi Düzenle"
+                >
+                  ✏️
+                </button>
+
+                <button
+                  type="button"
+                  onclick="deleteReminder('${r.id}')"
+                  class="p-1.5 text-rose-500 hover:bg-rose-50 rounded-xl transition"
+                  title="Görevi Sil"
+                >
+                  🗑️
+                </button>
+              </div>
+
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function speakReminderCard(reminderId) {
+      const r = allReminders.find(x => x.id === reminderId);
+      if (!r) return;
+      playAlarmChime(r.priority === 'urgent');
+      const speechText = buildReminderSpeechText(r);
+      setTimeout(() => speakTurkishReminder(speechText), 800);
+    }
+
+    function buildReminderSpeechText(r) {
+      const parts = ['Marina görev hatırlatması.'];
+      if (r.boat_name) parts.push(`${r.boat_name} teknesi.`);
+      if (r.title) parts.push(r.title + '.');
+      if (r.notes) parts.push(r.notes + '.');
+      if (r.contact_name) parts.push(`İlgili kişi: ${r.contact_name}.`);
+      return parts.join(' ');
+    }
+
+    function populateReminderBoatSelect(selectedBoatId = '') {
+      const select = document.getElementById('reminder-boat-select');
+      if (!select) return;
+      select.innerHTML = `<option value="">— Genel Marina Görevi (Teknesiz) —</option>` +
+        allBoats.map(b => {
+          const cap = `${b.captain_name || ''} ${b.captain_surname || ''}`.trim();
+          return `<option value="${b.id}" ${b.id === selectedBoatId ? 'selected' : ''}>⛵ ${b.name}${cap ? ' (' + cap + ')' : ''}</option>`;
+        }).join('');
+    }
+
+    function onReminderBoatChange() {
+      const boatId = document.getElementById('reminder-boat-select')?.value;
+      const contactInput = document.getElementById('reminder-contact-input');
+      if (!boatId || !contactInput) return;
+      const boat = allBoats.find(b => b.id === boatId);
+      if (!boat) return;
+      const capName = `${boat.captain_name || ''} ${boat.captain_surname || ''}`.trim();
+      const firstCrewPhone = (boat.crew && boat.crew[0] && boat.crew[0].phone) ? boat.crew[0].phone : '';
+      contactInput.value = [capName, firstCrewPhone].filter(Boolean).join(' - ');
+    }
+
+    function setQuickReminderTitle(text) {
+      const inp = document.getElementById('reminder-title-input');
+      if (inp) {
+        inp.value = text;
+        inp.focus();
+      }
+    }
+
+    function setReminderQuickTime(preset) {
+      const dueInput = document.getElementById('reminder-due-input');
+      if (!dueInput) return;
+      const target = new Date();
+      if (typeof preset === 'number') {
+        target.setTime(Date.now() + preset * 60 * 1000);
+      } else if (preset === 'tomorrow9') {
+        target.setDate(target.getDate() + 1);
+        target.setHours(9, 0, 0, 0);
+      } else if (preset === 'tomorrow14') {
+        target.setDate(target.getDate() + 1);
+        target.setHours(14, 0, 0, 0);
+      }
+      dueInput.value = toLocalDatetimeInputValue(target);
+    }
+
+    function openReminderModal(editId = null, preselectBoatId = '') {
+      editingReminderId = editId;
+      populateReminderBoatSelect(preselectBoatId);
+
+      const titleEl = document.getElementById('reminder-modal-title');
+      const saveBtnText = document.getElementById('reminder-save-btn-text');
+      const titleInput = document.getElementById('reminder-title-input');
+      const boatSelect = document.getElementById('reminder-boat-select');
+      const contactInput = document.getElementById('reminder-contact-input');
+      const dueInput = document.getElementById('reminder-due-input');
+      const prioritySelect = document.getElementById('reminder-priority-select');
+      const repeatSelect = document.getElementById('reminder-repeat-select');
+      const notesInput = document.getElementById('reminder-notes-input');
+
+      if (editId) {
+        const rem = allReminders.find(r => r.id === editId);
+        if (!rem) return;
+        titleEl.innerText = 'Görevi & Hatırlatmayı Düzenle';
+        saveBtnText.innerText = 'Değişiklikleri Kaydet';
+        titleInput.value = rem.title || '';
+        boatSelect.value = rem.boat_id || '';
+        contactInput.value = [rem.contact_name, rem.contact_phone].filter(Boolean).join(' - ');
+        dueInput.value = toLocalDatetimeInputValue(new Date(rem.due_at));
+        prioritySelect.value = rem.priority || 'normal';
+        repeatSelect.value = rem.repeat || 'none';
+        notesInput.value = rem.notes || '';
+      } else {
+        titleEl.innerText = 'Yeni Görev & Sesli Hatırlatma';
+        saveBtnText.innerText = 'Hatırlatmayı Kur';
+        titleInput.value = '';
+        boatSelect.value = preselectBoatId || '';
+        contactInput.value = '';
+        if (preselectBoatId) {
+          onReminderBoatChange();
+        }
+        // Default: 30 minutes from now
+        const defaultTime = new Date(Date.now() + 30 * 60 * 1000);
+        dueInput.value = toLocalDatetimeInputValue(defaultTime);
+        prioritySelect.value = 'normal';
+        repeatSelect.value = 'none';
+        notesInput.value = '';
+      }
+
+      document.getElementById('reminder-modal').classList.remove('hidden');
+      setTimeout(() => titleInput.focus(), 80);
+    }
+
+    function closeReminderModal() {
+      editingReminderId = null;
+      document.getElementById('reminder-modal').classList.add('hidden');
+    }
+
+    async function saveReminder(event) {
+      event.preventDefault();
+      unlockMobileAudioOnce();
+
+      // Request notification permission when setting a reminder so phone can notify
+      if ('Notification' in window && Notification.permission === 'default') {
+        Notification.requestPermission().then(() => updateNotificationPermissionBanner()).catch(() => {});
+      }
+
+      const title = document.getElementById('reminder-title-input').value.trim();
+      const boatId = document.getElementById('reminder-boat-select').value;
+      const boatObj = allBoats.find(b => b.id === boatId);
+      const contactRaw = document.getElementById('reminder-contact-input').value.trim();
+      const dueLocalVal = document.getElementById('reminder-due-input').value;
+      const priority = document.getElementById('reminder-priority-select').value;
+      const repeat = document.getElementById('reminder-repeat-select').value;
+      const notes = document.getElementById('reminder-notes-input').value.trim();
+
+      if (!title || !dueLocalVal) {
+        showToast('Lütfen görev başlığını ve hatırlatma zamanını girin.', true);
+        return;
+      }
+
+      // Extract phone number if present in contactRaw
+      const phoneMatch = contactRaw.match(/(\+?90|0)?\s*5\d{2}[\s\-]*\d{3}[\s\-]*\d{2}[\s\-]*\d{2}/);
+      const contactPhone = phoneMatch ? phoneMatch[0].trim() : '';
+      const contactName = contactRaw.replace(contactPhone, '').replace(/[-–—]/g, '').trim() ||
+                          (boatObj ? `${boatObj.captain_name || ''} ${boatObj.captain_surname || ''}`.trim() : '');
+
+      const payload = {
+        title,
+        notes,
+        boat_id: boatId || '',
+        boat_name: boatObj ? boatObj.name : '',
+        contact_name: contactName,
+        contact_phone: contactPhone,
+        due_at: new Date(dueLocalVal).toISOString(),
+        priority,
+        repeat
+      };
+
+      try {
+        const url = editingReminderId ? `/api/reminders/${editingReminderId}` : '/api/reminders';
+        const method = editingReminderId ? 'PUT' : 'POST';
+        if (editingReminderId) {
+          payload.notified_at = null; // Reset notification flag on edit
+        }
+
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const result = await res.json();
+        if (!res.ok) throw new Error(result.error || 'Hatırlatma kaydedilemedi');
+
+        closeReminderModal();
+        showToast(editingReminderId ? 'Görev güncellendi!' : '🔔 Sesli hatırlatma kuruldu!');
+        await loadData();
+      } catch (err) {
+        showToast(err.message || 'Sunucu hatası', true);
+      }
+    }
+
+    async function toggleReminderComplete(reminderId) {
+      const rem = allReminders.find(r => r.id === reminderId);
+      if (!rem) return;
+
+      // If it's a recurring reminder and being completed, advance to next cycle
+      if (!rem.completed && rem.repeat && rem.repeat !== 'none') {
+        const nextDue = new Date(rem.due_at);
+        if (rem.repeat === 'daily') nextDue.setDate(nextDue.getDate() + 1);
+        else if (rem.repeat === 'weekly') nextDue.setDate(nextDue.getDate() + 7);
+        else if (rem.repeat === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1);
+
+        try {
+          const res = await fetch(`/api/reminders/${reminderId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              due_at: nextDue.toISOString(),
+              notified_at: null,
+              completed: false
+            })
+          });
+          if (res.ok) {
+            showToast(`🔄 Tekrarlayan görev bir sonraki tarihe (${formatDateTimeTr(nextDue.toISOString())}) aktarıldı.`);
+            await loadData();
+          }
+        } catch (e) {
+          showToast('Güncelleme hatası', true);
+        }
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/reminders/${reminderId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ completed: !rem.completed })
+        });
+        if (res.ok) {
+          showToast(!rem.completed ? '✅ Görev tamamlandı!' : 'Görev tekrar bekleyenlere alındı.');
+          await loadData();
+        }
+      } catch (e) {
+        showToast('İşlem başarısız', true);
+      }
+    }
+
+    async function snoozeReminder(reminderId, minutes = 15) {
+      const newDue = new Date(Date.now() + minutes * 60 * 1000).toISOString();
+      try {
+        const res = await fetch(`/api/reminders/${reminderId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            due_at: newDue,
+            notified_at: null,
+            completed: false
+          })
+        });
+        if (res.ok) {
+          showToast(`💤 Görev ${minutes} dakika ertelendi.`);
+          await loadData();
+        }
+      } catch (e) {
+        showToast('Erteleme başarısız', true);
+      }
+    }
+
+    async function deleteReminder(reminderId) {
+      if (!confirm('Bu görevi ve hatırlatmayı silmek istediğinize emin misiniz?')) return;
+      try {
+        const res = await fetch(`/api/reminders/${reminderId}`, { method: 'DELETE' });
+        if (res.ok) {
+          showToast('Görev silindi.');
+          await loadData();
+        }
+      } catch (e) {
+        showToast('Silme başarısız', true);
+      }
+    }
+
+    // Active Alarm Modal & Loop
+    function triggerAlarmModal(reminder) {
+      activeAlarmReminder = reminder;
+      const modal = document.getElementById('alarm-modal');
+      document.getElementById('alarm-title').innerText = reminder.title || 'Marina Görev Hatırlatması';
+      document.getElementById('alarm-time').innerText = `Planlanan Zaman: ${formatDateTimeTr(reminder.due_at)}`;
+
+      const boatBox = document.getElementById('alarm-boat-box');
+      const boatNameEl = document.getElementById('alarm-boat-name');
+      const contactInfoEl = document.getElementById('alarm-contact-info');
+      const contactActionsEl = document.getElementById('alarm-contact-actions');
+
+      if (reminder.boat_name || reminder.contact_name || reminder.contact_phone) {
+        boatBox.classList.remove('hidden');
+        boatNameEl.innerText = reminder.boat_name ? `⛵ ${reminder.boat_name}` : 'Genel Marina Görevi';
+        contactInfoEl.innerText = [reminder.contact_name, reminder.contact_phone].filter(Boolean).join(' • ') || '';
+        const cleanTel = sanitizePhone(reminder.contact_phone);
+        contactActionsEl.innerHTML = cleanTel ? `
+          <a href="tel:${cleanTel}" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-extrabold shadow-sm">📞 Ara</a>
+          <a href="https://wa.me/${cleanTel}" target="_blank" class="px-3 py-1.5 bg-green-500 text-white rounded-xl text-xs font-extrabold shadow-sm">WA</a>
+        ` : '';
+      } else {
+        boatBox.classList.add('hidden');
+      }
+
+      const notesBox = document.getElementById('alarm-notes-box');
+      if (reminder.notes) {
+        notesBox.innerText = reminder.notes;
+        notesBox.classList.remove('hidden');
+      } else {
+        notesBox.classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+
+      // Play immediate chime + voice + system notification
+      const isUrgent = reminder.priority === 'urgent';
+      const speechText = buildReminderSpeechText(reminder);
+
+      playAlarmChime(isUrgent);
+      setTimeout(() => speakTurkishReminder(speechText), 900);
+
+      sendPhoneSystemNotification(
+        `🔔 ${reminder.boat_name ? '[' + reminder.boat_name + '] ' : ''}${reminder.title}`,
+        reminder.notes || `Görev zamanı geldi (${formatDateTimeTr(reminder.due_at)})`,
+        reminder.id
+      );
+
+      // Repeat alarm chime + voice up to 3 more times every 9 seconds until user interacts
+      if (alarmIntervalTimer) clearInterval(alarmIntervalTimer);
+      let repeatCount = 0;
+      alarmIntervalTimer = setInterval(() => {
+        repeatCount++;
+        if (repeatCount > 3 || !activeAlarmReminder) {
+          clearInterval(alarmIntervalTimer);
+          alarmIntervalTimer = null;
+          return;
+        }
+        playAlarmChime(isUrgent);
+        setTimeout(() => speakTurkishReminder(speechText), 900);
+      }, 9500);
+    }
+
+    function stopAlarmSoundLoop() {
+      if (alarmIntervalTimer) {
+        clearInterval(alarmIntervalTimer);
+        alarmIntervalTimer = null;
+      }
+      if ('speechSynthesis' in window) {
+        try { window.speechSynthesis.cancel(); } catch (e) {}
+      }
+    }
+
+    function repeatCurrentAlarmVoice() {
+      if (!activeAlarmReminder) return;
+      playAlarmChime(activeAlarmReminder.priority === 'urgent');
+      setTimeout(() => speakTurkishReminder(buildReminderSpeechText(activeAlarmReminder)), 800);
+    }
+
+    async function completeActiveAlarm() {
+      if (!activeAlarmReminder) return;
+      const id = activeAlarmReminder.id;
+      stopAlarmSoundLoop();
+      document.getElementById('alarm-modal').classList.add('hidden');
+      activeAlarmReminder = null;
+      await toggleReminderComplete(id);
+    }
+
+    async function snoozeActiveAlarm(minutes) {
+      if (!activeAlarmReminder) return;
+      const id = activeAlarmReminder.id;
+      stopAlarmSoundLoop();
+      document.getElementById('alarm-modal').classList.add('hidden');
+      activeAlarmReminder = null;
+      await snoozeReminder(id, minutes);
+    }
+
+    function dismissAlarmModalOnly() {
+      stopAlarmSoundLoop();
+      document.getElementById('alarm-modal').classList.add('hidden');
+      activeAlarmReminder = null;
+    }
+
+    // Background checker every 10 seconds for due reminders
+    async function checkDueRemindersNow() {
+      if (!REMINDERS_UI_ACTIVE) return;
+      if (activeAlarmReminder) return; // Already showing an alarm
+      const now = Date.now();
+      for (const r of allReminders) {
+        if (r.completed) continue;
+        const dueMs = new Date(r.due_at).getTime();
+        if (isNaN(dueMs) || dueMs > now) continue;
+
+        // Check if already notified for this due_at timestamp
+        const notifiedMs = r.notified_at ? new Date(r.notified_at).getTime() : 0;
+        if (notifiedMs >= dueMs) continue;
+
+        // Mark notified_at locally and on server so it doesn't re-trigger endlessly
+        const nowIso = new Date().toISOString();
+        r.notified_at = nowIso;
+        fetch(`/api/reminders/${r.id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ notified_at: nowIso })
+        }).catch(() => {});
+
+        renderReminders();
+        triggerAlarmModal(r);
+        break;
+      }
+    }
+
+    setInterval(() => {
+      if (!REMINDERS_UI_ACTIVE) return;
+      checkDueRemindersNow();
+      renderReminders();
+    }, 10000);
+
+    // Handle Service Worker notification click message
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (REMINDERS_UI_ACTIVE && event.data && event.data.type === 'OPEN_REMINDERS_TAB') {
+          switchTab('reminders');
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      if (!REMINDERS_UI_ACTIVE) {
+        document.getElementById('tab-reminders')?.classList.add('hidden');
+      }
+      const params = new URLSearchParams(window.location.search);
+      if (REMINDERS_UI_ACTIVE && params.get('tab') === 'reminders') {
+        switchTab('reminders');
+      }
+      loadData();
+    });
   </script>
 
 </body>
 </html>
+
 
