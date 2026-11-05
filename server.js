@@ -1501,7 +1501,7 @@ const server = http.createServer(async (req, res) => {
       const ext = path.extname(fullPath).toLowerCase();
       const contentType = MIME_TYPES[ext] || 'application/octet-stream';
       const headers = { 'Content-Type': contentType };
-      if (ext === '.html') {
+      if (ext === '.html' || ext === '.js' || ext === '.json') {
         headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
       }
       res.writeHead(200, headers);
