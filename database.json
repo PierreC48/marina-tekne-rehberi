@@ -1,6 +1,68 @@
 {
   "boats": [
     {
+      "id": "59f64652-5c37-4d26-926b-314a6702a70b",
+      "name": "Ares(sunseeker116)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Zafer",
+      "captain_surname": "Kılıç",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793867204245_1fd5bf88.jpg",
+      "form_date": "2026-11-05",
+      "created_at": "2026-11-05T08:27:24.790Z",
+      "updated_at": "2026-11-05T08:27:24.790Z",
+      "crew": [
+        {
+          "id": "fef02bd9-2a0f-4593-84a4-0b44e1bbe0b5",
+          "name": "Zafer",
+          "surname": "Kılıç",
+          "role": "Kaptan",
+          "phone": "0538 267 90 04",
+          "sort_order": 1
+        },
+        {
+          "id": "9c80dc2f-1016-4ea4-a7fd-ddd9c5044e44",
+          "name": "Abdulkadir",
+          "surname": "Musk",
+          "role": "Gemici",
+          "phone": "0542 820 32 35",
+          "sort_order": 2
+        },
+        {
+          "id": "a01fabdf-8fd3-4db3-b358-c473735d7b9a",
+          "name": "Tansel",
+          "surname": "Alibaş",
+          "role": "Gemici",
+          "phone": "0532 361 03 19",
+          "sort_order": 3
+        },
+        {
+          "id": "91b26936-84c8-4d58-99ab-25db907b2ae4",
+          "name": "Akan",
+          "surname": "Aydın",
+          "role": "Gemici",
+          "phone": "0554 649 89 13",
+          "sort_order": 4
+        },
+        {
+          "id": "bdc04240-e2e8-43bc-aed7-ddc18fc7488b",
+          "name": "Pınar",
+          "surname": "Sipahi",
+          "role": "Gemici",
+          "phone": "0544 845 84 85",
+          "sort_order": 5
+        },
+        {
+          "id": "8c7fb55b-710b-462f-a66e-6de23711b636",
+          "name": "Başak",
+          "surname": "Erbay",
+          "role": "Gemici",
+          "phone": "0555 565 80 66",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
       "id": "09b320f0-65e8-4314-96b0-655d84907583",
       "name": "My Sen",
       "captain_title": "KAPTAN",
@@ -1515,5 +1577,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-05T03:48:20.007Z"
+  "last_backup_at": "2026-11-05T08:27:24.797Z"
 }
