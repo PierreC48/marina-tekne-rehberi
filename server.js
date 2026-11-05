@@ -1114,6 +1114,53 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // API: PUT /api/boats/:id (Edit existing boat & crew content)
+    if (req.method === 'PUT' && pathname.startsWith('/api/boats/')) {
+      if (!checkRateLimit(req, res, 'write-boats', 200, 5 * 60 * 1000)) return;
+
+      const boatId = pathname.replace('/api/boats/', '');
+      const targetIdx = inMemoryDb.boats.findIndex(b => b.id === boatId);
+      if (targetIdx === -1) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Düzenlenecek tekne bulunamadı.' }));
+        return;
+      }
+
+      const body = await parseJsonBody(req, 512 * 1024);
+      const rawName = String(body.name || '').trim().slice(0, 120);
+      if (!rawName) {
+        res.writeHead(400, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ error: 'Tekne adı zorunludur.' }));
+        return;
+      }
+
+      const existing = inMemoryDb.boats[targetIdx];
+      const nowIso = new Date().toISOString();
+      const normalizedCrew = deduplicateCrewList(Array.isArray(body.crew) ? body.crew.slice(0, 50) : []);
+      const formDate = normalizeFormDate(body.form_date, existing.form_date || nowIso);
+
+      const updatedBoat = normalizeSingleBoat({
+        ...existing,
+        id: existing.id,
+        name: rawName,
+        captain_title: 'KAPTAN',
+        captain_name: String(body.captain_name || '').trim().slice(0, 80),
+        captain_surname: String(body.captain_surname || '').trim().slice(0, 80),
+        notes: body.notes !== undefined ? String(body.notes || '').trim().slice(0, 500) : existing.notes,
+        image_url: body.image_url ? String(body.image_url).trim().slice(0, 500) : existing.image_url,
+        form_date: formDate,
+        updated_at: nowIso,
+        crew: normalizedCrew
+      });
+
+      inMemoryDb.boats[targetIdx] = updatedBoat;
+      saveDb();
+
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ success: true, id: updatedBoat.id, edited: true, boat: updatedBoat }));
+      return;
+    }
+
     // API: DELETE /api/boats/:id
     if (req.method === 'DELETE' && pathname.startsWith('/api/boats/')) {
       if (!checkRateLimit(req, res, 'delete-boats', 100, 5 * 60 * 1000)) return;
