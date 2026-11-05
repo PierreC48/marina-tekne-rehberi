@@ -1,6 +1,68 @@
 {
   "boats": [
     {
+      "id": "4b096548-150f-4170-9c65-d8006691ce97",
+      "name": "Dusky Ve M.y. Era II",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ali",
+      "captain_surname": "Şener",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793867418932_454f4c65.jpg",
+      "form_date": "2025-10-05",
+      "created_at": "2026-11-03T05:38:48.660Z",
+      "updated_at": "2026-11-05T08:31:06.078Z",
+      "crew": [
+        {
+          "id": "4a44fd4d-eb9b-4a48-9c0e-cb11677c3d67",
+          "name": "Ali",
+          "surname": "Şener",
+          "role": "Kaptan",
+          "phone": "0546 219 98 48",
+          "sort_order": 1
+        },
+        {
+          "id": "3248ec48-e99f-44ad-be4a-78f0073ec48e",
+          "name": "Yusuf",
+          "surname": "Yılmaz",
+          "role": "Gemici",
+          "phone": "0537 560 48 00",
+          "sort_order": 2
+        },
+        {
+          "id": "052e8fcd-f140-48e3-9218-551ce3137d0d",
+          "name": "Durmuş Tekin",
+          "surname": "Yavuz",
+          "role": "Gemici",
+          "phone": "0555 714 78 76",
+          "sort_order": 3
+        },
+        {
+          "id": "14a712c2-d0ae-4a4b-9370-40deedabcf57",
+          "name": "Furkan",
+          "surname": "İnceler",
+          "role": "Gemici",
+          "phone": "0538 082 08 51",
+          "sort_order": 4
+        },
+        {
+          "id": "62c41320-6cab-4400-8245-9bcdd8269bed",
+          "name": "Tuncay",
+          "surname": "Karakartal",
+          "role": "Aşçı",
+          "phone": "0532 467 91 34",
+          "sort_order": 5
+        },
+        {
+          "id": "5a161346-a5c6-44cd-8490-a40fd53c219e",
+          "name": "Goncagül",
+          "surname": "Selçuk",
+          "role": "Kamarot / Hostes",
+          "phone": "0535 410 28 32",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
       "id": "59f64652-5c37-4d26-926b-314a6702a70b",
       "name": "Ares(sunseeker116)",
       "captain_title": "KAPTAN",
@@ -1403,60 +1465,6 @@
       ]
     },
     {
-      "id": "4b096548-150f-4170-9c65-d8006691ce97",
-      "name": "Era - 11",
-      "captain_title": "KAPTAN",
-      "captain_name": "Ali",
-      "captain_surname": "Şener",
-      "notes": "",
-      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793684309686_8248e06e.jpg",
-      "form_date": "2026-11-03",
-      "created_at": "2026-11-03T05:38:48.660Z",
-      "updated_at": "2026-11-03T05:38:48.660Z",
-      "crew": [
-        {
-          "id": "8f6d5a76-0f4c-4803-a1f7-0450d0f3e136",
-          "name": "Tuncay",
-          "surname": "Karakartal",
-          "role": "Şef",
-          "phone": "0532 467 91 34",
-          "sort_order": 1
-        },
-        {
-          "id": "391cbcc4-eb9f-4168-be9a-97dc8dc111b2",
-          "name": "Furkan",
-          "surname": "İnceler",
-          "role": "Gemici",
-          "phone": "0538 082 08 51",
-          "sort_order": 2
-        },
-        {
-          "id": "625e0c64-419f-434e-9a3c-5c5664d09a8f",
-          "name": "Tekin",
-          "surname": "Yavuz",
-          "role": "Gemici",
-          "phone": "0555 714 78 76",
-          "sort_order": 3
-        },
-        {
-          "id": "14d9ce57-499c-46dc-a888-86cd457a654d",
-          "name": "Yusuf",
-          "surname": "Yılmaz",
-          "role": "Gemici",
-          "phone": "0537 560 48 00",
-          "sort_order": 4
-        },
-        {
-          "id": "669d392d-aef3-441c-960d-df79f8e9a9dd",
-          "name": "Gonca",
-          "surname": "Gül Selçuk",
-          "role": "Gemici",
-          "phone": "0535 410 28 32",
-          "sort_order": 5
-        }
-      ]
-    },
-    {
       "id": "15be56df-4434-4df8-9de8-8a88667be3e2",
       "name": "TURMEPA - 30",
       "captain_title": "KAPTAN",
@@ -1555,5 +1563,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-05T08:29:59.716Z"
+  "last_backup_at": "2026-11-05T08:31:06.089Z"
 }
