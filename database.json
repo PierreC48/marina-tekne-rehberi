@@ -125,44 +125,6 @@
       ]
     },
     {
-      "id": "09b320f0-65e8-4314-96b0-655d84907583",
-      "name": "My Sen",
-      "captain_title": "KAPTAN",
-      "captain_name": "Sercan",
-      "captain_surname": "Karadayı",
-      "notes": "",
-      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793796431131_c487a66e.jpg",
-      "form_date": "2026-11-04",
-      "created_at": "2026-11-04T12:47:32.182Z",
-      "updated_at": "2026-11-04T12:47:32.182Z",
-      "crew": [
-        {
-          "id": "a7f9afad-2cf9-461d-a819-67c68d99bbef",
-          "name": "Sercan",
-          "surname": "Karadayı",
-          "role": "Kaptan",
-          "phone": "",
-          "sort_order": 1
-        },
-        {
-          "id": "b9d8d02e-cebb-48e2-9266-21806e350778",
-          "name": "Buse Deniz",
-          "surname": "Temel",
-          "role": "Kamarot / Hostes",
-          "phone": "",
-          "sort_order": 2
-        },
-        {
-          "id": "efe54d9b-361f-4c44-ae58-a15a8b5f7112",
-          "name": "Hakan Burak",
-          "surname": "İnan",
-          "role": "Gemici",
-          "phone": "",
-          "sort_order": 3
-        }
-      ]
-    },
-    {
       "id": "18377704-d2c5-4977-8659-ae2fca3c36f5",
       "name": "Eros",
       "captain_title": "KAPTAN",
@@ -1563,5 +1525,5 @@
       ]
     }
   ],
-  "last_backup_at": "2026-11-05T08:31:06.089Z"
+  "last_backup_at": "2026-11-05T08:31:24.798Z"
 }
