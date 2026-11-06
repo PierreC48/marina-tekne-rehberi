@@ -887,20 +887,19 @@
     let currentCameraFacing = 'environment';
     let matchedSimilarBoatId = null;
     let pendingExportType = null;
-    const REMINDERS_UI_ACTIVE =
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname.startsWith('10.') ||
-      window.location.hostname.startsWith('192.168.') ||
-      new URLSearchParams(window.location.search).get('reminders') === '1';
+    let pendingAdminCallback = null;
+    let sessionAdminPassword = sessionStorage.getItem('marina_admin_pwd') || '';
+    const REMINDERS_UI_ACTIVE = true;
 
     function openProtectedExport(type) {
       pendingExportType = type;
+      pendingAdminCallback = null;
       const modal = document.getElementById('password-modal');
       const titleEl = document.getElementById('password-modal-title');
       const descEl = document.getElementById('password-modal-desc');
       const inputEl = document.getElementById('export-password-input');
       const errEl = document.getElementById('password-modal-error');
+      const btnEl = document.getElementById('password-submit-btn');
 
       if (type === 'excel') {
         titleEl.innerText = 'Excel (CSV) Aktarımı';
@@ -909,6 +908,31 @@
         titleEl.innerText = 'Veritabanı Yedeği (.json)';
         descEl.innerText = 'Tam veritabanı yedeğini indirmek için yönetici şifresini girin:';
       }
+      if (btnEl) btnEl.innerText = 'Doğrula ve İndir';
+
+      inputEl.value = '';
+      errEl.classList.add('hidden');
+      modal.classList.remove('hidden');
+      setTimeout(() => inputEl.focus(), 80);
+    }
+
+    function requireAdminPassword(actionCallback) {
+      if (sessionAdminPassword) {
+        actionCallback();
+        return;
+      }
+      pendingExportType = null;
+      pendingAdminCallback = actionCallback;
+      const modal = document.getElementById('password-modal');
+      const titleEl = document.getElementById('password-modal-title');
+      const descEl = document.getElementById('password-modal-desc');
+      const inputEl = document.getElementById('export-password-input');
+      const errEl = document.getElementById('password-modal-error');
+      const btnEl = document.getElementById('password-submit-btn');
+
+      titleEl.innerText = 'Görev Yönetimi Şifresi Gerekli';
+      descEl.innerText = 'Görev / hatırlatma eklemek, düzenlemek veya silmek için lütfen yönetici şifresini girin:';
+      if (btnEl) btnEl.innerText = 'Doğrula ve Devam Et';
 
       inputEl.value = '';
       errEl.classList.add('hidden');
@@ -921,6 +945,7 @@
       document.getElementById('export-password-input').value = '';
       document.getElementById('password-modal-error').classList.add('hidden');
       pendingExportType = null;
+      pendingAdminCallback = null;
     }
 
     async function submitProtectedExport(event) {
@@ -929,7 +954,43 @@
       const errEl = document.getElementById('password-modal-error');
       const btnEl = document.getElementById('password-submit-btn');
       const pwd = inputEl.value.trim();
-      if (!pwd || !pendingExportType) return;
+      if (!pwd) return;
+
+      // Case 1: Unlocking Admin Password for Reminder Management
+      if (pendingAdminCallback) {
+        btnEl.disabled = true;
+        btnEl.innerText = 'Kontrol ediliyor...';
+        errEl.classList.add('hidden');
+        try {
+          const res = await fetch('/api/verify-admin', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-password': pwd
+            },
+            body: JSON.stringify({ adminPassword: pwd })
+          });
+          if (res.status === 401 || !res.ok) {
+            errEl.classList.remove('hidden');
+            inputEl.select();
+            return;
+          }
+          sessionAdminPassword = pwd;
+          try { sessionStorage.setItem('marina_admin_pwd', pwd); } catch (e) {}
+          const cb = pendingAdminCallback;
+          closePasswordModal();
+          cb();
+        } catch (err) {
+          showToast('Bağlantı hatası oluştu', true);
+        } finally {
+          btnEl.disabled = false;
+          btnEl.innerText = 'Doğrula ve Devam Et';
+        }
+        return;
+      }
+
+      // Case 2: Protected File Export (Excel / Backup)
+      if (!pendingExportType) return;
 
       const endpoint = pendingExportType === 'excel' ? '/api/export-csv' : '/api/backup';
       const defaultFilename = pendingExportType === 'excel'
@@ -981,7 +1042,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=9').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=10').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -2819,50 +2880,52 @@
     }
 
     function openReminderModal(editId = null, preselectBoatId = '') {
-      editingReminderId = editId;
-      populateReminderBoatSelect(preselectBoatId);
+      requireAdminPassword(() => {
+        editingReminderId = editId;
+        populateReminderBoatSelect(preselectBoatId);
 
-      const titleEl = document.getElementById('reminder-modal-title');
-      const saveBtnText = document.getElementById('reminder-save-btn-text');
-      const titleInput = document.getElementById('reminder-title-input');
-      const boatSelect = document.getElementById('reminder-boat-select');
-      const contactInput = document.getElementById('reminder-contact-input');
-      const dueInput = document.getElementById('reminder-due-input');
-      const prioritySelect = document.getElementById('reminder-priority-select');
-      const repeatSelect = document.getElementById('reminder-repeat-select');
-      const notesInput = document.getElementById('reminder-notes-input');
+        const titleEl = document.getElementById('reminder-modal-title');
+        const saveBtnText = document.getElementById('reminder-save-btn-text');
+        const titleInput = document.getElementById('reminder-title-input');
+        const boatSelect = document.getElementById('reminder-boat-select');
+        const contactInput = document.getElementById('reminder-contact-input');
+        const dueInput = document.getElementById('reminder-due-input');
+        const prioritySelect = document.getElementById('reminder-priority-select');
+        const repeatSelect = document.getElementById('reminder-repeat-select');
+        const notesInput = document.getElementById('reminder-notes-input');
 
-      if (editId) {
-        const rem = allReminders.find(r => r.id === editId);
-        if (!rem) return;
-        titleEl.innerText = 'Görevi & Hatırlatmayı Düzenle';
-        saveBtnText.innerText = 'Değişiklikleri Kaydet';
-        titleInput.value = rem.title || '';
-        boatSelect.value = rem.boat_id || '';
-        contactInput.value = [rem.contact_name, rem.contact_phone].filter(Boolean).join(' - ');
-        dueInput.value = toLocalDatetimeInputValue(new Date(rem.due_at));
-        prioritySelect.value = rem.priority || 'normal';
-        repeatSelect.value = rem.repeat || 'none';
-        notesInput.value = rem.notes || '';
-      } else {
-        titleEl.innerText = 'Yeni Görev & Sesli Hatırlatma';
-        saveBtnText.innerText = 'Hatırlatmayı Kur';
-        titleInput.value = '';
-        boatSelect.value = preselectBoatId || '';
-        contactInput.value = '';
-        if (preselectBoatId) {
-          onReminderBoatChange();
+        if (editId) {
+          const rem = allReminders.find(r => r.id === editId);
+          if (!rem) return;
+          titleEl.innerText = 'Görevi & Hatırlatmayı Düzenle';
+          saveBtnText.innerText = 'Değişiklikleri Kaydet';
+          titleInput.value = rem.title || '';
+          boatSelect.value = rem.boat_id || '';
+          contactInput.value = [rem.contact_name, rem.contact_phone].filter(Boolean).join(' - ');
+          dueInput.value = toLocalDatetimeInputValue(new Date(rem.due_at));
+          prioritySelect.value = rem.priority || 'normal';
+          repeatSelect.value = rem.repeat || 'none';
+          notesInput.value = rem.notes || '';
+        } else {
+          titleEl.innerText = 'Yeni Görev & Sesli Hatırlatma';
+          saveBtnText.innerText = 'Hatırlatmayı Kur';
+          titleInput.value = '';
+          boatSelect.value = preselectBoatId || '';
+          contactInput.value = '';
+          if (preselectBoatId) {
+            onReminderBoatChange();
+          }
+          // Default: 30 minutes from now
+          const defaultTime = new Date(Date.now() + 30 * 60 * 1000);
+          dueInput.value = toLocalDatetimeInputValue(defaultTime);
+          prioritySelect.value = 'normal';
+          repeatSelect.value = 'none';
+          notesInput.value = '';
         }
-        // Default: 30 minutes from now
-        const defaultTime = new Date(Date.now() + 30 * 60 * 1000);
-        dueInput.value = toLocalDatetimeInputValue(defaultTime);
-        prioritySelect.value = 'normal';
-        repeatSelect.value = 'none';
-        notesInput.value = '';
-      }
 
-      document.getElementById('reminder-modal').classList.remove('hidden');
-      setTimeout(() => titleInput.focus(), 80);
+        document.getElementById('reminder-modal').classList.remove('hidden');
+        setTimeout(() => titleInput.focus(), 80);
+      });
     }
 
     function closeReminderModal() {
@@ -2870,8 +2933,14 @@
       document.getElementById('reminder-modal').classList.add('hidden');
     }
 
+    function handleReminderUnauthorized(retryCallback) {
+      sessionAdminPassword = '';
+      try { sessionStorage.removeItem('marina_admin_pwd'); } catch (e) {}
+      requireAdminPassword(retryCallback);
+    }
+
     async function saveReminder(event) {
-      event.preventDefault();
+      if (event) event.preventDefault();
       unlockMobileAudioOnce();
 
       // Request notification permission when setting a reminder so phone can notify
@@ -2908,7 +2977,8 @@
         contact_phone: contactPhone,
         due_at: new Date(dueLocalVal).toISOString(),
         priority,
-        repeat
+        repeat,
+        adminPassword: sessionAdminPassword
       };
 
       try {
@@ -2920,9 +2990,16 @@
 
         const res = await fetch(url, {
           method,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'x-admin-password': sessionAdminPassword
+          },
           body: JSON.stringify(payload)
         });
+        if (res.status === 401) {
+          handleReminderUnauthorized(() => saveReminder(null));
+          return;
+        }
         const result = await res.json();
         if (!res.ok) throw new Error(result.error || 'Hatırlatma kaydedilemedi');
 
@@ -2935,83 +3012,122 @@
     }
 
     async function toggleReminderComplete(reminderId) {
-      const rem = allReminders.find(r => r.id === reminderId);
-      if (!rem) return;
+      requireAdminPassword(async () => {
+        const rem = allReminders.find(r => r.id === reminderId);
+        if (!rem) return;
 
-      // If it's a recurring reminder and being completed, advance to next cycle
-      if (!rem.completed && rem.repeat && rem.repeat !== 'none') {
-        const nextDue = new Date(rem.due_at);
-        if (rem.repeat === 'daily') nextDue.setDate(nextDue.getDate() + 1);
-        else if (rem.repeat === 'weekly') nextDue.setDate(nextDue.getDate() + 7);
-        else if (rem.repeat === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1);
+        // If it's a recurring reminder and being completed, advance to next cycle
+        if (!rem.completed && rem.repeat && rem.repeat !== 'none') {
+          const nextDue = new Date(rem.due_at);
+          if (rem.repeat === 'daily') nextDue.setDate(nextDue.getDate() + 1);
+          else if (rem.repeat === 'weekly') nextDue.setDate(nextDue.getDate() + 7);
+          else if (rem.repeat === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1);
+
+          try {
+            const res = await fetch(`/api/reminders/${reminderId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-admin-password': sessionAdminPassword
+              },
+              body: JSON.stringify({
+                due_at: nextDue.toISOString(),
+                notified_at: null,
+                completed: false,
+                adminPassword: sessionAdminPassword
+              })
+            });
+            if (res.status === 401) {
+              handleReminderUnauthorized(() => toggleReminderComplete(reminderId));
+              return;
+            }
+            if (res.ok) {
+              showToast(`🔄 Tekrarlayan görev bir sonraki tarihe (${formatDateTimeTr(nextDue.toISOString())}) aktarıldı.`);
+              await loadData();
+            }
+          } catch (e) {
+            showToast('Güncelleme hatası', true);
+          }
+          return;
+        }
 
         try {
           const res = await fetch(`/api/reminders/${reminderId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-password': sessionAdminPassword
+            },
             body: JSON.stringify({
-              due_at: nextDue.toISOString(),
-              notified_at: null,
-              completed: false
+              completed: !rem.completed,
+              adminPassword: sessionAdminPassword
             })
           });
+          if (res.status === 401) {
+            handleReminderUnauthorized(() => toggleReminderComplete(reminderId));
+            return;
+          }
           if (res.ok) {
-            showToast(`🔄 Tekrarlayan görev bir sonraki tarihe (${formatDateTimeTr(nextDue.toISOString())}) aktarıldı.`);
+            showToast(!rem.completed ? '✅ Görev tamamlandı!' : 'Görev tekrar bekleyenlere alındı.');
             await loadData();
           }
         } catch (e) {
-          showToast('Güncelleme hatası', true);
+          showToast('İşlem başarısız', true);
         }
-        return;
-      }
-
-      try {
-        const res = await fetch(`/api/reminders/${reminderId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ completed: !rem.completed })
-        });
-        if (res.ok) {
-          showToast(!rem.completed ? '✅ Görev tamamlandı!' : 'Görev tekrar bekleyenlere alındı.');
-          await loadData();
-        }
-      } catch (e) {
-        showToast('İşlem başarısız', true);
-      }
+      });
     }
 
     async function snoozeReminder(reminderId, minutes = 15) {
-      const newDue = new Date(Date.now() + minutes * 60 * 1000).toISOString();
-      try {
-        const res = await fetch(`/api/reminders/${reminderId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            due_at: newDue,
-            notified_at: null,
-            completed: false
-          })
-        });
-        if (res.ok) {
-          showToast(`💤 Görev ${minutes} dakika ertelendi.`);
-          await loadData();
+      requireAdminPassword(async () => {
+        const newDue = new Date(Date.now() + minutes * 60 * 1000).toISOString();
+        try {
+          const res = await fetch(`/api/reminders/${reminderId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-password': sessionAdminPassword
+            },
+            body: JSON.stringify({
+              due_at: newDue,
+              notified_at: null,
+              completed: false,
+              adminPassword: sessionAdminPassword
+            })
+          });
+          if (res.status === 401) {
+            handleReminderUnauthorized(() => snoozeReminder(reminderId, minutes));
+            return;
+          }
+          if (res.ok) {
+            showToast(`💤 Görev ${minutes} dakika ertelendi.`);
+            await loadData();
+          }
+        } catch (e) {
+          showToast('Erteleme başarısız', true);
         }
-      } catch (e) {
-        showToast('Erteleme başarısız', true);
-      }
+      });
     }
 
     async function deleteReminder(reminderId) {
-      if (!confirm('Bu görevi ve hatırlatmayı silmek istediğinize emin misiniz?')) return;
-      try {
-        const res = await fetch(`/api/reminders/${reminderId}`, { method: 'DELETE' });
-        if (res.ok) {
-          showToast('Görev silindi.');
-          await loadData();
+      requireAdminPassword(async () => {
+        if (!confirm('Bu görevi ve hatırlatmayı silmek istediğinize emin misiniz?')) return;
+        try {
+          const res = await fetch(`/api/reminders/${reminderId}`, {
+            method: 'DELETE',
+            headers: { 'x-admin-password': sessionAdminPassword }
+          });
+          if (res.status === 401) {
+            handleReminderUnauthorized(() => deleteReminder(reminderId));
+            return;
+          }
+          if (res.ok) {
+            showToast('Görev silindi.');
+            await loadData();
+          }
+        } catch (e) {
+          showToast('Silme başarısız', true);
         }
-      } catch (e) {
-        showToast('Silme başarısız', true);
-      }
+      });
     }
 
     // Active Alarm Modal & Loop

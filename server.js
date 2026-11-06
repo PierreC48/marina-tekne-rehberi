@@ -1219,6 +1219,31 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    // Helper: Verify Admin Password (Setur2026)
+    const verifyAdminReq = (bodyObj = null) => {
+      const expectedPassword = (process.env.ADMIN_PASSWORD || 'Setur2026').trim();
+      const providedPassword = String(
+        req.headers['x-admin-password'] ||
+        parsedUrl.searchParams.get('pwd') ||
+        (bodyObj && bodyObj.adminPassword) ||
+        ''
+      ).trim();
+      return Boolean(providedPassword && providedPassword === expectedPassword);
+    };
+
+    // API: POST /api/verify-admin
+    if (req.method === 'POST' && pathname === '/api/verify-admin') {
+      const body = await parseJsonBody(req, 16 * 1024);
+      if (!verifyAdminReq(body)) {
+        res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Hatalı yönetici şifresi!' }));
+        return;
+      }
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ success: true }));
+      return;
+    }
+
     // API: GET /api/reminders
     if (req.method === 'GET' && pathname === '/api/reminders') {
       const list = Array.isArray(inMemoryDb.reminders) ? inMemoryDb.reminders : [];
@@ -1227,10 +1252,16 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // API: POST /api/reminders (Create a task / reminder)
+    // API: POST /api/reminders (Create a task / reminder - Password Protected)
     if (req.method === 'POST' && pathname === '/api/reminders') {
       if (!checkRateLimit(req, res, 'write-reminders', 200, 5 * 60 * 1000)) return;
       const body = await parseJsonBody(req, 256 * 1024);
+      if (!verifyAdminReq(body)) {
+        res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Yetkisiz erişim: Görev eklemek için yönetici şifresi gereklidir.' }));
+        return;
+      }
+
       const title = String(body.title || '').trim().slice(0, 200);
       if (!title) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -1240,19 +1271,24 @@ const server = http.createServer(async (req, res) => {
 
       if (!Array.isArray(inMemoryDb.reminders)) inMemoryDb.reminders = [];
       const nowIso = new Date().toISOString();
+      const contactName = String(body.contact_name || body.captain_name || '').trim().slice(0, 120);
+      const contactPhone = String(body.contact_phone || body.captain_phone || '').trim().slice(0, 40);
       const newReminder = {
         id: crypto.randomUUID(),
         title,
         notes: String(body.notes || '').trim().slice(0, 500),
         boat_id: String(body.boat_id || '').trim(),
         boat_name: String(body.boat_name || '').trim().slice(0, 120),
-        captain_name: String(body.captain_name || '').trim().slice(0, 120),
-        captain_phone: String(body.captain_phone || '').trim().slice(0, 40),
+        contact_name: contactName,
+        contact_phone: contactPhone,
+        captain_name: contactName,
+        captain_phone: contactPhone,
         due_at: body.due_at ? String(body.due_at).trim() : nowIso,
         repeat: ['none', 'daily', 'weekly', 'monthly'].includes(body.repeat) ? body.repeat : 'none',
         priority: ['normal', 'high', 'urgent'].includes(body.priority) ? body.priority : 'normal',
         completed: false,
         completed_at: null,
+        notified_at: null,
         notified_due_at: null,
         created_at: nowIso,
         updated_at: nowIso
@@ -1279,8 +1315,20 @@ const server = http.createServer(async (req, res) => {
       }
 
       const body = await parseJsonBody(req, 256 * 1024);
+      // Only allow unauthenticated update if it is purely marking notified_at when an alarm rings
+      const bodyKeys = Object.keys(body || {});
+      const isOnlyNotifiedAt = bodyKeys.length === 1 && (bodyKeys[0] === 'notified_at' || bodyKeys[0] === 'notified_due_at');
+      if (!isOnlyNotifiedAt && !verifyAdminReq(body)) {
+        res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Yetkisiz erişim: Görev düzenlemek için yönetici şifresi gereklidir.' }));
+        return;
+      }
+
       const existing = inMemoryDb.reminders[idx];
       const nowIso = new Date().toISOString();
+      const newContactName = body.contact_name !== undefined ? String(body.contact_name).trim().slice(0, 120) : (body.captain_name !== undefined ? String(body.captain_name).trim().slice(0, 120) : (existing.contact_name || existing.captain_name || ''));
+      const newContactPhone = body.contact_phone !== undefined ? String(body.contact_phone).trim().slice(0, 40) : (body.captain_phone !== undefined ? String(body.captain_phone).trim().slice(0, 40) : (existing.contact_phone || existing.captain_phone || ''));
+      const newNotifiedAt = body.notified_at !== undefined ? body.notified_at : (body.notified_due_at !== undefined ? body.notified_due_at : (existing.notified_at || existing.notified_due_at || null));
 
       const updated = {
         ...existing,
@@ -1288,14 +1336,17 @@ const server = http.createServer(async (req, res) => {
         notes: body.notes !== undefined ? String(body.notes).trim().slice(0, 500) : existing.notes,
         boat_id: body.boat_id !== undefined ? String(body.boat_id).trim() : existing.boat_id,
         boat_name: body.boat_name !== undefined ? String(body.boat_name).trim().slice(0, 120) : existing.boat_name,
-        captain_name: body.captain_name !== undefined ? String(body.captain_name).trim().slice(0, 120) : existing.captain_name,
-        captain_phone: body.captain_phone !== undefined ? String(body.captain_phone).trim().slice(0, 40) : existing.captain_phone,
+        contact_name: newContactName,
+        contact_phone: newContactPhone,
+        captain_name: newContactName,
+        captain_phone: newContactPhone,
         due_at: body.due_at !== undefined ? String(body.due_at).trim() : existing.due_at,
         repeat: body.repeat !== undefined && ['none', 'daily', 'weekly', 'monthly'].includes(body.repeat) ? body.repeat : existing.repeat,
         priority: body.priority !== undefined && ['normal', 'high', 'urgent'].includes(body.priority) ? body.priority : existing.priority,
         completed: body.completed !== undefined ? Boolean(body.completed) : existing.completed,
         completed_at: body.completed !== undefined ? (body.completed ? nowIso : null) : existing.completed_at,
-        notified_due_at: body.notified_due_at !== undefined ? body.notified_due_at : existing.notified_due_at,
+        notified_at: newNotifiedAt,
+        notified_due_at: newNotifiedAt,
         updated_at: nowIso
       };
 
@@ -1307,8 +1358,13 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    // API: DELETE /api/reminders/:id
+    // API: DELETE /api/reminders/:id (Password Protected)
     if (req.method === 'DELETE' && pathname.startsWith('/api/reminders/')) {
+      if (!verifyAdminReq(null)) {
+        res.writeHead(401, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ error: 'Yetkisiz erişim: Görev silmek için yönetici şifresi gereklidir.' }));
+        return;
+      }
       const remId = pathname.replace('/api/reminders/', '');
       if (Array.isArray(inMemoryDb.reminders)) {
         const idx = inMemoryDb.reminders.findIndex(r => r.id === remId);
@@ -1349,8 +1405,32 @@ const server = http.createServer(async (req, res) => {
       const permanentCloudUrl = await uploadToSupabaseStorage(filename, imageBuffer, mimeType);
       const imageUrl = permanentCloudUrl || `/uploads/${filename}`;
 
-      // API Key strictly from Server Environment Variable
+      // If running on localhost without GEMINI_API_KEY env, delegate OCR analysis to live Render server
       if (!process.env.GEMINI_API_KEY && !process.env.GEMINI_API_KEYS) {
+        try {
+          const remoteRes = await fetch('https://marinateknerehberi.onrender.com/api/upload-and-analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              image: body.image,
+              pdfText: body.pdfText || ''
+            })
+          });
+          if (remoteRes.ok) {
+            const remoteJson = await remoteRes.json();
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({
+              imageUrl: remoteJson.imageUrl || imageUrl,
+              data: remoteJson.data,
+              aiError: remoteJson.aiError,
+              message: remoteJson.message
+            }));
+            return;
+          }
+        } catch (proxyErr) {
+          console.warn('Canlı sunucu OCR vekil hatası:', proxyErr.message);
+        }
+
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({
           imageUrl,
