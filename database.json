@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "26014781-c486-4ba1-8fbd-b234b9c451c6",
+      "name": "My Fatih",
+      "captain_title": "KAPTAN",
+      "captain_name": "Kadir",
+      "captain_surname": "Aydın",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793968722275_19b4946d.jpg",
+      "form_date": "2026-11-06",
+      "created_at": "2026-11-06T12:39:17.214Z",
+      "updated_at": "2026-11-06T12:39:17.214Z",
+      "crew": [
+        {
+          "id": "db38882a-3907-432b-8580-5089241896b3",
+          "name": "Kadir",
+          "surname": "Aydın",
+          "role": "Kaptan",
+          "phone": "0506 154 03 35",
+          "sort_order": 1
+        },
+        {
+          "id": "776fab67-ba5b-4560-8dc5-846da301817d",
+          "name": "Enes",
+          "surname": "Özcan",
+          "role": "Gemici",
+          "phone": "0552 785 24 48",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "a2b6135b-7ec7-433f-b003-5235d93a7220",
       "name": "Isra108 (ex:deborah)",
       "captain_title": "KAPTAN",
@@ -1640,5 +1670,5 @@
     }
   ],
   "reminders": [],
-  "last_backup_at": "2026-11-06T11:03:25.718Z"
+  "last_backup_at": "2026-11-06T12:39:17.245Z"
 }
