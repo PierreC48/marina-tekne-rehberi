@@ -1,6 +1,44 @@
 {
   "boats": [
     {
+      "id": "a2b6135b-7ec7-433f-b003-5235d93a7220",
+      "name": "Isra 108 (ex:deborah)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Süleyman",
+      "captain_surname": "Ecebey",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793955143405_0d1693b9.jpg",
+      "form_date": "2026-11-06",
+      "created_at": "2026-11-06T08:53:46.337Z",
+      "updated_at": "2026-11-06T08:53:46.337Z",
+      "crew": [
+        {
+          "id": "e664c23e-5edb-4109-a242-7d58d5301429",
+          "name": "Süleyman",
+          "surname": "Ecebey",
+          "role": "Kaptan",
+          "phone": "",
+          "sort_order": 1
+        },
+        {
+          "id": "d98baeda-2eea-41ef-9cd0-07e85acf08f4",
+          "name": "Merthan",
+          "surname": "Erol",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "4563d42c-745a-44da-895c-eabd5977d35c",
+          "name": "Merve",
+          "surname": "Gunay",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "3da2e4c0-4e3f-4d9d-a852-ba2be53541f2",
       "name": "Karma (y)",
       "captain_title": "KAPTAN",
@@ -1602,5 +1640,5 @@
     }
   ],
   "reminders": [],
-  "last_backup_at": "2026-11-06T08:51:34.810Z"
+  "last_backup_at": "2026-11-06T08:53:46.348Z"
 }
