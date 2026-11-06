@@ -1042,7 +1042,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=10').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=11').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -1077,12 +1077,39 @@
       return 'badge-diger';
     }
 
-    function sanitizePhone(phone) {
+    // Format phone number for tel: links and vCard (+905XXXXXXXXX or +<country><number>)
+    function formatDialPhone(phone) {
       if (!phone) return '';
-      let cleaned = phone.replace(/[^0-9]/g, '');
-      if (cleaned.startsWith('0')) cleaned = '90' + cleaned.substring(1);
-      if (!cleaned.startsWith('90') && cleaned.length === 10) cleaned = '90' + cleaned;
-      return cleaned;
+      const raw = String(phone).trim();
+      const digits = raw.replace(/[^0-9]/g, '');
+      if (digits.length < 7) return '';
+
+      if (raw.startsWith('+')) {
+        return '+' + digits;
+      }
+      if (raw.startsWith('00') && digits.length > 4) {
+        return '+' + digits.substring(2);
+      }
+      if (digits.length === 11 && digits.startsWith('0')) {
+        return '+90' + digits.substring(1);
+      }
+      if (digits.length === 10) {
+        return '+90' + digits;
+      }
+      if (digits.length === 12 && digits.startsWith('90')) {
+        return '+' + digits;
+      }
+      if (digits.length > 10) {
+        return '+' + digits;
+      }
+      return digits;
+    }
+
+    // Format phone number for WhatsApp wa.me links (country code + digits without +)
+    function sanitizePhone(phone) {
+      const dial = formatDialPhone(phone);
+      if (!dial) return '';
+      return dial.replace(/^\+/, '');
     }
 
     function formatDateTr(dateStr) {
@@ -1123,17 +1150,21 @@
       const fullName = `${name || ''} ${surname || ''}`.trim() || 'Mürettebat';
       const cleanRole = role || 'Mürettebat';
       const cleanBoat = boatName || 'Tekne';
-      const vcf = [
+      const dialTel = formatDialPhone(phone) || (phone || '').trim();
+      const lines = [
         'BEGIN:VCARD',
         'VERSION:3.0',
         `FN:${fullName} (${cleanBoat})`,
         `N:${surname || ''};${name || ''};;;`,
         `ORG:${cleanBoat} Teknesi`,
-        `TITLE:${cleanRole}`,
-        `TEL;TYPE=CELL,VOICE:${phone || ''}`,
-        `NOTE:${cleanBoat} Teknesi - Görev: ${cleanRole}`,
-        'END:VCARD'
-      ].join('\r\n');
+        `TITLE:${cleanRole}`
+      ];
+      if (dialTel) {
+        lines.push(`TEL;TYPE=CELL,VOICE:${dialTel}`);
+      }
+      lines.push(`NOTE:${cleanBoat} Teknesi - Görev: ${cleanRole}`);
+      lines.push('END:VCARD');
+      const vcf = lines.join('\r\n');
       const safeFilename = `${fullName}_${cleanBoat}`.replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ_-]/g, '_');
       triggerVCardDownload(vcf, `${safeFilename}.vcf`);
       showToast(`"${fullName}" rehber dosyası indirildi.`);
@@ -1148,18 +1179,22 @@
       let vcf = '';
       boat.crew.forEach(member => {
         const fullName = `${member.name || ''} ${member.surname || ''}`.trim();
-        vcf += [
+        const dialTel = formatDialPhone(member.phone) || (member.phone || '').trim();
+        const lines = [
           'BEGIN:VCARD',
           'VERSION:3.0',
           `FN:${fullName} (${boat.name})`,
           `N:${member.surname || ''};${member.name || ''};;;`,
           `ORG:${boat.name} Teknesi`,
-          `TITLE:${member.role || 'Mürettebat'}`,
-          `TEL;TYPE=CELL,VOICE:${member.phone || ''}`,
-          `NOTE:${boat.name} Teknesi - Görev: ${member.role || ''}`,
-          'END:VCARD',
-          ''
-        ].join('\r\n');
+          `TITLE:${member.role || 'Mürettebat'}`
+        ];
+        if (dialTel) {
+          lines.push(`TEL;TYPE=CELL,VOICE:${dialTel}`);
+        }
+        lines.push(`NOTE:${boat.name} Teknesi - Görev: ${member.role || ''}`);
+        lines.push('END:VCARD');
+        lines.push('');
+        vcf += lines.join('\r\n');
       });
       const safeBoat = (boat.name || 'tekne').replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ_-]/g, '_');
       triggerVCardDownload(vcf, `${safeBoat}_murettebat.vcf`);
@@ -1381,7 +1416,8 @@
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                   ${(b.crew || []).map((m, idx) => {
-                    const cleanTel = sanitizePhone(m.phone);
+                    const dialTel = formatDialPhone(m.phone);
+                    const waTel = sanitizePhone(m.phone);
                     return `
                       <tr class="hover:bg-slate-50/80 transition">
                         <td class="px-4 py-2.5 text-center text-slate-400 font-bold">${idx + 1}</td>
@@ -1391,11 +1427,15 @@
                             ${m.role || '-'}
                           </span>
                         </td>
-                        <td class="px-4 py-2.5 font-mono font-medium text-slate-800">${m.phone}</td>
+                        <td class="px-4 py-2.5 font-mono font-medium text-slate-800">
+                          ${dialTel ? `<a href="tel:${dialTel}" class="hover:text-emerald-700 hover:underline inline-flex items-center gap-1" title="Numarayı Ara">📞 ${m.phone}</a>` : `<span class="text-slate-400 italic text-[11px]">Telefon Yok</span>`}
+                        </td>
                         <td class="px-4 py-2.5 text-right">
                           <div class="inline-flex items-center gap-1.5">
-                            <a href="tel:${cleanTel}" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition">Ara</a>
-                            <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg text-xs transition">WhatsApp</a>
+                            ${dialTel ? `
+                              <a href="tel:${dialTel}" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition">📞 Ara</a>
+                              <a href="https://wa.me/${waTel}" target="_blank" rel="noopener" class="px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg text-xs transition">WhatsApp</a>
+                            ` : ''}
                             <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(b.name)}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs transition border border-slate-200" title="Kişiyi Telefon Rehberine Ekle">
                               📇 Rehbere Ekle
                             </button>
@@ -1411,7 +1451,8 @@
             <!-- MOBILE CREW CARDS (Visible on Mobile Only - Anti Overflow) -->
             <div class="sm:hidden divide-y divide-slate-100">
               ${(b.crew || []).map((m) => {
-                const cleanTel = sanitizePhone(m.phone);
+                const dialTel = formatDialPhone(m.phone);
+                const waTel = sanitizePhone(m.phone);
                 return `
                   <div class="p-3 flex items-center justify-between gap-2">
                     <div class="min-w-0 flex-1">
@@ -1420,13 +1461,15 @@
                         <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-semibold ${getRoleBadge(m.role)}">${m.role || '-'}</span>
                       </div>
                       <div class="font-mono text-slate-600 text-xs mt-1">
-                        ${m.phone}
+                        ${dialTel ? `<a href="tel:${dialTel}" class="text-emerald-700 font-bold hover:underline inline-flex items-center gap-1">📞 ${m.phone}</a>` : `<span class="text-slate-400 italic text-[11px]">Telefon Yok</span>`}
                       </div>
                     </div>
                     <div class="flex items-center gap-1 shrink-0">
-                      <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">Ara</a>
-                      <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2 py-1 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">WA</a>
-                      <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(b.name)}')" class="px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs shadow-xs active:scale-95" title="Rehbere Ekle">
+                      ${dialTel ? `
+                        <a href="tel:${dialTel}" class="px-2.5 py-1.5 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">📞 Ara</a>
+                        <a href="https://wa.me/${waTel}" target="_blank" rel="noopener" class="px-2 py-1.5 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm active:scale-95">WA</a>
+                      ` : ''}
+                      <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(b.name)}')" class="px-2 py-1.5 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs shadow-xs active:scale-95" title="Rehbere Ekle">
                         📇
                       </button>
                     </div>
@@ -1454,7 +1497,8 @@
 
       // Desktop table
       tbody.innerHTML = contacts.map(c => {
-        const cleanTel = sanitizePhone(c.phone);
+        const dialTel = formatDialPhone(c.phone);
+        const waTel = sanitizePhone(c.phone);
         const boatObj = allBoats.find(b => b.id === c.boat_id);
         const stale = isStaleRecord(boatObj);
         return `
@@ -1469,11 +1513,15 @@
                 ${c.role}
               </span>
             </td>
-            <td class="px-5 py-3 font-mono font-medium text-slate-800">${c.phone}</td>
+            <td class="px-5 py-3 font-mono font-medium text-slate-800">
+              ${dialTel ? `<a href="tel:${dialTel}" class="hover:text-emerald-700 hover:underline inline-flex items-center gap-1" title="Numarayı Ara">📞 ${c.phone}</a>` : `<span class="text-slate-400 italic text-[11px]">Telefon Yok</span>`}
+            </td>
             <td class="px-5 py-3 text-right">
               <div class="inline-flex items-center gap-1.5">
-                <a href="tel:${cleanTel}" class="px-2.5 py-1 bg-emerald-600 text-white font-semibold rounded-lg text-xs hover:bg-emerald-700">Ara</a>
-                <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1 bg-green-500 text-white font-semibold rounded-lg text-xs hover:bg-green-600">WhatsApp</a>
+                ${dialTel ? `
+                  <a href="tel:${dialTel}" class="px-2.5 py-1 bg-emerald-600 text-white font-semibold rounded-lg text-xs hover:bg-emerald-700">📞 Ara</a>
+                  <a href="https://wa.me/${waTel}" target="_blank" rel="noopener" class="px-2.5 py-1 bg-green-500 text-white font-semibold rounded-lg text-xs hover:bg-green-600">WhatsApp</a>
+                ` : ''}
                 <button type="button" onclick="downloadPersonVCard('${escapeJsStr(c.name)}', '${escapeJsStr(c.surname)}', '${escapeJsStr(c.role)}', '${escapeJsStr(c.phone)}', '${escapeJsStr(c.boat_name)}')" class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-lg text-xs border border-slate-200">
                   📇 Rehbere Ekle
                 </button>
@@ -1485,7 +1533,8 @@
 
       // Mobile list
       mobileList.innerHTML = contacts.map(c => {
-        const cleanTel = sanitizePhone(c.phone);
+        const dialTel = formatDialPhone(c.phone);
+        const waTel = sanitizePhone(c.phone);
         const boatObj = allBoats.find(b => b.id === c.boat_id);
         const stale = isStaleRecord(boatObj);
         return `
@@ -1498,13 +1547,15 @@
               </div>
               <div class="flex items-center gap-2 mt-1">
                 <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-semibold ${getRoleBadge(c.role)}">${c.role}</span>
-                <span class="font-mono text-slate-600 text-xs">${c.phone}</span>
+                ${dialTel ? `<a href="tel:${dialTel}" class="font-mono text-emerald-700 font-bold text-xs hover:underline">📞 ${c.phone}</a>` : `<span class="text-slate-400 italic text-[11px]">Telefon Yok</span>`}
               </div>
             </div>
             <div class="flex items-center gap-1 shrink-0">
-              <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm">Ara</a>
-              <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2 py-1 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm">WA</a>
-              <button type="button" onclick="downloadPersonVCard('${escapeJsStr(c.name)}', '${escapeJsStr(c.surname)}', '${escapeJsStr(c.role)}', '${escapeJsStr(c.phone)}', '${escapeJsStr(c.boat_name)}')" class="px-2 py-1 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs">
+              ${dialTel ? `
+                <a href="tel:${dialTel}" class="px-2.5 py-1.5 bg-emerald-600 text-white font-bold rounded-lg text-xs shadow-sm">📞 Ara</a>
+                <a href="https://wa.me/${waTel}" target="_blank" rel="noopener" class="px-2 py-1.5 bg-green-500 text-white font-bold rounded-lg text-xs shadow-sm">WA</a>
+              ` : ''}
+              <button type="button" onclick="downloadPersonVCard('${escapeJsStr(c.name)}', '${escapeJsStr(c.surname)}', '${escapeJsStr(c.role)}', '${escapeJsStr(c.phone)}', '${escapeJsStr(c.boat_name)}')" class="px-2 py-1.5 bg-slate-100 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs">
                 📇
               </button>
             </div>
@@ -1570,16 +1621,16 @@
 
       const crewContainer = document.getElementById('modal-crew-list');
       crewContainer.innerHTML = (boat.crew || []).map(m => {
-        const cleanTel = sanitizePhone(m.phone);
+        const dialTel = formatDialPhone(m.phone);
         return `
           <div class="p-2 bg-slate-50 rounded-xl border border-slate-100 flex items-center justify-between text-xs gap-2">
             <div class="min-w-0">
               <p class="font-bold text-slate-900 truncate">${m.name} ${m.surname}</p>
               <span class="inline-block px-1.5 py-0.2 rounded text-[10px] font-semibold ${getRoleBadge(m.role)}">${m.role}</span>
-              <span class="font-mono text-slate-600 text-[11px] ml-1">${m.phone}</span>
+              ${dialTel ? `<a href="tel:${dialTel}" class="font-mono text-emerald-700 font-bold text-[11px] ml-1 hover:underline">📞 ${m.phone}</a>` : `<span class="text-slate-400 italic text-[10px] ml-1">Tel Yok</span>`}
             </div>
             <div class="flex items-center gap-1 shrink-0">
-              <a href="tel:${cleanTel}" class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold">Ara</a>
+              ${dialTel ? `<a href="tel:${dialTel}" class="px-2 py-1 bg-emerald-600 text-white rounded text-[10px] font-bold">📞 Ara</a>` : ''}
               <button type="button" onclick="downloadPersonVCard('${escapeJsStr(m.name)}', '${escapeJsStr(m.surname)}', '${escapeJsStr(m.role)}', '${escapeJsStr(m.phone)}', '${escapeJsStr(boat.name)}')" class="px-2 py-1 bg-slate-200 hover:bg-slate-300 text-slate-800 rounded text-[10px] font-bold" title="Rehbere Ekle">📇</button>
             </div>
           </div>
@@ -2716,7 +2767,8 @@
         const rel = getRelativeTimeBadge(r.due_at, r.completed);
         const pStyle = priorityStyles[r.priority] || priorityStyles.normal;
         const isOverdue = !r.completed && new Date(r.due_at).getTime() <= now;
-        const cleanTel = sanitizePhone(r.contact_phone);
+        const dialTel = formatDialPhone(r.contact_phone);
+        const waTel = sanitizePhone(r.contact_phone);
         const repeatTag = repeatLabels[r.repeat] || '';
 
         return `
@@ -2755,7 +2807,7 @@
                   <div class="flex items-center gap-3 flex-wrap text-[11px] text-slate-500 mt-2">
                     <span>🔔 <strong>Alarm:</strong> ${formatDateTimeTr(r.due_at)}</span>
                     ${r.contact_name || r.contact_phone ? `
-                      <span>👤 <strong>İlgili:</strong> ${r.contact_name || ''} ${r.contact_phone || ''}</span>
+                      <span>👤 <strong>İlgili:</strong> ${r.contact_name || ''} ${dialTel ? `<a href="tel:${dialTel}" class="text-emerald-700 font-bold hover:underline">📞 ${r.contact_phone}</a>` : (r.contact_phone || '')}</span>
                     ` : ''}
                   </div>
                 </div>
@@ -2763,11 +2815,11 @@
 
               <!-- Right Actions -->
               <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center flex-wrap">
-                ${cleanTel ? `
-                  <a href="tel:${cleanTel}" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
+                ${dialTel ? `
+                  <a href="tel:${dialTel}" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition shadow-xs">
                     📞 Ara
                   </a>
-                  <a href="https://wa.me/${cleanTel}" target="_blank" class="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-bold transition shadow-xs">
+                  <a href="https://wa.me/${waTel}" target="_blank" rel="noopener" class="px-2.5 py-1.5 bg-green-500 hover:bg-green-600 text-white rounded-xl text-xs font-bold transition shadow-xs">
                     WA
                   </a>
                 ` : ''}
@@ -2851,7 +2903,8 @@
       const boat = allBoats.find(b => b.id === boatId);
       if (!boat) return;
       const capName = `${boat.captain_name || ''} ${boat.captain_surname || ''}`.trim();
-      const firstCrewPhone = (boat.crew && boat.crew[0] && boat.crew[0].phone) ? boat.crew[0].phone : '';
+      const memberWithPhone = (boat.crew || []).find(c => formatDialPhone(c.phone));
+      const firstCrewPhone = memberWithPhone ? memberWithPhone.phone : '';
       contactInput.value = [capName, firstCrewPhone].filter(Boolean).join(' - ');
     }
 
@@ -3146,10 +3199,11 @@
         boatBox.classList.remove('hidden');
         boatNameEl.innerText = reminder.boat_name ? `⛵ ${reminder.boat_name}` : 'Genel Marina Görevi';
         contactInfoEl.innerText = [reminder.contact_name, reminder.contact_phone].filter(Boolean).join(' • ') || '';
-        const cleanTel = sanitizePhone(reminder.contact_phone);
-        contactActionsEl.innerHTML = cleanTel ? `
-          <a href="tel:${cleanTel}" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-extrabold shadow-sm">📞 Ara</a>
-          <a href="https://wa.me/${cleanTel}" target="_blank" class="px-3 py-1.5 bg-green-500 text-white rounded-xl text-xs font-extrabold shadow-sm">WA</a>
+        const dialTel = formatDialPhone(reminder.contact_phone);
+        const waTel = sanitizePhone(reminder.contact_phone);
+        contactActionsEl.innerHTML = dialTel ? `
+          <a href="tel:${dialTel}" class="px-3 py-1.5 bg-emerald-600 text-white rounded-xl text-xs font-extrabold shadow-sm">📞 Ara</a>
+          <a href="https://wa.me/${waTel}" target="_blank" rel="noopener" class="px-3 py-1.5 bg-green-500 text-white rounded-xl text-xs font-extrabold shadow-sm">WA</a>
         ` : '';
       } else {
         boatBox.classList.add('hidden');
