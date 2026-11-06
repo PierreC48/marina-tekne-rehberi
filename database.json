@@ -262,18 +262,18 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793795328374_d3492740.jpg",
       "form_date": "2026-11-04",
       "created_at": "2026-11-04T12:29:19.183Z",
-      "updated_at": "2026-11-04T12:29:19.183Z",
+      "updated_at": "2026-11-06T05:32:01.269Z",
       "crew": [
         {
-          "id": "9e58c6f6-3ad4-4245-98b7-531dc40079ff",
+          "id": "ae2707a6-4881-4d34-bc49-3b62139c2e4b",
           "name": "Ercan",
           "surname": "Tutşun",
           "role": "Kaptan",
-          "phone": "",
+          "phone": "0542 899 42 70",
           "sort_order": 1
         },
         {
-          "id": "c7b518a0-f5bb-491f-8b7b-149a002dd006",
+          "id": "87f28639-2fe9-4784-95dd-838eb9178b48",
           "name": "Murat",
           "surname": "Şimşek",
           "role": "Gemici",
@@ -281,7 +281,7 @@
           "sort_order": 2
         },
         {
-          "id": "9cbc37c0-0074-42f6-8d47-1aa0513f377e",
+          "id": "671f1df1-850b-4292-822b-fbcd7a789fd3",
           "name": "Mustafa",
           "surname": "Kundalan",
           "role": "Gemici",
@@ -1602,5 +1602,5 @@
     }
   ],
   "reminders": [],
-  "last_backup_at": "2026-11-06T05:31:23.688Z"
+  "last_backup_at": "2026-11-06T05:32:01.290Z"
 }
