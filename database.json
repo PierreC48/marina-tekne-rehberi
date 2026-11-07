@@ -1,6 +1,52 @@
 {
   "boats": [
     {
+      "id": "9179f32c-c766-4272-9c3f-f941344d542a",
+      "name": "Nymphaea",
+      "captain_title": "KAPTAN",
+      "captain_name": "Mehmet",
+      "captain_surname": "Ekim",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794052684114_3159e37d.jpg",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:59:18.487Z",
+      "updated_at": "2026-11-07T11:59:18.487Z",
+      "crew": [
+        {
+          "id": "48642a49-e870-4a06-81f5-a3d3fe3b20e4",
+          "name": "Mehmet",
+          "surname": "Ekim",
+          "role": "Kaptan",
+          "phone": "0542 346 61 67",
+          "sort_order": 1
+        },
+        {
+          "id": "aa9524af-d730-4718-8774-76e7cc72956d",
+          "name": "Ferhat",
+          "surname": "Özkaya",
+          "role": "Gemici",
+          "phone": "0535 500 04 29",
+          "sort_order": 2
+        },
+        {
+          "id": "f4f3e826-6972-4978-a3a8-d84b6b8132af",
+          "name": "Kadir",
+          "surname": "Kıvrak",
+          "role": "Gemici",
+          "phone": "0553 430 12 56",
+          "sort_order": 3
+        },
+        {
+          "id": "33fc6dc4-e4b2-4d00-9702-7dd58845d701",
+          "name": "Şeyma",
+          "surname": "Uysal",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
       "id": "26014781-c486-4ba1-8fbd-b234b9c451c6",
       "name": "My Fatih (mb)",
       "captain_title": "KAPTAN",
@@ -1688,5 +1734,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-07T11:44:16.540Z"
+  "last_backup_at": "2026-11-07T11:59:18.506Z"
 }
