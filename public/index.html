@@ -41,6 +41,8 @@
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
     }
   </script>
+  <!-- jsPDF for yard plan export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body { 
@@ -52,6 +54,72 @@
     .badge-asci { background-color: #d97706; color: #ffffff; }
     .badge-diger { background-color: #475569; color: #ffffff; }
     .cropper-view-box, .cropper-face { border-radius: 4px; }
+
+    /* Çekek Sahası Kroki ve İsim Sığdırma Stilleri */
+    #cekek-map-container {
+      background-color: #cbd5e1;
+      background-size: 100% 100%;
+      background-position: 0 0;
+      background-repeat: no-repeat;
+      transform-origin: 0 0;
+      will-change: transform;
+    }
+    .boat-item {
+      position: absolute;
+      background-color: #facc15;
+      color: #000000;
+      font-weight: 800;
+      border: 2px solid #b45309;
+      border-radius: 6px;
+      cursor: grab;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100px;
+      height: 40px;
+      padding: 1px 3px;
+      box-sizing: border-box;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.32);
+      transform-origin: center center;
+      transition: box-shadow 0.15s, border-color 0.15s;
+      will-change: transform, left, top;
+      overflow: hidden !important; /* Dışarı taşmayı kesin olarak engelle */
+      z-index: 10;
+    }
+    .boat-item:active {
+      cursor: grabbing;
+    }
+    .boat-item.selected {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.45) !important;
+      z-index: 50 !important;
+    }
+    .boat-item .boat-name-inner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      line-height: 1.05;
+      word-break: break-word;
+      hyphens: auto;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+      letter-spacing: -0.02em;
+    }
+    @keyframes pulseHighlight {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); background-color: #facc15; transform: scale(1); }
+      50% { box-shadow: 0 0 25px 15px rgba(239, 68, 68, 0); background-color: #ef4444; color: white; border-color: white; transform: scale(1.15); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); background-color: #facc15; transform: scale(1); }
+    }
+    .highlight-pulse {
+      animation: pulseHighlight 0.8s ease-in-out 4;
+      z-index: 100 !important;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-900 min-h-screen flex flex-col antialiased selection:bg-marine-500 selection:text-white overflow-x-hidden">
@@ -121,12 +189,16 @@
           <span>👥 Tüm Kişiler</span>
           <span id="stat-contact-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
-        <button id="tab-gallery" onclick="switchTab('gallery')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
-          <span>🖼️ Orijinal Formlar</span>
+        <button id="tab-cekek" onclick="switchTab('cekek')" class="hidden flex-1 py-2 px-3 rounded-lg font-medium transition text-emerald-300 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap relative">
+          <span>🗺️ Çekek Sahası</span>
+          <span id="stat-cekek-count" class="text-[10px] bg-emerald-950 text-emerald-200 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
         <button id="tab-reminders" onclick="switchTab('reminders')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-amber-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span>🔔 Görevler</span>
           <span id="stat-reminder-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
+        </button>
+        <button id="tab-gallery" onclick="switchTab('gallery')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>🖼️ Orijinal Formlar</span>
         </button>
       </div>
 
@@ -254,6 +326,161 @@
         </button>
       </div>
 
+    </div>
+
+    <!-- VIEW 5: ÇEKEK SAHASI YERLEŞİM PLANI -->
+    <div id="view-cekek" class="hidden flex flex-col h-[calc(100dvh-185px)] min-h-[580px] bg-slate-900 rounded-2xl overflow-hidden border border-slate-700 shadow-xl relative select-none">
+      
+      <!-- Sub Header / Tool Bar for Çekek -->
+      <div class="bg-gradient-to-r from-slate-950 via-marine-950 to-slate-900 text-white p-2.5 sm:px-4 flex flex-wrap gap-2 items-center justify-between border-b border-slate-800 z-30 shrink-0">
+        <div class="flex items-center gap-2 min-w-0">
+          <div class="flex items-center gap-1.5 font-extrabold text-xs sm:text-sm text-white shrink-0">
+            <span class="text-base sm:text-lg">🗺️</span>
+            <span>Çekek Sahası</span>
+          </div>
+          <span id="cekek-sync-status" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-900/60 text-emerald-300 border border-emerald-700/50 truncate">
+            ● Ortak kayıt aktif
+          </span>
+          <span id="cekek-boat-counter" class="hidden sm:inline-block text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-950 text-sky-200 border border-sky-800 truncate">
+            0 Tekne Sahada
+          </span>
+        </div>
+
+        <!-- Actions & Tools -->
+        <div class="flex items-center gap-1.5 flex-wrap">
+          <!-- Search inside Yard -->
+          <div class="relative flex items-center">
+            <input 
+              type="text" 
+              id="cekek-search-input" 
+              placeholder="Sahada tekne ara..." 
+              class="bg-slate-900/90 text-white placeholder-slate-400 text-xs rounded-xl pl-7 pr-2.5 py-1.5 border border-slate-700 w-32 sm:w-44 focus:ring-1 focus:ring-sky-400 focus:outline-none"
+              onkeydown="if(event.key==='Enter') searchCekekBoat(this.value)"
+            />
+            <span class="absolute left-2 text-xs text-slate-400">🔍</span>
+          </div>
+
+          <!-- Add Boat to Yard -->
+          <button type="button" onclick="openAddCekekBoatModal()" class="inline-flex items-center gap-1 bg-sky-600 hover:bg-sky-500 text-white px-2.5 py-1.5 rounded-xl text-xs font-bold transition shadow-sm active:scale-95">
+            <span>＋</span>
+            <span class="hidden sm:inline">Tekne Ekle</span>
+          </button>
+
+          <!-- Zoom / Fit Tools -->
+          <div class="flex items-center bg-slate-800 border border-slate-700 rounded-xl overflow-hidden p-0.5">
+            <button type="button" onclick="zoomCekekMap(1/1.25)" class="px-2 py-1 text-xs font-extrabold hover:bg-slate-700 text-slate-200" title="Uzaklaştır">−</button>
+            <span id="cekek-zoom-level" class="text-[10px] font-mono font-bold px-1.5 text-sky-300">100%</span>
+            <button type="button" onclick="zoomCekekMap(1.25)" class="px-2 py-1 text-xs font-extrabold hover:bg-slate-700 text-slate-200" title="Yakınlaştır">＋</button>
+            <button type="button" onclick="fitAllCekekMap()" class="px-2 py-1 text-[10px] font-bold bg-slate-700/60 hover:bg-slate-600 text-sky-200 ml-0.5 rounded" title="Tüm Sahayı Ekrana Sığdır">Sığdır</button>
+          </div>
+
+          <!-- Settings / Kroki Değiştir -->
+          <button type="button" onclick="toggleCekekSettingsMenu()" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-300 px-2 py-1.5 rounded-xl text-xs font-semibold border border-slate-700 transition" title="Saha Ayarları & Kroki">
+            <span>⚙️</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Interactive Map Canvas Area -->
+      <div class="flex-1 relative w-full h-full overflow-hidden bg-slate-950" id="cekek-map-wrapper">
+        <div id="cekek-map-container" class="absolute left-0 top-0 w-[2600px] h-[1100px] origin-top-left cursor-crosshair">
+          <!-- Boats rendered here -->
+        </div>
+
+        <!-- Selected Boat Floating Control Panel -->
+        <div id="cekek-control-panel" class="absolute hidden bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200 p-3.5 w-64 z-[60] flex flex-col gap-2.5 transition-all text-slate-900">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+            <div class="min-w-0">
+              <span class="text-[9px] font-bold uppercase tracking-wider text-sky-600">Seçili Tekne</span>
+              <h4 id="cekek-panel-boat-name" class="font-extrabold text-sm text-slate-900 truncate">Tekne Adı</h4>
+            </div>
+            <button onclick="deselectCekekBoat()" class="text-slate-400 hover:text-slate-700 p-1 text-sm font-bold">✕</button>
+          </div>
+
+          <!-- Linked Rehber Info if boat exists in Tekne Rehberi database -->
+          <div id="cekek-panel-rehber-box" class="hidden bg-sky-50 border border-sky-200 rounded-xl p-2 text-xs">
+            <div class="flex items-center justify-between gap-1">
+              <span id="cekek-panel-captain-name" class="font-bold text-sky-950 truncate">Kaptan: -</span>
+              <span class="text-[9px] bg-sky-200/80 text-sky-900 px-1.5 py-0.2 rounded font-extrabold shrink-0">Rehberde Kayıtlı</span>
+            </div>
+            <div id="cekek-panel-captain-actions" class="flex items-center gap-1 mt-1.5">
+              <!-- Call & WhatsApp buttons injected here -->
+            </div>
+          </div>
+
+          <!-- Rename Boat Button & Editor -->
+          <div>
+            <button id="cekek-rename-toggle" onclick="toggleCekekRenameEditor()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs rounded-xl py-1.5 font-bold transition">
+              ✏️ İsmi Düzenle
+            </button>
+            <div id="cekek-rename-editor" class="hidden mt-1.5 space-y-1.5">
+              <input id="cekek-rename-input" type="text" maxlength="150" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs font-bold" placeholder="Yeni tekne adı">
+              <div class="flex gap-1.5">
+                <button onclick="saveCekekBoatName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg py-1 text-xs font-bold">Kaydet</button>
+                <button onclick="toggleCekekRenameEditor(false)" class="flex-1 bg-slate-200 text-slate-700 rounded-lg py-1 text-xs font-bold">İptal</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Scale Controls -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1">
+              <span>Boyut (Ölçek)</span>
+              <span id="cekek-scale-val" class="font-mono text-sky-600 font-extrabold">1.0x</span>
+            </div>
+            <div class="flex gap-1.5">
+              <button onclick="changeCekekScale(-0.1)" class="flex-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1 font-extrabold text-sm text-slate-700 transition">－</button>
+              <button onclick="changeCekekScale(0.1)" class="flex-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1 font-extrabold text-sm text-slate-700 transition">＋</button>
+            </div>
+          </div>
+
+          <!-- Free Rotation Slider -->
+          <div>
+            <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1">
+              <span>Serbest Döndür</span>
+              <span id="cekek-rotation-val" class="font-mono text-sky-600 font-extrabold">0°</span>
+            </div>
+            <input type="range" id="cekek-rotation-slider" min="0" max="360" value="0" class="w-full accent-sky-600 cursor-pointer" oninput="handleCekekRotation(event)" onchange="saveCekekState()">
+          </div>
+
+          <!-- Quick Reminder for this Boat -->
+          <button onclick="openReminderForCekekBoat()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs rounded-xl py-1.5 font-bold transition flex items-center justify-center gap-1">
+            <span>⏰</span>
+            <span>Bu Tekneye Görev / Alarm Kur</span>
+          </button>
+
+          <!-- Delete Boat from Yard Button -->
+          <button onclick="deleteSelectedCekekBoat()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs rounded-xl py-1.5 font-bold transition">
+            🗑️ Sahadan Kaldır
+          </button>
+        </div>
+
+        <!-- Settings Menu Overlay -->
+        <div id="cekek-settings-menu" class="hidden absolute top-3 right-3 bg-white rounded-2xl shadow-2xl border border-slate-200 p-3 w-64 z-[70] space-y-2 text-xs">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h4 class="font-extrabold text-slate-900">⚙️ Çekek Sahası Ayarları</h4>
+            <button onclick="toggleCekekSettingsMenu(false)" class="text-slate-400 hover:text-slate-700 font-bold p-1">✕</button>
+          </div>
+          <label class="cursor-pointer flex items-center gap-2 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 font-bold text-slate-700 transition">
+            <span>🖼️</span>
+            <span>Kroki Resmini Değiştir</span>
+            <input type="file" id="cekek-bg-upload" accept="image/*" class="hidden" onchange="handleCekekImageUpload(event)">
+          </label>
+          <button type="button" onclick="exportCekekPlan('pdf')" class="w-full text-left flex items-center gap-2 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 font-bold text-slate-700 transition">
+            <span>📄</span>
+            <span>Krokiyi PDF Olarak İndir</span>
+          </button>
+          <button type="button" onclick="exportCekekPlan('png')" class="w-full text-left flex items-center gap-2 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 font-bold text-slate-700 transition">
+            <span>🖼️</span>
+            <span>Krokiyi Resim (PNG) Olarak İndir</span>
+          </button>
+          <button type="button" onclick="refreshCekekCloudState(true)" class="w-full text-left flex items-center gap-2 p-2 rounded-xl bg-slate-50 hover:bg-slate-100 font-bold text-slate-700 transition">
+            <span>🔄</span>
+            <span>Verileri Şimdi Yenile</span>
+          </button>
+        </div>
+
+      </div>
     </div>
 
   </main>
@@ -866,6 +1093,37 @@
     </div>
   </div>
 
+  <!-- MODAL: ADD BOAT TO ÇEKEK SAHASI -->
+  <div id="cekek-add-modal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-3">
+    <div class="bg-white rounded-2xl shadow-2xl p-4 sm:p-5 max-w-md w-full border border-slate-200 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 flex items-center gap-1.5">
+          <span>⛵</span>
+          <span>Sahaya Tekne Yerleştir</span>
+        </h3>
+        <button onclick="closeAddCekekBoatModal()" class="text-slate-400 hover:text-slate-700 font-bold p-1">✕</button>
+      </div>
+
+      <!-- Quick select from Rehber boats -->
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Rehberdeki Teknelerden Seç:</label>
+        <select id="cekek-add-rehber-select" onchange="onCekekRehberSelectChange()" class="w-full border border-slate-300 rounded-xl p-2 text-xs font-semibold focus:ring-1 focus:ring-sky-500 bg-white">
+          <option value="">— Rehberden tekne seçin (isteğe bağlı) —</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold text-slate-700 mb-1">Veya Tekne Adını Yazın:</label>
+        <input type="text" id="cekek-add-name-input" placeholder="Örn: BLUE HORIZON III (MY)" class="w-full border border-slate-300 rounded-xl p-2 text-xs font-bold focus:ring-1 focus:ring-sky-500">
+      </div>
+
+      <div class="flex justify-end gap-2 pt-1">
+        <button type="button" onclick="closeAddCekekBoatModal()" class="px-3.5 py-2 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700">İptal</button>
+        <button type="button" onclick="confirmAddBoatToCekek()" class="px-4 py-2 rounded-xl text-xs font-extrabold bg-sky-600 hover:bg-sky-500 text-white shadow-sm">Sahaya Ekle</button>
+      </div>
+    </div>
+  </div>
+
   <!-- TOAST NOTIFICATION -->
   <div id="toast" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-5 sm:w-auto z-50 transform translate-y-24 opacity-0 transition-all duration-300 bg-slate-900 text-white text-xs font-semibold px-4 py-3 rounded-xl shadow-xl flex items-center gap-2">
     <span id="toast-icon">✓</span>
@@ -890,6 +1148,8 @@
     let pendingAdminCallback = null;
     let sessionAdminPassword = sessionStorage.getItem('marina_admin_pwd') || '';
     const REMINDERS_UI_ACTIVE = true;
+    let CEKEK_UI_ACTIVE = false; // Kullanıcı 'aktifleştir' diyene kadar canlıda gizli kalır
+    let isCekekPreviewActive = false;
 
     function openProtectedExport(type) {
       pendingExportType = type;
@@ -1275,7 +1535,7 @@
 
     function switchTab(tab) {
       activeTab = tab;
-      const tabs = ['boats', 'contacts', 'reminders', 'gallery'];
+      const tabs = ['boats', 'contacts', 'reminders', 'gallery', 'cekek'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const view = document.getElementById(`view-${t}`);
@@ -1288,6 +1548,9 @@
           view.classList.add('hidden');
         }
       });
+      if (tab === 'cekek') {
+        ensureCekekLoadedAndRendered();
+      }
     }
 
     function handleSearch(query) {
@@ -1395,6 +1658,13 @@
                   <span>📇</span>
                   <span>Rehbere Aktar</span>
                 </button>
+
+                ${(CEKEK_UI_ACTIVE || isCekekPreviewActive) ? `
+                <button onclick="showBoatOnCekekMap('${escapeJsStr(b.name)}')" class="px-2.5 py-1.5 bg-teal-700 hover:bg-teal-600 text-white rounded-xl transition text-xs font-semibold flex items-center gap-1 shadow-sm" title="Bu Teknenin Çekek Sahasındaki Konumunu Gör">
+                  <span>📍</span>
+                  <span>Sahada Gör</span>
+                </button>
+                ` : ''}
 
                 <button onclick="deleteBoat('${b.id}', '${escapeJsStr(b.name)}')" class="p-1.5 text-rose-400 hover:bg-rose-950/40 rounded-xl transition" title="Tekneyi Sil">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
@@ -3331,13 +3601,979 @@
       });
     }
 
+    // ============================================================================
+    // 🗺️ ÇEKEK SAHASI YERLEŞİM PLANI (MERGED INTEGRATION & AUTO-FIT)
+    // ============================================================================
+
+    const CEKEK_SUPABASE_URL = "https://cxepumcfugqnxixznvir.supabase.co";
+    const CEKEK_SUPABASE_KEY = "sb_publishable_80esJnSeEstFkWVztcCgdg_VGXC5yO0";
+    const CEKEK_DEFAULT_BG = "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/kroki-1793351270933-884ccafa-8412-4ac5-9e32-9384e730b015.png";
+    const CEKEK_WORLD_W = 2600;
+    const CEKEK_WORLD_H = 1100;
+
+    let cekekState = {
+      bgImage: CEKEK_DEFAULT_BG,
+      boats: [] // { id, name, left, top, scale, rotation }
+    };
+    let confirmedCekekCloudState = null;
+    let selectedCekekBoatId = null;
+    let cekekHighestZ = 20;
+    let cekekLoaded = false;
+    let cekekSyncTimer = null;
+    let cekekWaitingWrites = 0;
+    let cekekPendingWrites = Promise.resolve();
+    let cekekView = { scale: 1, x: 0, y: 0, initialized: false };
+    let cekekDragActiveEl = null;
+    let cekekDragStartX = 0, cekekDragStartY = 0;
+    let cekekDragInitialLeft = 0, cekekDragInitialTop = 0;
+    let isCekekDragging = false;
+    let cekekDesktopPan = null;
+    let cekekTouchGesture = null;
+
+    function setCekekSyncStatus(msg, isError = false) {
+      const el = document.getElementById('cekek-sync-status');
+      if (!el) return;
+      el.innerText = msg;
+      el.className = `text-[10px] font-bold px-2 py-0.5 rounded-full ${
+        isError ? 'bg-rose-900/70 text-rose-300 border border-rose-700/50' : 'bg-emerald-900/60 text-emerald-300 border border-emerald-700/50'
+      } truncate`;
+    }
+
+    async function cekekApiCall(path, options = {}) {
+      const res = await fetch(CEKEK_SUPABASE_URL + '/rest/v1/' + path, {
+        ...options,
+        headers: {
+          apikey: CEKEK_SUPABASE_KEY,
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+      if (!res.ok) {
+        throw new Error('Supabase HTTP ' + res.status + ': ' + (await res.text()).slice(0, 200));
+      }
+      if (res.status === 204) return null;
+      const text = await res.text();
+      return text ? JSON.parse(text) : null;
+    }
+
+    // Auto-fit boat text inside 100x40 box so it NEVER spills outside
+    function fitCekekBoatName(el, name) {
+      const safe = escapeHtml(name || '');
+      el.innerHTML = `<span class="boat-name-inner">${safe}</span>`;
+      const inner = el.querySelector('.boat-name-inner');
+      if (!inner) return;
+
+      const len = (name || '').trim().length;
+      let fontSize = 11.5;
+      if (len > 22) fontSize = 7.0;
+      else if (len > 18) fontSize = 7.6;
+      else if (len > 14) fontSize = 8.4;
+      else if (len > 10) fontSize = 9.2;
+      else if (len > 6) fontSize = 10.4;
+      else fontSize = 11.5;
+
+      inner.style.fontSize = fontSize + 'px';
+
+      // Fine-tuning loop against real box boundaries (printable area ~90x34px)
+      if (inner.scrollWidth > 0 && inner.scrollHeight > 0) {
+        let guard = 0;
+        while ((inner.scrollWidth > 90 || inner.scrollHeight > 34) && fontSize > 6.0 && guard < 15) {
+          fontSize -= 0.4;
+          inner.style.fontSize = fontSize + 'px';
+          guard++;
+        }
+      }
+    }
+
+    function refitAllCekekBoatNames() {
+      document.querySelectorAll('#cekek-map-container .boat-item').forEach(el => {
+        const boat = cekekState.boats.find(b => b.id === el.id);
+        if (boat) fitCekekBoatName(el, boat.name);
+      });
+    }
+
+    function renderCekekBoatElement(boatData) {
+      const container = document.getElementById('cekek-map-container');
+      if (!container) return;
+
+      const boatEl = document.createElement('div');
+      boatEl.className = 'boat-item' + (boatData.id === selectedCekekBoatId ? ' selected' : '');
+      boatEl.id = boatData.id;
+
+      boatEl.style.left = (Number(boatData.left) || 0) + 'px';
+      boatEl.style.top = (Number(boatData.top) || 0) + 'px';
+      boatEl.style.transform = `rotate(${Number(boatData.rotation) || 0}deg) scale(${Number(boatData.scale) || 1})`;
+
+      // Event listeners
+      boatEl.addEventListener('mousedown', startCekekDrag);
+      boatEl.addEventListener('touchstart', startCekekDrag, { passive: false });
+      boatEl.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectCekekBoat(boatData.id);
+      });
+
+      container.appendChild(boatEl);
+      fitCekekBoatName(boatEl, boatData.name);
+    }
+
+    function redrawCekekState(state) {
+      cekekState = JSON.parse(JSON.stringify(state));
+      const container = document.getElementById('cekek-map-container');
+      if (!container) return;
+
+      const bgUrl = cekekState.bgImage || CEKEK_DEFAULT_BG;
+      container.style.backgroundImage = `url("${bgUrl}")`;
+      container.innerHTML = '';
+
+      (cekekState.boats || []).forEach(renderCekekBoatElement);
+      requestAnimationFrame(refitAllCekekBoatNames);
+
+      const counterEl = document.getElementById('cekek-boat-counter');
+      if (counterEl) counterEl.innerText = `${cekekState.boats.length} Tekne Sahada`;
+      const tabCounterEl = document.getElementById('stat-cekek-count');
+      if (tabCounterEl) tabCounterEl.innerText = cekekState.boats.length;
+
+      if (selectedCekekBoatId && cekekState.boats.some(b => b.id === selectedCekekBoatId)) {
+        selectCekekBoat(selectedCekekBoatId);
+      } else {
+        deselectCekekBoat();
+      }
+
+      try {
+        localStorage.setItem('marinaCekekState', JSON.stringify(cekekState));
+      } catch (e) {}
+    }
+
+    async function loadCekekState() {
+      // 1. Try local cache first for instant rendering
+      try {
+        const cached = localStorage.getItem('marinaCekekState');
+        if (cached) {
+          const parsed = JSON.parse(cached);
+          if (parsed && Array.isArray(parsed.boats)) {
+            redrawCekekState(parsed);
+          }
+        }
+      } catch (e) {}
+
+      // 2. Fetch from Supabase
+      setCekekSyncStatus('Bağlanıyor…');
+      try {
+        const [boatRows, settingRows] = await Promise.all([
+          cekekApiCall('marina_boats?select=id,data'),
+          cekekApiCall('marina_settings?select=bg_image&id=eq.1')
+        ]);
+        const remote = {
+          boats: (boatRows || []).map(r => r.data).filter(Boolean),
+          bgImage: (settingRows && settingRows.length && settingRows[0].bg_image) ? settingRows[0].bg_image : CEKEK_DEFAULT_BG
+        };
+        confirmedCekekCloudState = JSON.parse(JSON.stringify(remote));
+        cekekLoaded = true;
+        redrawCekekState(remote);
+        setCekekSyncStatus('● Ortak kayıt aktif');
+
+        if (cekekSyncTimer) clearInterval(cekekSyncTimer);
+        cekekSyncTimer = setInterval(refreshCekekCloudState, 5000);
+      } catch (err) {
+        console.warn('Çekek bulut verisi yüklenemedi:', err);
+        setCekekSyncStatus('⚠ Çevrimdışı / Yerel kayıt', true);
+      }
+    }
+
+    async function refreshCekekCloudState(force = false) {
+      if (!cekekLoaded && !force) return;
+      if (cekekWaitingWrites > 0 || isCekekDragging) return;
+
+      try {
+        const [boatRows, settingRows] = await Promise.all([
+          cekekApiCall('marina_boats?select=id,data'),
+          cekekApiCall('marina_settings?select=bg_image&id=eq.1')
+        ]);
+        const remote = {
+          boats: (boatRows || []).map(r => r.data).filter(Boolean),
+          bgImage: (settingRows && settingRows.length && settingRows[0].bg_image) ? settingRows[0].bg_image : CEKEK_DEFAULT_BG
+        };
+        if (JSON.stringify(remote) !== JSON.stringify(confirmedCekekCloudState)) {
+          confirmedCekekCloudState = JSON.parse(JSON.stringify(remote));
+          redrawCekekState(remote);
+        }
+        setCekekSyncStatus('● Ortak kayıt aktif');
+      } catch (err) {
+        setCekekSyncStatus('⚠ Bağlantı kesildi', true);
+      }
+    }
+
+    function queueCekekCloudWrite(task) {
+      cekekWaitingWrites++;
+      setCekekSyncStatus('Kaydediliyor…');
+      cekekPendingWrites = cekekPendingWrites.catch(() => {}).then(task).then(() => {
+        setCekekSyncStatus('● Ortak kayıt aktif');
+      }).catch(err => {
+        console.error('Çekek bulut yazma hatası:', err);
+        setCekekSyncStatus('⚠ Kayıt başarısız', true);
+      }).finally(() => {
+        cekekWaitingWrites = Math.max(0, cekekWaitingWrites - 1);
+      });
+      return cekekPendingWrites;
+    }
+
+    function saveCekekState() {
+      try {
+        localStorage.setItem('marinaCekekState', JSON.stringify(cekekState));
+      } catch (e) {}
+
+      if (!cekekLoaded) return;
+      const current = JSON.parse(JSON.stringify(cekekState));
+
+      queueCekekCloudWrite(async () => {
+        const prev = confirmedCekekCloudState || { bgImage: null, boats: [] };
+        const prevBoats = new Map(prev.boats.map(b => [b.id, b]));
+        const nowIds = new Set(current.boats.map(b => b.id));
+        const changed = current.boats.filter(b => JSON.stringify(b) !== JSON.stringify(prevBoats.get(b.id)));
+        const deleted = prev.boats.filter(b => !nowIds.has(b.id)).map(b => b.id);
+
+        for (const id of deleted) {
+          await cekekApiCall('marina_boats?id=eq.' + encodeURIComponent(id), { method: 'DELETE' });
+        }
+        if (changed.length) {
+          await cekekApiCall('marina_boats?on_conflict=id', {
+            method: 'POST',
+            headers: { Prefer: 'resolution=merge-duplicates' },
+            body: JSON.stringify(changed.map(b => ({ id: b.id, data: b })))
+          });
+        }
+        if (current.bgImage && current.bgImage !== prev.bgImage) {
+          await cekekApiCall('marina_settings?on_conflict=id', {
+            method: 'POST',
+            headers: { Prefer: 'resolution=merge-duplicates' },
+            body: JSON.stringify([{ id: 1, bg_image: current.bgImage }])
+          });
+        }
+        confirmedCekekCloudState = current;
+      });
+    }
+
+    // Viewport transform & pan/zoom logic
+    function boundCekekPan() {
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      if (!wrapper) return;
+      const w = wrapper.clientWidth;
+      const h = wrapper.clientHeight;
+      if (!w || !h) return;
+      const margin = 40;
+
+      cekekView.x = (CEKEK_WORLD_W * cekekView.scale <= w)
+        ? (w - CEKEK_WORLD_W * cekekView.scale) / 2
+        : Math.max(w - CEKEK_WORLD_W * cekekView.scale - margin, Math.min(margin, cekekView.x));
+
+      cekekView.y = (CEKEK_WORLD_H * cekekView.scale <= h)
+        ? (h - CEKEK_WORLD_H * cekekView.scale) / 2
+        : Math.max(h - CEKEK_WORLD_H * cekekView.scale - margin, Math.min(margin, cekekView.y));
+    }
+
+    function applyCekekTransform() {
+      const container = document.getElementById('cekek-map-container');
+      const zoomLevelEl = document.getElementById('cekek-zoom-level');
+      if (!container) return;
+
+      container.style.width = CEKEK_WORLD_W + 'px';
+      container.style.height = CEKEK_WORLD_H + 'px';
+      container.style.transformOrigin = '0 0';
+      container.style.transform = `translate3d(${cekekView.x}px, ${cekekView.y}px, 0) scale(${cekekView.scale})`;
+
+      if (zoomLevelEl) {
+        zoomLevelEl.innerText = Math.round(cekekView.scale * 100) + '%';
+      }
+    }
+
+    function fitAllCekekMap() {
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      if (!wrapper) return;
+      const w = wrapper.clientWidth;
+      const h = wrapper.clientHeight;
+      if (!w || !h) return;
+
+      cekekView.scale = Math.max(0.12, Math.min((w - 20) / CEKEK_WORLD_W, (h - 20) / CEKEK_WORLD_H));
+      cekekView.x = (w - CEKEK_WORLD_W * cekekView.scale) / 2;
+      cekekView.y = (h - CEKEK_WORLD_H * cekekView.scale) / 2;
+      cekekView.initialized = true;
+      applyCekekTransform();
+    }
+
+    function zoomCekekMap(mult) {
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      if (!wrapper) return;
+      const cx = wrapper.clientWidth / 2;
+      const cy = wrapper.clientHeight / 2;
+      const old = cekekView.scale;
+      cekekView.scale = Math.max(0.15, Math.min(3.2, old * mult));
+      cekekView.x = cx - (cx - cekekView.x) * (cekekView.scale / old);
+      cekekView.y = cy - (cy - cekekView.y) * (cekekView.scale / old);
+      boundCekekPan();
+      applyCekekTransform();
+    }
+
+    function focusCekekBoat(id) {
+      if (!id) return;
+      const boat = cekekState.boats.find(b => b.id === id);
+      if (!boat) return;
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      if (!wrapper) return;
+
+      cekekView.scale = Math.max(0.75, Math.min(2.0, cekekView.scale));
+      cekekView.x = wrapper.clientWidth / 2 - ((Number(boat.left) || 0) + 50) * cekekView.scale;
+      cekekView.y = wrapper.clientHeight / 2 - ((Number(boat.top) || 0) + 20) * cekekView.scale;
+      boundCekekPan();
+      applyCekekTransform();
+
+      const el = document.getElementById(id);
+      if (el) {
+        el.classList.remove('highlight-pulse');
+        void el.offsetWidth;
+        el.classList.add('highlight-pulse');
+      }
+    }
+
+    // Drag boat logic
+    function startCekekDrag(e) {
+      if (e.target.closest('#cekek-control-panel, button, input')) return;
+      e.preventDefault();
+
+      cekekDragActiveEl = this;
+      isCekekDragging = false;
+      selectCekekBoat(cekekDragActiveEl.id);
+
+      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+      cekekDragStartX = clientX;
+      cekekDragStartY = clientY;
+      cekekDragInitialLeft = parseFloat(cekekDragActiveEl.style.left) || 0;
+      cekekDragInitialTop = parseFloat(cekekDragActiveEl.style.top) || 0;
+
+      document.addEventListener('mousemove', moveCekekDrag);
+      document.addEventListener('mouseup', endCekekDrag);
+      document.addEventListener('touchmove', moveCekekDrag, { passive: false });
+      document.addEventListener('touchend', endCekekDrag);
+    }
+
+    function moveCekekDrag(e) {
+      if (!cekekDragActiveEl) return;
+      e.preventDefault();
+      isCekekDragging = true;
+
+      const clientX = e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+      const clientY = e.type.includes('mouse') ? e.clientY : e.touches[0].clientY;
+
+      const inv = 1 / Math.max(0.1, cekekView.scale);
+      const dx = (clientX - cekekDragStartX) * inv;
+      const dy = (clientY - cekekDragStartY) * inv;
+
+      let newLeft = Math.max(0, Math.min(CEKEK_WORLD_W - 100, cekekDragInitialLeft + dx));
+      let newTop = Math.max(0, Math.min(CEKEK_WORLD_H - 40, cekekDragInitialTop + dy));
+
+      cekekDragActiveEl.style.left = newLeft + 'px';
+      cekekDragActiveEl.style.top = newTop + 'px';
+
+      positionCekekControlPanel();
+    }
+
+    function endCekekDrag() {
+      if (!cekekDragActiveEl) return;
+      if (isCekekDragging) {
+        const id = cekekDragActiveEl.id;
+        const b = cekekState.boats.find(x => x.id === id);
+        if (b) {
+          b.left = parseFloat(cekekDragActiveEl.style.left) || 0;
+          b.top = parseFloat(cekekDragActiveEl.style.top) || 0;
+          saveCekekState();
+        }
+      }
+      cekekDragActiveEl = null;
+      isCekekDragging = false;
+
+      document.removeEventListener('mousemove', moveCekekDrag);
+      document.removeEventListener('mouseup', endCekekDrag);
+      document.removeEventListener('touchmove', moveCekekDrag);
+      document.removeEventListener('touchend', endCekekDrag);
+    }
+
+    // Selection & Control Panel
+    function selectCekekBoat(id) {
+      if (selectedCekekBoatId) {
+        const prev = document.getElementById(selectedCekekBoatId);
+        if (prev) prev.classList.remove('selected');
+      }
+
+      selectedCekekBoatId = id;
+      const boatEl = document.getElementById(id);
+      if (!boatEl) return;
+
+      cekekHighestZ++;
+      boatEl.style.zIndex = cekekHighestZ;
+      boatEl.classList.add('selected');
+
+      const boat = cekekState.boats.find(b => b.id === id);
+      if (!boat) return;
+
+      document.getElementById('cekek-panel-boat-name').innerText = boat.name;
+      document.getElementById('cekek-scale-val').innerText = (Number(boat.scale) || 1).toFixed(1) + 'x';
+      document.getElementById('cekek-rotation-slider').value = Number(boat.rotation) || 0;
+      document.getElementById('cekek-rotation-val').innerText = (Number(boat.rotation) || 0) + '°';
+      document.getElementById('cekek-rename-editor').classList.add('hidden');
+
+      // Check if this boat is in Tekne Rehberi (allBoats)
+      const rehberBox = document.getElementById('cekek-panel-rehber-box');
+      const capNameEl = document.getElementById('cekek-panel-captain-name');
+      const capActionsEl = document.getElementById('cekek-panel-captain-actions');
+      const normYardName = normalizeKeyClient(boat.name);
+
+      const matchedBoat = allBoats.find(b => {
+        const n = normalizeKeyClient(b.name);
+        return n && normYardName && (n === normYardName || n.includes(normYardName) || normYardName.includes(n));
+      });
+
+      if (matchedBoat) {
+        rehberBox.classList.remove('hidden');
+        const cap = `${matchedBoat.captain_name || ''} ${matchedBoat.captain_surname || ''}`.trim() || 'Belirtilmedi';
+        capNameEl.innerText = `👤 Kaptan: ${cap}`;
+
+        const firstPhone = (matchedBoat.crew || []).find(c => formatDialPhone(c.phone));
+        if (firstPhone) {
+          const dial = formatDialPhone(firstPhone.phone);
+          const wa = sanitizePhone(firstPhone.phone);
+          capActionsEl.innerHTML = `
+            <a href="tel:${dial}" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition">📞 Ara</a>
+            <a href="https://wa.me/${wa}" target="_blank" rel="noopener" class="px-2.5 py-1 bg-green-500 hover:bg-green-600 text-white rounded-lg text-xs font-bold transition">WA</a>
+            <button type="button" onclick="openPhotoModal('${matchedBoat.id}')" class="px-2 py-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-xs font-bold transition">📋 Form</button>
+          `;
+        } else {
+          capActionsEl.innerHTML = `<span class="text-[10px] text-slate-500 italic">Telefon kayıtlı değil</span>`;
+        }
+      } else {
+        rehberBox.classList.add('hidden');
+      }
+
+      const panel = document.getElementById('cekek-control-panel');
+      panel.classList.remove('hidden');
+      positionCekekControlPanel();
+    }
+
+    function deselectCekekBoat() {
+      if (selectedCekekBoatId) {
+        const prev = document.getElementById(selectedCekekBoatId);
+        if (prev) prev.classList.remove('selected');
+        selectedCekekBoatId = null;
+      }
+      document.getElementById('cekek-control-panel')?.classList.add('hidden');
+      document.getElementById('cekek-rename-editor')?.classList.add('hidden');
+    }
+
+    function positionCekekControlPanel() {
+      if (!selectedCekekBoatId) return;
+      const boatEl = document.getElementById(selectedCekekBoatId);
+      const panel = document.getElementById('cekek-control-panel');
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      if (!boatEl || !panel || !wrapper) return;
+
+      const rect = boatEl.getBoundingClientRect();
+      const wrapRect = wrapper.getBoundingClientRect();
+
+      let left = (rect.right - wrapRect.left) + 12;
+      let top = (rect.top - wrapRect.top);
+
+      if (left + 260 > wrapRect.width) {
+        left = (rect.left - wrapRect.left) - 260 - 12;
+      }
+      if (top + panel.offsetHeight > wrapRect.height) {
+        top = wrapRect.height - panel.offsetHeight - 12;
+      }
+      if (top < 10) top = 10;
+      if (left < 10) left = 10;
+
+      panel.style.left = left + 'px';
+      panel.style.top = top + 'px';
+    }
+
+    function toggleCekekRenameEditor(force) {
+      const editor = document.getElementById('cekek-rename-editor');
+      const input = document.getElementById('cekek-rename-input');
+      const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
+      if (!editor || !boat) return;
+
+      const open = typeof force === 'boolean' ? force : editor.classList.contains('hidden');
+      editor.classList.toggle('hidden', !open);
+      if (open) {
+        input.value = boat.name;
+        input.focus();
+      }
+      positionCekekControlPanel();
+    }
+
+    function saveCekekBoatName() {
+      const input = document.getElementById('cekek-rename-input');
+      const newName = input?.value.trim();
+      if (!newName || !selectedCekekBoatId) return;
+
+      const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
+      if (!boat) return;
+
+      boat.name = newName;
+      document.getElementById('cekek-panel-boat-name').innerText = newName;
+
+      const boatEl = document.getElementById(boat.id);
+      if (boatEl) {
+        fitCekekBoatName(boatEl, newName);
+      }
+
+      toggleCekekRenameEditor(false);
+      saveCekekState();
+      showToast(`Tekne adı "${newName}" olarak güncellendi.`);
+    }
+
+    function changeCekekScale(delta) {
+      if (!selectedCekekBoatId) return;
+      const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
+      if (!boat) return;
+
+      let current = Number(boat.scale) || 1.0;
+      let next = Math.max(0.35, Math.min(2.5, current + delta));
+      boat.scale = Math.round(next * 10) / 10;
+
+      document.getElementById('cekek-scale-val').innerText = boat.scale.toFixed(1) + 'x';
+      const el = document.getElementById(boat.id);
+      if (el) {
+        el.style.transform = `rotate(${Number(boat.rotation) || 0}deg) scale(${boat.scale})`;
+      }
+      saveCekekState();
+    }
+
+    function handleCekekRotation(e) {
+      if (!selectedCekekBoatId) return;
+      const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
+      if (!boat) return;
+
+      const val = parseInt(e.target.value) || 0;
+      boat.rotation = val;
+      document.getElementById('cekek-rotation-val').innerText = val + '°';
+
+      const el = document.getElementById(boat.id);
+      if (el) {
+        el.style.transform = `rotate(${val}deg) scale(${Number(boat.scale) || 1})`;
+      }
+    }
+
+    function deleteSelectedCekekBoat() {
+      if (!selectedCekekBoatId) return;
+      const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
+      if (!boat) return;
+
+      requireAdminPassword(() => {
+        if (!confirm(`"${boat.name}" isimli tekneyi sahadan kaldırmak istediğinize emin misiniz?`)) return;
+
+        const id = boat.id;
+        cekekState.boats = cekekState.boats.filter(b => b.id !== id);
+        document.getElementById(id)?.remove();
+        deselectCekekBoat();
+        saveCekekState();
+        showToast(`"${boat.name}" sahadan kaldırıldı.`);
+
+        const counterEl = document.getElementById('cekek-boat-counter');
+        if (counterEl) counterEl.innerText = `${cekekState.boats.length} Tekne Sahada`;
+      });
+    }
+
+    function openReminderForCekekBoat() {
+      if (!selectedCekekBoatId) return;
+      const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
+      if (!boat) return;
+
+      // Match in allBoats
+      const norm = normalizeKeyClient(boat.name);
+      const matched = allBoats.find(b => normalizeKeyClient(b.name) === norm);
+      openReminderModal(null, matched ? matched.id : '');
+
+      setTimeout(() => {
+        const titleInp = document.getElementById('reminder-title-input');
+        if (titleInp && !titleInp.value) {
+          titleInp.value = `${boat.name} - Saha Kontrolü`;
+        }
+      }, 100);
+    }
+
+    // Modal: Add Boat to Çekek
+    function openAddCekekBoatModal() {
+      requireAdminPassword(() => {
+        const modal = document.getElementById('cekek-add-modal');
+        const select = document.getElementById('cekek-add-rehber-select');
+        const input = document.getElementById('cekek-add-name-input');
+
+        // Populate select with boats not yet on yard
+        const yardNames = new Set(cekekState.boats.map(b => normalizeKeyClient(b.name)));
+        select.innerHTML = '<option value="">— Rehberden tekne seçin (isteğe bağlı) —</option>' +
+          allBoats.map(b => {
+            const onYard = yardNames.has(normalizeKeyClient(b.name));
+            return `<option value="${escapeHtml(b.name)}">${onYard ? '✓ ' : '＋ '}⛵ ${escapeHtml(b.name)}${onYard ? ' (Sahada Mevcut)' : ''}</option>`;
+          }).join('');
+
+        input.value = '';
+        modal.classList.remove('hidden');
+        setTimeout(() => input.focus(), 80);
+      });
+    }
+
+    function closeAddCekekBoatModal() {
+      document.getElementById('cekek-add-modal')?.classList.add('hidden');
+    }
+
+    function onCekekRehberSelectChange() {
+      const val = document.getElementById('cekek-add-rehber-select')?.value;
+      const input = document.getElementById('cekek-add-name-input');
+      if (val && input) {
+        input.value = val;
+      }
+    }
+
+    function confirmAddBoatToCekek() {
+      const input = document.getElementById('cekek-add-name-input');
+      const name = input?.value.trim();
+      if (!name) {
+        showToast('Lütfen tekne adını girin.', true);
+        return;
+      }
+
+      // Determine starting coordinate near center of current view
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      const startX = wrapper ? Math.round((wrapper.clientWidth / 2 - cekekView.x) / cekekView.scale - 50) : 1200;
+      const startY = wrapper ? Math.round((wrapper.clientHeight / 2 - cekekView.y) / cekekView.scale - 20) : 500;
+
+      const newBoat = {
+        id: 'boat_' + (crypto.randomUUID ? crypto.randomUUID() : (Date.now() + '_' + Math.random().toString(36).slice(2))),
+        name: name,
+        left: Math.max(50, Math.min(CEKEK_WORLD_W - 120, startX)),
+        top: Math.max(50, Math.min(CEKEK_WORLD_H - 60, startY)),
+        scale: 0.7,
+        rotation: 0
+      };
+
+      cekekState.boats.push(newBoat);
+      renderCekekBoatElement(newBoat);
+      saveCekekState();
+
+      closeAddCekekBoatModal();
+      selectCekekBoat(newBoat.id);
+      focusCekekBoat(newBoat.id);
+      showToast(`"${name}" sahaya eklendi.`);
+
+      const counterEl = document.getElementById('cekek-boat-counter');
+      if (counterEl) counterEl.innerText = `${cekekState.boats.length} Tekne Sahada`;
+    }
+
+    // Search inside Çekek Yard
+    function searchCekekBoat(query) {
+      const q = String(query || '').trim().toLocaleLowerCase('tr-TR');
+      if (!q) return;
+
+      const normQ = normalizeKeyClient(q);
+      const match = cekekState.boats.find(b => {
+        const nb = normalizeKeyClient(b.name);
+        return nb === normQ || nb.includes(normQ) || normQ.includes(nb);
+      });
+
+      if (match) {
+        selectCekekBoat(match.id);
+        focusCekekBoat(match.id);
+        showToast(`📍 "${match.name}" sahada bulundu!`);
+      } else {
+        showToast(`"${query}" sahada bulunamadı.`, true);
+      }
+    }
+
+    // Two-way navigation: Show Boat on Çekek Map from Rehber list
+    function showBoatOnCekekMap(boatName) {
+      if (!boatName) return;
+
+      // Reveal Çekek tab if currently hidden (preview mode)
+      document.getElementById('tab-cekek')?.classList.remove('hidden');
+      isCekekPreviewActive = true;
+      switchTab('cekek');
+
+      setTimeout(() => {
+        searchCekekBoat(boatName);
+      }, 250);
+    }
+
+    function toggleCekekSettingsMenu(force) {
+      const menu = document.getElementById('cekek-settings-menu');
+      if (!menu) return;
+      const open = typeof force === 'boolean' ? force : menu.classList.contains('hidden');
+      menu.classList.toggle('hidden', !open);
+    }
+
+    async function handleCekekImageUpload(e) {
+      const file = e.target.files?.[0];
+      e.target.value = '';
+      if (!file) return;
+
+      requireAdminPassword(async () => {
+        showToast('Kroki resmi yükleniyor...');
+        try {
+          const reader = new FileReader();
+          reader.onload = async (ev) => {
+            const dataUrl = ev.target.result;
+            cekekState.bgImage = dataUrl;
+            document.getElementById('cekek-map-container').style.backgroundImage = `url("${dataUrl}")`;
+            saveCekekState();
+            toggleCekekSettingsMenu(false);
+            showToast('Kroki resmi başarıyla güncellendi!');
+          };
+          reader.readAsDataURL(file);
+        } catch (err) {
+          showToast('Kroki yüklenemedi: ' + err.message, true);
+        }
+      });
+    }
+
+    // PDF and PNG Export with auto-fitted boat names
+    async function makeCekekExportCanvas() {
+      const W = CEKEK_WORLD_W;
+      const H = CEKEK_WORLD_H;
+      const headerH = 60, footerH = 45;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H + headerH + footerH;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas oluşturulamadı');
+
+      // Background
+      ctx.fillStyle = '#082f49';
+      ctx.fillRect(0, 0, W, headerH);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 24px Arial, sans-serif';
+      ctx.fillText('MARİNA ÇEKEK SAHASI YERLEŞİM PLANI', 24, 38);
+
+      // Croquis image
+      const bgImg = new Image();
+      bgImg.crossOrigin = 'anonymous';
+      await new Promise((resolve) => {
+        bgImg.onload = resolve;
+        bgImg.onerror = resolve;
+        bgImg.src = cekekState.bgImage || CEKEK_DEFAULT_BG;
+      });
+      ctx.save();
+      ctx.translate(0, headerH);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.fillRect(0, 0, W, H);
+      try {
+        ctx.drawImage(bgImg, 0, 0, W, H);
+      } catch (e) {}
+
+      // Render boats with names cleanly fitted inside boxes
+      for (const b of cekekState.boats) {
+        const x = (Number(b.left) || 0) + 50;
+        const y = (Number(b.top) || 0) + 20;
+        const sz = Number(b.scale) || 1.0;
+        const ang = (Number(b.rotation) || 0) * Math.PI / 180;
+
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(ang);
+        ctx.scale(sz, sz);
+
+        // Box
+        ctx.beginPath();
+        if (ctx.roundRect) ctx.roundRect(-50, -20, 100, 40, 6);
+        else ctx.rect(-50, -20, 100, 40);
+        ctx.fillStyle = '#facc15';
+        ctx.strokeStyle = '#b45309';
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        // Fitted Text
+        ctx.fillStyle = '#000000';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+
+        let nameStr = String(b.name || '');
+        let fSize = 11;
+        ctx.font = `bold ${fSize}px Arial, sans-serif`;
+        while (fSize > 7 && ctx.measureText(nameStr).width > 92) {
+          fSize -= 1;
+          ctx.font = `bold ${fSize}px Arial, sans-serif`;
+        }
+        if (ctx.measureText(nameStr).width > 92) {
+          while (nameStr.length > 1 && ctx.measureText(nameStr + '…').width > 92) {
+            nameStr = nameStr.slice(0, -1);
+          }
+          nameStr += '…';
+        }
+        ctx.fillText(nameStr, 0, 1);
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // Footer
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, headerH + H, W, footerH);
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '14px Arial, sans-serif';
+      const nowStr = new Date().toLocaleString('tr-TR');
+      ctx.fillText(`Rapor Tarihi: ${nowStr}   •   Toplam Yerleşmiş Tekne: ${cekekState.boats.length}`, 24, headerH + H + 28);
+
+      return canvas;
+    }
+
+    async function exportCekekPlan(type = 'pdf') {
+      toggleCekekSettingsMenu(false);
+      showToast('Kroki dışa aktarılıyor...');
+      try {
+        const canvas = await makeCekekExportCanvas();
+        const dateStr = new Date().toISOString().slice(0, 10);
+        const fileName = `Marina_Cekek_Sahasi_${dateStr}`;
+
+        if (type === 'png') {
+          const url = canvas.toDataURL('image/png');
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileName + '.png';
+          a.click();
+          showToast('Kroki resmi indirildi.');
+        } else {
+          if (!window.jspdf?.jsPDF) {
+            throw new Error('PDF kütüphanesi hazır değil.');
+          }
+          const { jsPDF } = window.jspdf;
+          const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a3' });
+          const pw = pdf.internal.pageSize.getWidth();
+          const ph = pdf.internal.pageSize.getHeight();
+          const scale = Math.min((pw - 16) / canvas.width, (ph - 16) / canvas.height);
+          const w = canvas.width * scale;
+          const h = canvas.height * scale;
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', (pw - w) / 2, (ph - h) / 2, w, h);
+          pdf.save(fileName + '.pdf');
+          showToast('Kroki PDF olarak indirildi.');
+        }
+      } catch (err) {
+        showToast('Dışa aktarma hatası: ' + err.message, true);
+      }
+    }
+
+    let cekekInitDone = false;
+    function ensureCekekLoadedAndRendered() {
+      if (!cekekInitDone) {
+        cekekInitDone = true;
+        loadCekekState();
+        initCekekMapEvents();
+      }
+      requestAnimationFrame(() => {
+        if (!cekekView.initialized) {
+          fitAllCekekMap();
+        } else {
+          applyCekekTransform();
+        }
+        refitAllCekekBoatNames();
+      });
+    }
+
+    function initCekekMapEvents() {
+      const wrapper = document.getElementById('cekek-map-wrapper');
+      if (!wrapper) return;
+
+      // Click outside deselects boat
+      wrapper.addEventListener('click', (e) => {
+        if (e.target.id === 'cekek-map-container' || e.target.id === 'cekek-map-wrapper') {
+          deselectCekekBoat();
+        }
+      });
+
+      // Desktop background mouse drag to pan
+      wrapper.addEventListener('mousedown', (e) => {
+        if (e.button !== 0 || e.target.closest('.boat-item, #cekek-control-panel, button, input')) return;
+        cekekDesktopPan = { px: e.clientX, py: e.clientY, x: cekekView.x, y: cekekView.y };
+      });
+      window.addEventListener('mousemove', (e) => {
+        if (!cekekDesktopPan) return;
+        cekekView.x = cekekDesktopPan.x + (e.clientX - cekekDesktopPan.px);
+        cekekView.y = cekekDesktopPan.y + (e.clientY - cekekDesktopPan.py);
+        boundCekekPan();
+        applyCekekTransform();
+      });
+      window.addEventListener('mouseup', () => { cekekDesktopPan = null; });
+
+      // Mouse wheel zoom
+      wrapper.addEventListener('wheel', (e) => {
+        if (e.target.closest('#cekek-control-panel')) return;
+        e.preventDefault();
+        const rect = wrapper.getBoundingClientRect();
+        const mult = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        const cx = e.clientX - rect.left;
+        const cy = e.clientY - rect.top;
+        const old = cekekView.scale;
+        cekekView.scale = Math.max(0.15, Math.min(3.2, old * mult));
+        cekekView.x = cx - (cx - cekekView.x) * (cekekView.scale / old);
+        cekekView.y = cy - (cy - cekekView.y) * (cekekView.scale / old);
+        boundCekekPan();
+        applyCekekTransform();
+      }, { passive: false });
+
+      // Touch pan & pinch zoom
+      const getPt = (t) => ({ x: t.clientX - wrapper.getBoundingClientRect().left, y: t.clientY - wrapper.getBoundingClientRect().top });
+      const getDist = (a, b) => Math.hypot(a.x - b.x, a.y - b.y);
+
+      wrapper.addEventListener('touchstart', (e) => {
+        if (e.touches.length >= 2) {
+          e.preventDefault();
+          const a = getPt(e.touches[0]), b = getPt(e.touches[1]);
+          cekekTouchGesture = { type: 'pinch', dist: getDist(a, b), scale: cekekView.scale, x: cekekView.x, y: cekekView.y, cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 };
+          return;
+        }
+        if (e.target.closest('.boat-item, #cekek-control-panel, button, input')) return;
+        const p = getPt(e.touches[0]);
+        cekekTouchGesture = { type: 'pan', start: p, x: cekekView.x, y: cekekView.y };
+      }, { capture: true, passive: false });
+
+      wrapper.addEventListener('touchmove', (e) => {
+        if (!cekekTouchGesture) return;
+        e.preventDefault();
+        if (cekekTouchGesture.type === 'pinch' && e.touches.length >= 2) {
+          const a = getPt(e.touches[0]), b = getPt(e.touches[1]);
+          const cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+          cekekView.scale = Math.min(3.0, Math.max(0.15, cekekTouchGesture.scale * getDist(a, b) / Math.max(1, cekekTouchGesture.dist)));
+          cekekView.x = cx - (cekekTouchGesture.cx - cekekTouchGesture.x) * (cekekView.scale / cekekTouchGesture.scale);
+          cekekView.y = cy - (cekekTouchGesture.cy - cekekTouchGesture.y) * (cekekView.scale / cekekTouchGesture.scale);
+        } else if (cekekTouchGesture.type === 'pan' && e.touches.length === 1) {
+          const p = getPt(e.touches[0]);
+          cekekView.x = cekekTouchGesture.x + p.x - cekekTouchGesture.start.x;
+          cekekView.y = cekekTouchGesture.y + p.y - cekekTouchGesture.start.y;
+        }
+        boundCekekPan();
+        applyCekekTransform();
+      }, { capture: true, passive: false });
+
+      wrapper.addEventListener('touchend', () => { cekekTouchGesture = null; });
+      wrapper.addEventListener('touchcancel', () => { cekekTouchGesture = null; });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       if (!REMINDERS_UI_ACTIVE) {
         document.getElementById('tab-reminders')?.classList.add('hidden');
       }
       const params = new URLSearchParams(window.location.search);
+      const isCekekPreview = params.get('preview') === 'cekek' || params.get('tab') === 'cekek' || params.get('test') === 'cekek';
+
+      if (CEKEK_UI_ACTIVE || isCekekPreview) {
+        isCekekPreviewActive = true;
+        document.getElementById('tab-cekek')?.classList.remove('hidden');
+      } else {
+        document.getElementById('tab-cekek')?.classList.add('hidden');
+      }
+
       if (REMINDERS_UI_ACTIVE && params.get('tab') === 'reminders') {
         switchTab('reminders');
+      } else if (isCekekPreview) {
+        switchTab('cekek');
+        showToast('🧪 Çekek Sahası Önizleme ve Test Modu Aktif');
       }
       loadData();
     });
