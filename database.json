@@ -40,26 +40,26 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793962953664_6ceebb4d.jpg",
       "form_date": "2026-11-06",
       "created_at": "2026-11-06T08:53:46.337Z",
-      "updated_at": "2026-11-06T11:03:25.707Z",
+      "updated_at": "2026-11-07T06:36:43.695Z",
       "crew": [
         {
-          "id": "895d5856-b4ef-4788-b48a-caff3e55a390",
+          "id": "d8da9028-3f30-498d-8437-1d27cb6166f0",
           "name": "Süleyman",
           "surname": "Ecebey",
           "role": "Kaptan",
-          "phone": "",
+          "phone": "0507 375 20 26",
           "sort_order": 1
         },
         {
-          "id": "2e4950e5-7841-4dd7-91a0-0bab8911807f",
+          "id": "fd963120-667b-4ae0-9378-d55d34c864c7",
           "name": "Merthan",
           "surname": "Erol",
           "role": "Gemici",
-          "phone": "",
+          "phone": "0546 772 08 12",
           "sort_order": 2
         },
         {
-          "id": "3df22df9-9501-46b1-8ffd-0b559af94c6d",
+          "id": "abe4288a-b453-4a40-867f-2adaf521ce6a",
           "name": "Merve",
           "surname": "Gunay",
           "role": "Gemici",
@@ -1670,5 +1670,5 @@
     }
   ],
   "reminders": [],
-  "last_backup_at": "2026-11-07T02:49:14.951Z"
+  "last_backup_at": "2026-11-07T06:36:43.719Z"
 }
