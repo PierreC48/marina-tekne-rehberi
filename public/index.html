@@ -189,7 +189,7 @@
           <span>👥 Tüm Kişiler</span>
           <span id="stat-contact-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
-        <button id="tab-cekek" onclick="switchTab('cekek')" class="hidden flex-1 py-2 px-3 rounded-lg font-medium transition text-emerald-300 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap relative">
+        <button id="tab-cekek" onclick="switchTab('cekek')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-emerald-300 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap relative">
           <span>🗺️ Çekek Sahası</span>
           <span id="stat-cekek-count" class="text-[10px] bg-emerald-950 text-emerald-200 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
@@ -1148,7 +1148,7 @@
     let pendingAdminCallback = null;
     let sessionAdminPassword = sessionStorage.getItem('marina_admin_pwd') || '';
     const REMINDERS_UI_ACTIVE = true;
-    let CEKEK_UI_ACTIVE = false; // Kullanıcı 'aktifleştir' diyene kadar canlıda gizli kalır
+    let CEKEK_UI_ACTIVE = true; // Canlıda aktif
     let isCekekPreviewActive = false;
 
     function openProtectedExport(type) {
