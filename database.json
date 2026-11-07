@@ -1669,6 +1669,24 @@
       ]
     }
   ],
-  "reminders": [],
-  "last_backup_at": "2026-11-07T10:02:57.171Z"
+  "reminders": [
+    {
+      "id": "d79375db-b171-4f43-89c7-dbe4fe4c30a5",
+      "title": "Ramazan yavuz çalışma saati bildirilecek",
+      "notes": "",
+      "boat_id": "",
+      "boat_name": "",
+      "captain_name": "",
+      "captain_phone": "",
+      "due_at": "2026-11-05T10:06:00.000Z",
+      "repeat": "none",
+      "priority": "normal",
+      "completed": true,
+      "completed_at": "2026-11-05T10:06:20.251Z",
+      "notified_due_at": null,
+      "created_at": "2026-11-05T10:05:31.168Z",
+      "updated_at": "2026-11-05T10:06:20.251Z"
+    }
+  ],
+  "last_backup_at": "2026-11-07T11:44:16.540Z"
 }
