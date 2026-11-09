@@ -185,13 +185,13 @@
           <span>⛵ Tekneler</span>
           <span id="stat-boat-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
-        <button id="tab-contacts" onclick="switchTab('contacts')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
-          <span>👥 Tüm Kişiler</span>
-          <span id="stat-contact-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
-        </button>
         <button id="tab-cekek" onclick="switchTab('cekek')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-emerald-300 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap relative">
           <span>🗺️ Çekek Sahası</span>
           <span id="stat-cekek-count" class="text-[10px] bg-emerald-950 text-emerald-200 px-1.5 py-0.5 rounded-full font-bold">0</span>
+        </button>
+        <button id="tab-contacts" onclick="switchTab('contacts')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-sky-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
+          <span>👥 Tüm Kişiler</span>
+          <span id="stat-contact-count" class="text-[10px] bg-marine-950/70 px-1.5 py-0.5 rounded-full font-bold">0</span>
         </button>
         <button id="tab-reminders" onclick="switchTab('reminders')" class="flex-1 py-2 px-3 rounded-lg font-medium transition text-amber-200 hover:text-white hover:bg-marine-800 flex items-center justify-center gap-1.5 whitespace-nowrap">
           <span>🔔 Görevler</span>
@@ -1302,7 +1302,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=14').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=15').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -1545,7 +1545,7 @@
 
     function switchTab(tab) {
       activeTab = tab;
-      const tabs = ['boats', 'contacts', 'reminders', 'gallery', 'cekek'];
+      const tabs = ['boats', 'cekek', 'contacts', 'reminders', 'gallery'];
       tabs.forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         const view = document.getElementById(`view-${t}`);
@@ -4575,6 +4575,11 @@
       if (CEKEK_UI_ACTIVE || isCekekPreview) {
         isCekekPreviewActive = true;
         document.getElementById('tab-cekek')?.classList.remove('hidden');
+        if (!cekekInitDone) {
+          cekekInitDone = true;
+          loadCekekState();
+          initCekekMapEvents();
+        }
       } else {
         document.getElementById('tab-cekek')?.classList.add('hidden');
       }

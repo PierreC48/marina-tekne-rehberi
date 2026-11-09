@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marina-rehber-v14';
+const CACHE_NAME = 'marina-rehber-v15';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
