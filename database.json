@@ -1318,19 +1318,6 @@
       "crew": []
     },
     {
-      "id": "boat_9c932622-6698-4b7e-b931-0055e0530073",
-      "name": "North & South (y)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 552, Y: 62]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
-    },
-    {
       "id": "324655a9-7a9e-4d04-bb27-3de7bf8ad81d",
       "name": "Nourth & South",
       "captain_title": "KAPTAN",
@@ -2119,5 +2106,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:27:46.709Z"
+  "last_backup_at": "2026-11-09T09:34:23.352Z"
 }
