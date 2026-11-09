@@ -2068,19 +2068,6 @@
       "created_at": "2026-11-07T11:58:47.900Z",
       "updated_at": "2026-11-07T11:58:47.900Z",
       "crew": []
-    },
-    {
-      "id": "boat_7a82d3cb-5301-4479-93e2-78fca3cd361c",
-      "name": "Slince III (my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 865, Y: 540]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
     }
   ],
   "reminders": [
@@ -2102,5 +2089,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T11:54:43.172Z"
+  "last_backup_at": "2026-11-09T11:54:48.449Z"
 }
