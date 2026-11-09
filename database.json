@@ -802,13 +802,13 @@
       "id": "boat_33c7682f-c5aa-437b-8728-fe70f3650182",
       "name": "Hey Teacher (y)",
       "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
+      "captain_name": "Serhat",
+      "captain_surname": "Ayan",
       "notes": "Çekek Sahası Yerleşim Planı [X: 491, Y: 102]",
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-09T11:27:33.039Z",
       "crew": []
     },
     {
@@ -2220,5 +2220,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T11:26:57.060Z"
+  "last_backup_at": "2026-11-09T11:27:33.143Z"
 }
