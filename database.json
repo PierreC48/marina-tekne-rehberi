@@ -1749,10 +1749,10 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701854715_912c6e5d.jpg",
       "form_date": "2026-11-03",
       "created_at": "2026-11-03T10:31:38.719Z",
-      "updated_at": "2026-11-03T10:31:38.719Z",
+      "updated_at": "2026-11-09T09:24:43.268Z",
       "crew": [
         {
-          "id": "dda83d43-2fbc-43b5-a91a-fd63f50dccfd",
+          "id": "35c86a90-93b1-44b2-a234-6fb8e578e01a",
           "name": "Tolga",
           "surname": "Bozdemir",
           "role": "Gemici",
@@ -1760,12 +1760,20 @@
           "sort_order": 1
         },
         {
-          "id": "869463dc-03e6-448d-821a-92e0e6b3532d",
+          "id": "f4a62553-3fb9-43a4-89f9-dd21f772ff0e",
           "name": "Anıl",
           "surname": "Umut Deniz",
           "role": "Gemici",
           "phone": "0501 603 55 34",
           "sort_order": 2
+        },
+        {
+          "id": "9e50e6df-c8ee-4f37-ba58-0c8686c626fc",
+          "name": "Meriç",
+          "surname": "Yazkan",
+          "role": "Gemici",
+          "phone": "0530 687 15 29",
+          "sort_order": 3
         }
       ]
     },
@@ -2137,5 +2145,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:20:56.239Z"
+  "last_backup_at": "2026-11-09T09:24:43.280Z"
 }
