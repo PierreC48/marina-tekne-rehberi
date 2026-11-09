@@ -595,19 +595,6 @@
       ]
     },
     {
-      "id": "boat_3106d4ca-8a92-45d8-beb3-8f4b7b3094fe",
-      "name": "Dusky(mb)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 948, Y: 223]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
-    },
-    {
       "id": "boat_3ec3fa05-9b4e-4ca9-84ff-960f70d6d32c",
       "name": "Enterprice(cat)",
       "captain_title": "KAPTAN",
@@ -2093,5 +2080,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:34:42.178Z"
+  "last_backup_at": "2026-11-09T09:34:52.875Z"
 }
