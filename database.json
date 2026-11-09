@@ -1947,19 +1947,6 @@
       "crew": []
     },
     {
-      "id": "boat_b26fb6a2-1974-4351-b43b-2f1b58777259",
-      "name": "Dali (my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 271, Y: 262]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
-    },
-    {
       "id": "boat_3106d4ca-8a92-45d8-beb3-8f4b7b3094fe",
       "name": "Dusky(mb)",
       "captain_title": "KAPTAN",
@@ -2018,5 +2005,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T11:30:13.348Z"
+  "last_backup_at": "2026-11-09T11:30:23.805Z"
 }
