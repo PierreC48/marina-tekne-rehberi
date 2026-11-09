@@ -1,4 +1,4 @@
-const CACHE_NAME = 'marina-rehber-v17';
+const CACHE_NAME = 'marina-rehber-v18';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
@@ -32,16 +32,24 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
+  const data = event.notification.data || {};
+  const targetTab = data.tab;
+  const targetUrl = data.url || (targetTab ? `/?tab=${targetTab}` : '/');
+
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
       for (const client of clientList) {
         if ('focus' in client) {
-          client.postMessage({ type: 'OPEN_REMINDERS_TAB', reminderId: event.notification.data?.reminderId });
+          if (data.reminderId) {
+            client.postMessage({ type: 'OPEN_REMINDERS_TAB', reminderId: data.reminderId });
+          } else if (targetTab) {
+            client.postMessage({ type: 'SWITCH_TAB', tab: targetTab });
+          }
           return client.focus();
         }
       }
       if (self.clients.openWindow) {
-        return self.clients.openWindow('/?tab=reminders');
+        return self.clients.openWindow(targetUrl);
       }
     })
   );
