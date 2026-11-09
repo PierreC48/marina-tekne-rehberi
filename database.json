@@ -1956,19 +1956,6 @@
       "crew": []
     },
     {
-      "id": "boat_46128d45-b465-4f00-b9e6-41d6fbfa0194",
-      "name": "Aragon (my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 1777, Y: 168]",
-      "image_url": "",
-      "form_date": "2026-11-09",
-      "created_at": "2026-11-09T08:15:10.405Z",
-      "updated_at": "2026-11-09T08:15:10.405Z",
-      "crew": []
-    },
-    {
       "id": "boat_7f19fb75-f86f-4840-ab56-a1a4d5b65644",
       "name": "Dlophin (my)",
       "captain_title": "KAPTAN",
@@ -2001,5 +1988,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T11:55:03.002Z"
+  "last_backup_at": "2026-11-09T11:55:07.362Z"
 }
