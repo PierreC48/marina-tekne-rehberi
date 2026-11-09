@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "boat_46128d45-b465-4f00-b9e6-41d6fbfa0194",
+      "name": "Aragon (my) Tr Bayrak",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ayhan",
+      "captain_surname": "İnan",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 1777, Y: 168]",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794215756190_cf1d55f9.jpg",
+      "form_date": "2026-11-09",
+      "created_at": "2026-11-09T08:15:10.405Z",
+      "updated_at": "2026-11-09T09:16:48.250Z",
+      "crew": [
+        {
+          "id": "a1b2daaa-de6f-46c7-8578-22882ede5e9e",
+          "name": "Ayhan",
+          "surname": "İnan",
+          "role": "Kaptan",
+          "phone": "0506 609 54 07",
+          "sort_order": 1
+        },
+        {
+          "id": "40a78be4-94a9-4cc2-990e-a06975a2e875",
+          "name": "Musa",
+          "surname": "Aydın",
+          "role": "Gemici",
+          "phone": "0533 701 88 51",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "c9d1712e-42b9-47f5-88f0-1c5a2a3da0f5",
       "name": "Marık (my)",
       "captain_title": "KAPTAN",
@@ -236,19 +266,6 @@
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
       "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
-    },
-    {
-      "id": "boat_46128d45-b465-4f00-b9e6-41d6fbfa0194",
-      "name": "Aragon (my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 1777, Y: 168]",
-      "image_url": "",
-      "form_date": "2026-11-09",
-      "created_at": "2026-11-09T08:15:10.405Z",
-      "updated_at": "2026-11-09T08:15:10.405Z",
       "crew": []
     },
     {
@@ -2111,5 +2128,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:15:16.956Z"
+  "last_backup_at": "2026-11-09T09:16:48.263Z"
 }
