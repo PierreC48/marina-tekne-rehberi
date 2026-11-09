@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#082f49">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Marina Rehber">
   <link rel="manifest" href="/manifest.json">
   <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23082f49'/><text y='.9em' x='50%' text-anchor='middle' font-size='65'>⚓</text></svg>">
   <title>Marina Tekne & Mürettebat Rehberi</title>
@@ -204,6 +205,12 @@
 
       <!-- Quick Action Buttons -->
       <div class="flex items-center gap-1.5 shrink-0">
+        <!-- iOS & Android Notification Toggle / Test Button -->
+        <button type="button" id="header-notif-btn" onclick="toggleGlobalNotificationPermission()" class="inline-flex items-center gap-1 bg-slate-800 hover:bg-slate-700 text-slate-200 px-2.5 py-2 rounded-xl text-xs font-medium border border-slate-700 transition" title="iOS & Android Bildirimlerini Aç / Test Et">
+          <span id="header-notif-icon">🔔</span>
+          <span id="header-notif-label" class="hidden sm:inline">Bildirimler</span>
+        </button>
+
         <button onclick="openUploadModal()" class="inline-flex items-center gap-1.5 bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold shadow-md shadow-sky-600/30 transition-all active:scale-95">
           <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
           <span>Form Yükle</span>
@@ -262,6 +269,25 @@
 
     </div>
   </header>
+
+  <!-- Global Notification Permission Banner (iOS & Android) -->
+  <div id="global-notif-banner" class="hidden max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3">
+    <div class="bg-gradient-to-r from-sky-950 via-slate-900 to-marine-950 border border-sky-600/50 rounded-2xl p-3 sm:p-3.5 text-white flex items-center justify-between gap-3 shadow-xl">
+      <div class="flex items-center gap-3 min-w-0">
+        <span class="text-2xl shrink-0">🔔</span>
+        <div class="text-xs">
+          <p class="font-extrabold text-sky-200 text-sm">Tekne Bildirimleri (iOS & Android)</p>
+          <p class="text-slate-300 text-[11px] truncate mt-0.5">Rehberde ve Çekek Sahası'nda tekne eklenip çıkarıldığında telefonunuza anlık bildirim gelsin.</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="requestGlobalNotificationPermission()" class="bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-extrabold px-3.5 py-1.5 rounded-xl text-xs transition shadow-md active:scale-95 flex items-center gap-1.5">
+          <span>Bildirimleri Aç</span>
+        </button>
+        <button onclick="dismissGlobalNotifBanner()" class="text-slate-400 hover:text-white p-1 text-base font-bold" title="Kapat">✕</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MAIN CONTENT CONTAINER -->
   <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6 flex-1 w-full overflow-x-hidden">
@@ -1407,7 +1433,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=17').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=18').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -1592,6 +1618,15 @@
       }, 3500);
     }
 
+    let lastKnownRehberBoatIds = null;
+    let lastKnownRehberBoatMap = new Map();
+    const recentLocalBoatActions = new Set();
+    function markLocalBoatAction(action, id) {
+      const key = `${action}_${id}`;
+      recentLocalBoatActions.add(key);
+      setTimeout(() => recentLocalBoatActions.delete(key), 20000);
+    }
+
     async function loadData() {
       updateOnlineStatusUI();
       try {
@@ -1606,6 +1641,31 @@
         if (remindersRes && remindersRes.ok) {
           allReminders = await remindersRes.json();
         }
+
+        // Multi-device sync: Check if boats were added or deleted remotely by another user
+        if (lastKnownRehberBoatIds !== null) {
+          const currentIds = new Set(allBoats.map(b => b.id));
+
+          // Remotely added boats
+          for (const b of allBoats) {
+            if (!lastKnownRehberBoatIds.has(b.id) && !recentLocalBoatActions.has('add_' + b.id)) {
+              if (typeof sendMarinaNotification === 'function') {
+                sendMarinaNotification('⛵ Yeni Tekne Eklendi', `"${b.name}" marina rehberine eklendi.`, 'boat-add', 'boats');
+              }
+            }
+          }
+
+          // Remotely deleted boats
+          for (const [oldId, oldName] of lastKnownRehberBoatMap.entries()) {
+            if (!currentIds.has(oldId) && !recentLocalBoatActions.has('del_' + oldId)) {
+              if (typeof sendMarinaNotification === 'function') {
+                sendMarinaNotification('🗑️ Tekne Rehberden Kaldırıldı', `"${oldName}" marina rehberinden silindi.`, 'boat-delete', 'boats');
+              }
+            }
+          }
+        }
+        lastKnownRehberBoatIds = new Set(allBoats.map(b => b.id));
+        lastKnownRehberBoatMap = new Map(allBoats.map(b => [b.id, b.name]));
 
         // Save to localStorage for offline marina usage
         try {
@@ -2817,8 +2877,13 @@
         const result = await res.json();
         if (res.ok) {
           const savedName = result?.boat?.name || boatName;
+          const savedId = result?.boat?.id || result?.id;
+          if (savedId) markLocalBoatAction('add', savedId);
           closeUploadModal();
           showToast(result.merged ? `"${savedName}" mevcut kayıtla birleştirildi ve güncellendi!` : `"${savedName}" başarıyla kaydedildi!`);
+          if (!result.merged) {
+            sendMarinaNotification('⛵ Yeni Tekne Eklendi', `"${savedName}" marina rehberine eklendi.`, 'boat-add', 'boats');
+          }
           loadData();
         } else {
           showToast(result.error || 'Kayıt başarısız oldu.', true);
@@ -2836,7 +2901,9 @@
       try {
         const res = await fetch(`/api/boats/${id}`, { method: 'DELETE' });
         if (res.ok) {
+          markLocalBoatAction('del', id);
           showToast(`"${name}" silindi.`);
+          sendMarinaNotification('🗑️ Tekne Rehberden Kaldırıldı', `"${name}" marina rehberinden silindi.`, 'boat-delete', 'boats');
           loadData();
         }
       } catch (e) {
@@ -2937,40 +3004,154 @@
       }
     }
 
-    // Trigger system notification on mobile / desktop
-    async function sendPhoneSystemNotification(title, body, reminderId = null) {
-      if (!('Notification' in window)) return;
+    // Global Marina System & Mobile Notification (iOS & Android)
+    async function sendMarinaNotification(title, body, tag = 'marina-event', tab = null, extraData = {}) {
       try {
-        if (Notification.permission === 'default') {
-          await Notification.requestPermission();
-        }
-        if (Notification.permission !== 'granted') return;
+        playAlarmChime(false);
+      } catch (e) {}
 
-        const options = {
-          body: body,
-          icon: 'https://cdn-icons-png.flaticon.com/512/2942/2942076.png',
-          badge: 'https://cdn-icons-png.flaticon.com/512/2942/2942076.png',
-          vibrate: [400, 150, 400, 150, 600],
-          requireInteraction: true,
-          tag: reminderId ? `marina-reminder-${reminderId}` : 'marina-reminder-test',
-          renotify: true,
-          data: { reminderId }
-        };
+      // In-app visual notification
+      showToast(`${title}: ${body}`);
 
-        if ('serviceWorker' in navigator) {
-          const reg = await navigator.serviceWorker.getRegistration();
-          if (reg && reg.showNotification) {
-            await reg.showNotification(title, options);
-            return;
+      if (!('Notification' in window)) return;
+
+      try {
+        if (Notification.permission === 'granted') {
+          const options = {
+            body: body,
+            icon: 'https://cdn-icons-png.flaticon.com/512/2942/2942076.png',
+            badge: 'https://cdn-icons-png.flaticon.com/512/2942/2942076.png',
+            vibrate: [400, 150, 400, 150, 600],
+            requireInteraction: false,
+            tag: (tag || 'marina') + '-' + Date.now(),
+            renotify: true,
+            data: {
+              url: tab ? `/?tab=${tab}` : '/',
+              tab: tab,
+              ...extraData
+            }
+          };
+
+          if ('serviceWorker' in navigator) {
+            const reg = await navigator.serviceWorker.getRegistration();
+            if (reg && reg.showNotification) {
+              await reg.showNotification(title, options);
+              return;
+            }
           }
+          new Notification(title, options);
         }
-        new Notification(title, options);
-      } catch (e) {
-        console.warn('Bildirim gönderilemedi:', e);
+      } catch (err) {
+        console.warn('Sistem bildirimi gösterilemedi:', err);
+      }
+    }
+
+    // Trigger system notification on mobile / desktop (for reminders)
+    async function sendPhoneSystemNotification(title, body, reminderId = null) {
+      return sendMarinaNotification(title, body, reminderId ? `reminder-${reminderId}` : 'reminder-test', 'reminders', { reminderId });
+    }
+
+    function updateGlobalNotificationUI() {
+      const btn = document.getElementById('header-notif-btn');
+      const icon = document.getElementById('header-notif-icon');
+      const label = document.getElementById('header-notif-label');
+      const banner = document.getElementById('global-notif-banner');
+
+      const isDismissed = localStorage.getItem('marina_notif_banner_dismissed') === 'true';
+
+      if (!('Notification' in window)) {
+        if (btn) btn.classList.add('hidden');
+        if (banner) banner.classList.add('hidden');
+        return;
+      }
+
+      if (Notification.permission === 'granted') {
+        if (btn) {
+          btn.className = "inline-flex items-center gap-1 bg-emerald-900/70 hover:bg-emerald-800 text-emerald-200 px-2.5 py-2 rounded-xl text-xs font-bold border border-emerald-600/70 transition shadow-sm";
+          if (icon) icon.innerText = '🔔';
+          if (label) label.innerText = 'Bildirim Açık';
+        }
+        if (banner) banner.classList.add('hidden');
+      } else if (Notification.permission === 'denied') {
+        if (btn) {
+          btn.className = "inline-flex items-center gap-1 bg-rose-950/50 hover:bg-rose-900 text-rose-300 px-2.5 py-2 rounded-xl text-xs font-medium border border-rose-800/60 transition";
+          if (icon) icon.innerText = '🔕';
+          if (label) label.innerText = 'Bildirim Kapalı';
+        }
+        if (banner) banner.classList.add('hidden');
+      } else {
+        if (btn) {
+          btn.className = "inline-flex items-center gap-1 bg-sky-900/60 hover:bg-sky-800 text-sky-200 px-2.5 py-2 rounded-xl text-xs font-semibold border border-sky-600/60 transition animate-pulse";
+          if (icon) icon.innerText = '🔔';
+          if (label) label.innerText = 'Bildirimleri Aç';
+        }
+        if (banner && !isDismissed) {
+          banner.classList.remove('hidden');
+        }
+      }
+    }
+
+    function dismissGlobalNotifBanner() {
+      localStorage.setItem('marina_notif_banner_dismissed', 'true');
+      document.getElementById('global-notif-banner')?.classList.add('hidden');
+    }
+
+    async function requestGlobalNotificationPermission() {
+      if (!('Notification' in window)) {
+        showToast('Cihazınızda web bildirimleri desteklenmiyor.', true);
+        return;
+      }
+
+      try {
+        playAlarmChime(false);
+      } catch (e) {}
+
+      try {
+        const perm = await Notification.requestPermission();
+        updateGlobalNotificationUI();
+        updateNotificationPermissionBanner();
+
+        if (perm === 'granted') {
+          showToast('🔔 Bildirimler başarıyla açıldı!');
+          sendMarinaNotification(
+            '🔔 Marina Bildirimleri Aktif!',
+            'Hem iOS hem Android cihazınızda tekne ekleme ve çıkarma işlemlerinde anlık bildirim alacaksınız.',
+            'welcome-notif'
+          );
+
+          const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+          const isStandalone = window.navigator.standalone === true;
+          if (isIOS && !isStandalone) {
+            setTimeout(() => {
+              showToast('İpucu: iOS kilit ekranında da bildirim almak için Paylaş (⬆️) menüsünden "Ana Ekrana Ekle" yapabilirsiniz.', false);
+            }, 3000);
+          }
+        } else if (perm === 'denied') {
+          showToast('Tarayıcı ayarlarından bildirim iznini açabilirsiniz.', true);
+        }
+      } catch (err) {
+        console.warn('İzin isteme hatası:', err);
+      }
+    }
+
+    function toggleGlobalNotificationPermission() {
+      if (!('Notification' in window)) {
+        showToast('Cihazınızda web bildirimleri desteklenmiyor.', true);
+        return;
+      }
+      if (Notification.permission === 'granted') {
+        sendMarinaNotification(
+          '🔔 Bildirim Testi',
+          'Bildirimleriniz aktif ve sorunsuz çalışıyor!',
+          'test-notif'
+        );
+      } else {
+        requestGlobalNotificationPermission();
       }
     }
 
     function updateNotificationPermissionBanner() {
+      updateGlobalNotificationUI();
       const banner = document.getElementById('notif-permission-banner');
       if (!banner || !('Notification' in window)) return;
       if (Notification.permission !== 'granted') {
@@ -2981,19 +3162,7 @@
     }
 
     async function requestNotificationPermissionManual() {
-      playAlarmChime(false);
-      if ('Notification' in window) {
-        const perm = await Notification.requestPermission();
-        updateNotificationPermissionBanner();
-        if (perm === 'granted') {
-          showToast('Bildirim ve ses izinleri aktif edildi!');
-          sendPhoneSystemNotification('🔔 Marina Görev Bildirimi Aktif', 'Belirlediğiniz görev saatlerinde telefonunuza sesli bildirim gelecektir.');
-        } else {
-          showToast('Tarayıcı bildirim izni kapalı. Uygulama açıkken sesli alarm yine de çalacaktır.', true);
-        }
-      } else {
-        showToast('Sesli alarm sistemi aktif edildi!');
-      }
+      return requestGlobalNotificationPermission();
     }
 
     async function testReminderSoundAndNotification() {
@@ -3715,6 +3884,8 @@
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (REMINDERS_UI_ACTIVE && event.data && event.data.type === 'OPEN_REMINDERS_TAB') {
           switchTab('reminders');
+        } else if (event.data && event.data.type === 'SWITCH_TAB' && event.data.tab) {
+          switchTab(event.data.tab);
         }
       });
     }
@@ -3913,6 +4084,29 @@
           bgImage: (settingRows && settingRows.length && settingRows[0].bg_image) ? settingRows[0].bg_image : CEKEK_DEFAULT_BG
         };
         if (JSON.stringify(remote) !== JSON.stringify(confirmedCekekCloudState)) {
+          if (confirmedCekekCloudState && confirmedCekekCloudState.boats && confirmedCekekCloudState.boats.length > 0) {
+            const prevMap = new Map(confirmedCekekCloudState.boats.map(b => [b.id, b]));
+            const remoteMap = new Map((remote.boats || []).map(b => [b.id, b]));
+
+            // Remote additions
+            for (const rb of (remote.boats || [])) {
+              if (!prevMap.has(rb.id) && !recentLocalBoatActions.has('cekek_add_' + rb.id)) {
+                if (typeof sendMarinaNotification === 'function') {
+                  sendMarinaNotification('🗺️ Çekek Sahasına Yeni Tekne Eklendi', `"${rb.name}" çekek sahası krokisine yerleştirildi.`, 'cekek-add', 'cekek');
+                }
+              }
+            }
+
+            // Remote removals
+            for (const pb of confirmedCekekCloudState.boats) {
+              if (!remoteMap.has(pb.id) && !recentLocalBoatActions.has('cekek_del_' + pb.id)) {
+                if (typeof sendMarinaNotification === 'function') {
+                  sendMarinaNotification('🗑️ Çekek Sahasından Tekne Çıkarıldı', `"${pb.name}" çekek sahası yerleşiminden kaldırıldı.`, 'cekek-delete', 'cekek');
+                }
+              }
+            }
+          }
+
           confirmedCekekCloudState = JSON.parse(JSON.stringify(remote));
           redrawCekekState(remote);
         }
@@ -4556,11 +4750,16 @@
       if (!confirm(`"${boat.name}" isimli tekneyi sahadan kaldırmak istediğinize emin misiniz?`)) return;
 
       const id = boat.id;
+      const boatName = boat.name;
       cekekState.boats = cekekState.boats.filter(b => b.id !== id);
       document.getElementById(id)?.remove();
       deselectCekekBoat();
       saveCekekState();
-      showToast(`"${boat.name}" sahadan kaldırıldı.`);
+      markLocalBoatAction('cekek_del', id);
+      showToast(`"${boatName}" sahadan kaldırıldı.`);
+      if (typeof sendMarinaNotification === 'function') {
+        sendMarinaNotification('🗑️ Çekek Sahasından Tekne Çıkarıldı', `"${boatName}" çekek sahası yerleşiminden kaldırıldı.`, 'cekek-delete', 'cekek');
+      }
 
       const counterEl = document.getElementById('cekek-boat-counter');
       if (counterEl) counterEl.innerText = `${cekekState.boats.length} Tekne Sahada`;
@@ -4643,7 +4842,11 @@
       closeAddCekekBoatModal();
       selectCekekBoat(newBoat.id);
       focusCekekBoat(newBoat.id);
+      markLocalBoatAction('cekek_add', newBoat.id);
       showToast(`"${name}" sahaya eklendi.`);
+      if (typeof sendMarinaNotification === 'function') {
+        sendMarinaNotification('🗺️ Çekek Sahasına Tekne Eklendi', `"${name}" çekek sahası krokisine yerleştirildi.`, 'cekek-add', 'cekek');
+      }
 
       const counterEl = document.getElementById('cekek-boat-counter');
       if (counterEl) counterEl.innerText = `${cekekState.boats.length} Tekne Sahada`;
@@ -4981,7 +5184,9 @@
       } else if (params.get('tab') === 'cekek') {
         switchTab('cekek');
       }
+      updateGlobalNotificationUI();
       loadData();
+      setInterval(loadData, 10000);
     });
   </script>
 
