@@ -1140,16 +1140,25 @@
     },
     {
       "id": "boat_1340eada-c1d0-4dd7-a8e4-287834db324e",
-      "name": "Marina Virginia (my)",
+      "name": "Marıa Vırgınıa (my)",
       "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
+      "captain_name": "Gürkan",
+      "captain_surname": "Göllü",
       "notes": "Çekek Sahası Yerleşim Planı [X: 2484, Y: 636]",
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-09T09:20:56.227Z",
+      "crew": [
+        {
+          "id": "80a26b03-776c-40ee-a247-5fbd295db9cf",
+          "name": "Gürkan",
+          "surname": "Göllü",
+          "role": "Gemici",
+          "phone": "0543 381 80 11",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "boat_911663bf-60c4-44a6-a6e6-2cdbfb577e22",
@@ -2128,5 +2137,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:16:48.263Z"
+  "last_backup_at": "2026-11-09T09:20:56.239Z"
 }
