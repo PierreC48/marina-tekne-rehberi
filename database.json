@@ -1322,19 +1322,6 @@
       ]
     },
     {
-      "id": "boat_17ad37ce-dc77-46d7-9091-29f79798ede5",
-      "name": "Nymphaea(my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 522, Y: 532]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
-    },
-    {
       "id": "71b7ee48-d681-4ed5-abb7-0f5821d76588",
       "name": "Ocean (my)",
       "captain_title": "KAPTAN",
@@ -2028,5 +2015,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:36:13.096Z"
+  "last_backup_at": "2026-11-09T09:36:27.457Z"
 }
