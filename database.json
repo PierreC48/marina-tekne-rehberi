@@ -256,19 +256,6 @@
       ]
     },
     {
-      "id": "boat_040c847f-1772-4f48-96c7-15677935a2df",
-      "name": "Aquila 1(my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 559, Y: 555]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
-    },
-    {
       "id": "8bd0e073-6b41-4b42-95cf-ffa17c42741f",
       "name": "Ares (my)",
       "captain_title": "KAPTAN",
@@ -2145,5 +2132,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:24:43.280Z"
+  "last_backup_at": "2026-11-09T09:27:24.848Z"
 }
