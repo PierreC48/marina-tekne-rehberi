@@ -1218,7 +1218,7 @@
     },
     {
       "id": "0b3de62e-d6f1-464c-b35d-21120b367ceb",
-      "name": "Mys Tere Ab",
+      "name": "Mystere Ab (my)",
       "captain_title": "KAPTAN",
       "captain_name": "Hüsnü Teoman",
       "captain_surname": "Derin",
@@ -1226,10 +1226,10 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1793701669217_d0c8af95.jpg",
       "form_date": "2026-11-03",
       "created_at": "2026-11-03T10:28:21.919Z",
-      "updated_at": "2026-11-03T10:28:21.919Z",
+      "updated_at": "2026-11-09T09:37:37.976Z",
       "crew": [
         {
-          "id": "9aeb617c-9357-4890-a461-e87be4fbcdd3",
+          "id": "81655fa4-995d-418f-bba8-3bdafe260673",
           "name": "Hüsnü Teoman",
           "surname": "Derin",
           "role": "Kaptan",
@@ -1237,7 +1237,7 @@
           "sort_order": 1
         },
         {
-          "id": "6f1848c1-502d-4ca7-bef7-0ea5e2c754e1",
+          "id": "8b10335c-4a12-4f88-b3c3-8b170654b1ca",
           "name": "Bahattin",
           "surname": "Kaplan",
           "role": "Gemici",
@@ -1245,7 +1245,7 @@
           "sort_order": 2
         },
         {
-          "id": "aa80facd-d86b-4b2b-beb8-2ac0d334968b",
+          "id": "b0655b7d-f568-4e50-a06b-70310bb4d713",
           "name": "Yiğit",
           "surname": "Sönder",
           "role": "Personel",
@@ -1253,7 +1253,7 @@
           "sort_order": 3
         },
         {
-          "id": "616ca1ee-3c23-4eb8-be13-c22c58f01ea2",
+          "id": "697062be-628d-4444-99a8-dd40058be2ef",
           "name": "Yusuf",
           "surname": "Kibar",
           "role": "Personel",
@@ -1261,7 +1261,7 @@
           "sort_order": 4
         },
         {
-          "id": "d8b04afe-4e2f-451f-ba6b-4cb02d858bf5",
+          "id": "aeb8ecd3-1de8-4830-9c2b-13049977a235",
           "name": "Serhat",
           "surname": "Kambur",
           "role": "Personel",
@@ -1269,7 +1269,7 @@
           "sort_order": 5
         },
         {
-          "id": "9384cab1-3cdf-44c3-8b8a-2a7e8261d1f1",
+          "id": "06bfe435-add3-4663-a3bf-26e71aa1b576",
           "name": "Hüseyin",
           "surname": "Cömert",
           "role": "Personel",
@@ -2015,5 +2015,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T09:36:27.457Z"
+  "last_backup_at": "2026-11-09T09:37:37.987Z"
 }
