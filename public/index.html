@@ -1302,7 +1302,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=11').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=14').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -1459,6 +1459,16 @@
       const safeBoat = (boat.name || 'tekne').replace(/[^a-zA-Z0-9ğüşıöçĞÜŞİÖÇ_-]/g, '_');
       triggerVCardDownload(vcf, `${safeBoat}_murettebat.vcf`);
       showToast(`"${boat.name}" tüm mürettebat rehber dosyası indirildi.`);
+    }
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
 
     function escapeJsStr(str) {
@@ -4571,9 +4581,8 @@
 
       if (REMINDERS_UI_ACTIVE && params.get('tab') === 'reminders') {
         switchTab('reminders');
-      } else if (isCekekPreview) {
+      } else if (params.get('tab') === 'cekek') {
         switchTab('cekek');
-        showToast('🧪 Çekek Sahası Önizleme ve Test Modu Aktif');
       }
       loadData();
     });
