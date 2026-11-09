@@ -1,0 +1,100 @@
+{
+  "boats": [
+    {
+      "id": "boat-ya79",
+      "name": "Ya 79",
+      "captain_title": "KAPTAN",
+      "captain_name": "Bekir",
+      "captain_surname": "Temiz",
+      "notes": "Setur Marinas Mürettebat Bilgi Formu",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/ya79_form.jpg",
+      "form_date": "2026-11-03",
+      "created_at": "2026-11-03T05:19:14.121Z",
+      "updated_at": "2026-11-03T05:19:14.121Z",
+      "crew": [
+        {
+          "id": "c1",
+          "name": "Bekir",
+          "surname": "Temiz",
+          "role": "Kaptan",
+          "phone": "0532 553 51 11",
+          "sort_order": 1
+        },
+        {
+          "id": "c2",
+          "name": "Ceyhun",
+          "surname": "Esen",
+          "role": "Gemici",
+          "phone": "0553 494 04 44",
+          "sort_order": 2
+        },
+        {
+          "id": "c3",
+          "name": "Yusuf",
+          "surname": "Şahin",
+          "role": "Gemici",
+          "phone": "0533 321 58 83",
+          "sort_order": 3
+        },
+        {
+          "id": "c4",
+          "name": "Batuhan",
+          "surname": "Demirhan",
+          "role": "Gemici",
+          "phone": "0507 707 83 97",
+          "sort_order": 4
+        },
+        {
+          "id": "c5",
+          "name": "Mehmet",
+          "surname": "Erevciler",
+          "role": "Aşçı",
+          "phone": "0531 524 56 94",
+          "sort_order": 5
+        }
+      ]
+    },
+    {
+      "id": "boat-turmepa",
+      "name": "DTO TURMEPA (atık Teknesi)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Aytaç",
+      "captain_surname": "Akboyun",
+      "notes": "Setur Marinas Formu",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/turmepa_form.jpg",
+      "form_date": "2026-11-03",
+      "created_at": "2026-11-03T05:19:14.122Z",
+      "updated_at": "2026-11-03T05:19:14.122Z",
+      "crew": [
+        {
+          "id": "c6",
+          "name": "İbrahim Aytaç",
+          "surname": "Akboyun",
+          "role": "Kaptan",
+          "phone": "0543 395 50 73",
+          "sort_order": 1
+        }
+      ]
+    }
+  ],
+  "reminders": [
+    {
+      "id": "d79375db-b171-4f43-89c7-dbe4fe4c30a5",
+      "title": "Ramazan yavuz çalışma saati bildirilecek",
+      "notes": "",
+      "boat_id": "",
+      "boat_name": "",
+      "captain_name": "",
+      "captain_phone": "",
+      "due_at": "2026-11-05T10:06:00.000Z",
+      "repeat": "none",
+      "priority": "normal",
+      "completed": true,
+      "completed_at": "2026-11-05T10:06:20.251Z",
+      "notified_due_at": null,
+      "created_at": "2026-11-05T10:05:31.168Z",
+      "updated_at": "2026-11-05T10:06:20.251Z"
+    }
+  ],
+  "last_backup_at": "2026-11-05T22:18:20.495Z"
+}
