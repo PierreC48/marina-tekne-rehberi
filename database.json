@@ -2094,19 +2094,6 @@
       "created_at": "2026-11-07T11:58:47.900Z",
       "updated_at": "2026-11-07T11:58:47.900Z",
       "crew": []
-    },
-    {
-      "id": "boat_65fd4522-d26e-420d-afec-8bce62df9a22",
-      "name": "Thirty Eigth (my)",
-      "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
-      "notes": "Çekek Sahası Yerleşim Planı [X: 598, Y: 572]",
-      "image_url": "",
-      "form_date": "2026-11-07",
-      "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
     }
   ],
   "reminders": [
@@ -2128,5 +2115,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T11:54:29.313Z"
+  "last_backup_at": "2026-11-09T11:54:37.543Z"
 }
