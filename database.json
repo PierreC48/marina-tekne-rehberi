@@ -1,6 +1,52 @@
 {
   "boats": [
     {
+      "id": "c9d1712e-42b9-47f5-88f0-1c5a2a3da0f5",
+      "name": "Marık (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Nıkolaı",
+      "captain_surname": "Pozdnıakov",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794215684100_59e7cca4.jpg",
+      "form_date": "2026-11-09",
+      "created_at": "2026-11-09T09:15:16.911Z",
+      "updated_at": "2026-11-09T09:15:16.911Z",
+      "crew": [
+        {
+          "id": "71dcbcb9-a52a-42b9-8fcb-571947744d25",
+          "name": "Nıkolaı",
+          "surname": "Pozdnıakov",
+          "role": "Kaptan",
+          "phone": "",
+          "sort_order": 1
+        },
+        {
+          "id": "8804cd6f-8384-4747-b954-0eeb291d3966",
+          "name": "Aleksandr",
+          "surname": "Tonkonogov",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "f521a053-2495-4a1d-8d56-af1baee7c667",
+          "name": "Olga",
+          "surname": "Pozdnıakova",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "e86259e9-1733-4568-b306-3659c8034bca",
+          "name": "Sergey",
+          "surname": "Shatrov",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
       "id": "boat-ya79",
       "name": "Ya 79",
       "captain_title": "KAPTAN",
@@ -2065,5 +2111,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T08:55:30.359Z"
+  "last_backup_at": "2026-11-09T09:15:16.956Z"
 }
