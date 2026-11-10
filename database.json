@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "baf0845c-ec80-45b5-8f8a-9fcf9a78e01d",
+      "name": "Amberada",
+      "captain_title": "KAPTAN",
+      "captain_name": "Görkem",
+      "captain_surname": "Anık",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794305919215_82c629be.jpg",
+      "form_date": "2026-11-10",
+      "created_at": "2026-11-10T10:18:52.874Z",
+      "updated_at": "2026-11-10T10:18:52.874Z",
+      "crew": [
+        {
+          "id": "e143d95f-411b-43ab-b166-d8760c59f4fb",
+          "name": "Görkem",
+          "surname": "Anık",
+          "role": "Kaptan",
+          "phone": "0542 497 81 61",
+          "sort_order": 1
+        },
+        {
+          "id": "52d653cf-3fc4-4b1b-8a16-82e5fdbe3e95",
+          "name": "Mustafa",
+          "surname": "Deniz",
+          "role": "Gemici",
+          "phone": "0536 739 83 27",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "26514c01-9caa-4f00-89ae-06695a730c24",
       "name": "Xo Cape Arnna",
       "captain_title": "KAPTAN",
@@ -2036,5 +2066,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-10T10:17:56.635Z"
+  "last_backup_at": "2026-11-10T10:18:52.885Z"
 }
