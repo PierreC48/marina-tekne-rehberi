@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "fe764764-8fda-42ad-bec9-270ebaba8255",
+      "name": "Aragon",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ayhan",
+      "captain_surname": "İnan",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794297043175_e5b76449.jpg",
+      "form_date": "2026-11-10",
+      "created_at": "2026-11-10T07:51:12.519Z",
+      "updated_at": "2026-11-10T07:51:12.519Z",
+      "crew": [
+        {
+          "id": "d7248f4c-a774-4058-93b9-3b20d7132312",
+          "name": "Ayhan",
+          "surname": "İnan",
+          "role": "Kaptan",
+          "phone": "0506 609 54 07",
+          "sort_order": 1
+        },
+        {
+          "id": "2f0d8fd6-9d7a-4525-9fb9-64a75bd31468",
+          "name": "Musa",
+          "surname": "Aydın",
+          "role": "Gemici",
+          "phone": "0533 701 88 51",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "c9d1712e-42b9-47f5-88f0-1c5a2a3da0f5",
       "name": "Marık (my)",
       "captain_title": "KAPTAN",
@@ -1962,5 +1992,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-10T05:51:36.809Z"
+  "last_backup_at": "2026-11-10T07:51:12.532Z"
 }
