@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "9a25a865-3145-4d72-b11c-2d599c588f38",
+      "name": "Laura Blu",
+      "captain_title": "KAPTAN",
+      "captain_name": "Engın",
+      "captain_surname": "Erdogmus",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794376407547_e368b8bd.jpg",
+      "form_date": "2026-11-11",
+      "created_at": "2026-11-11T05:53:48.771Z",
+      "updated_at": "2026-11-11T05:53:48.771Z",
+      "crew": [
+        {
+          "id": "0f045a0a-358f-452c-bfe7-e86e6600ed8c",
+          "name": "Engın",
+          "surname": "Erdogmus",
+          "role": "Kaptan",
+          "phone": "0535 204 12 03",
+          "sort_order": 1
+        },
+        {
+          "id": "c7761a84-2f0d-426c-8a42-47a85a4c89ab",
+          "name": "Ekrem Berat",
+          "surname": "Aydın",
+          "role": "Gemici",
+          "phone": "0552 645 34 48",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "baf0845c-ec80-45b5-8f8a-9fcf9a78e01d",
       "name": "Amberada",
       "captain_title": "KAPTAN",
@@ -2066,5 +2096,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-11T05:51:36.811Z"
+  "last_backup_at": "2026-11-11T05:53:48.789Z"
 }
