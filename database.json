@@ -1,6 +1,68 @@
 {
   "boats": [
     {
+      "id": "5818d6fa-b16b-40ea-8676-f9bc386cfa4c",
+      "name": "Mys Tere Ab",
+      "captain_title": "KAPTAN",
+      "captain_name": "Hüsnü Teoman",
+      "captain_surname": "Derin",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794392580113_d09b0fda.jpg",
+      "form_date": "2026-09-19",
+      "created_at": "2026-11-11T10:24:44.616Z",
+      "updated_at": "2026-11-11T10:24:44.616Z",
+      "crew": [
+        {
+          "id": "ceaf6df2-e8f9-498d-8afd-b8be556f98ff",
+          "name": "Hüsnü Teoman",
+          "surname": "Derin",
+          "role": "Kaptan",
+          "phone": "0532 201 58 64",
+          "sort_order": 1
+        },
+        {
+          "id": "d6f243a3-a1b0-4ac8-a77e-a85ded51be0a",
+          "name": "Bahattin",
+          "surname": "Kaplan",
+          "role": "Gemici",
+          "phone": "0532 171 37 67",
+          "sort_order": 2
+        },
+        {
+          "id": "7858a4e8-bcb2-4724-a9b3-8951de24b314",
+          "name": "Yiğit",
+          "surname": "Sinder",
+          "role": "Gemici",
+          "phone": "0536 475 24 47",
+          "sort_order": 3
+        },
+        {
+          "id": "d03b6a9b-8bbb-4267-8c40-b6e24b5f6925",
+          "name": "Yusuf",
+          "surname": "Kibar",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        },
+        {
+          "id": "350ef8e3-41ef-4276-9b09-9ffff0ed701b",
+          "name": "Serhat",
+          "surname": "Kambur",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 5
+        },
+        {
+          "id": "e2597bdd-28a5-4c8b-9c98-fdf0809e192b",
+          "name": "Hüseyin",
+          "surname": "Cömert",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
       "id": "9a25a865-3145-4d72-b11c-2d599c588f38",
       "name": "Laura Blu",
       "captain_title": "KAPTAN",
@@ -2112,5 +2174,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-11T08:26:47.524Z"
+  "last_backup_at": "2026-11-11T10:24:44.631Z"
 }
