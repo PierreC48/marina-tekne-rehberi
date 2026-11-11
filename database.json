@@ -100,15 +100,23 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794305677445_fbd1d127.jpg",
       "form_date": "2026-11-10",
       "created_at": "2026-11-10T10:15:06.737Z",
-      "updated_at": "2026-11-10T10:17:19.001Z",
+      "updated_at": "2026-11-11T08:25:32.549Z",
       "crew": [
         {
-          "id": "483e3379-6160-44ba-8084-d32bd8accf39",
+          "id": "92cea6ca-5288-4f35-a2ed-9950038330c3",
           "name": "Ramazan",
           "surname": "Gök",
           "role": "Kaptan",
           "phone": "0554 650 47 29",
           "sort_order": 1
+        },
+        {
+          "id": "4fc2c015-73a8-4c96-957b-aa37b8279e93",
+          "name": "Göktan",
+          "surname": "Çelik",
+          "role": "Gemici",
+          "phone": "0533 550 05 84",
+          "sort_order": 2
         }
       ]
     },
@@ -2104,5 +2112,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-11T08:24:42.090Z"
+  "last_backup_at": "2026-11-11T08:25:32.588Z"
 }
