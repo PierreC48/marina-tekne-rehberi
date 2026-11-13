@@ -72,7 +72,7 @@
       font-weight: 800;
       border: 2px solid #b45309;
       border-radius: 6px;
-      cursor: grab;
+      cursor: pointer;
       user-select: none;
       display: flex;
       align-items: center;
@@ -90,12 +90,27 @@
       z-index: 10;
     }
     .boat-item:active {
-      cursor: grabbing;
+      cursor: pointer;
     }
     .boat-item.selected {
       border-color: #ef4444 !important;
       box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.45) !important;
       z-index: 50 !important;
+    }
+    .boat-item.is-movable {
+      outline: 3px dashed #10b981 !important;
+      outline-offset: 3px !important;
+      box-shadow: 0 0 22px rgba(16, 185, 129, 0.85), 0 0 0 4px rgba(239, 68, 68, 0.5) !important;
+      cursor: grab !important;
+      z-index: 60 !important;
+      animation: pulseMovable 1.2s infinite ease-in-out;
+    }
+    .boat-item.is-movable:active {
+      cursor: grabbing !important;
+    }
+    @keyframes pulseMovable {
+      0%, 100% { outline-color: #10b981; }
+      50% { outline-color: #f59e0b; }
     }
     .boat-item .boat-name-inner {
       display: flex;
@@ -544,6 +559,17 @@
                 <button onclick="toggleCekekRenameEditor(false)" class="flex-1 bg-slate-200 text-slate-700 rounded-lg py-1 text-xs font-bold">İptal</button>
               </div>
             </div>
+          </div>
+
+          <!-- Move / Relocate Selected Boat Button (Single Boat Move Mode) -->
+          <div>
+            <button id="cekek-move-toggle-btn" type="button" onclick="toggleCekekBoatMoveMode()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs rounded-xl py-2 font-extrabold transition shadow-sm flex items-center justify-center gap-1.5 active:scale-95" title="Sadece bu teknenin yerini değiştirmek için tıklayın">
+              <span id="cekek-move-btn-icon">📍</span>
+              <span id="cekek-move-btn-text">Konumu Değiştir (Taşı)</span>
+            </button>
+            <p id="cekek-move-hint" class="hidden text-[10.5px] text-emerald-800 font-extrabold text-center mt-1 bg-emerald-50 p-1.5 rounded-lg border border-emerald-300">
+              ⚡ Tekneyi parmağınızla/fareyle yeni yerine sürükleyin, ardından bu butona tekrar basarak kilitleyin.
+            </p>
           </div>
 
           <!-- Scale Controls -->
@@ -1433,7 +1459,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=18').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=19').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -3907,6 +3933,7 @@
     window.cekekState = cekekState;
     let confirmedCekekCloudState = null;
     let selectedCekekBoatId = null;
+    let cekekMovableBoatId = null;
     let cekekHighestZ = 20;
     let cekekLoaded = false;
     let cekekSyncTimer = null;
@@ -4376,10 +4403,72 @@
       });
     }
 
-    // Drag boat logic with automatic panel transparency during drag
+    // Helper to update the Single Boat Move Mode button & hint UI
+    function updateCekekMoveButtonUI() {
+      const btn = document.getElementById('cekek-move-toggle-btn');
+      const icon = document.getElementById('cekek-move-btn-icon');
+      const text = document.getElementById('cekek-move-btn-text');
+      const hint = document.getElementById('cekek-move-hint');
+      if (!btn) return;
+
+      const isMovable = (cekekMovableBoatId && cekekMovableBoatId === selectedCekekBoatId);
+      if (isMovable) {
+        btn.className = 'w-full bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600 text-xs rounded-xl py-2 font-extrabold transition shadow-md flex items-center justify-center gap-1.5 active:scale-95 animate-pulse';
+        if (icon) icon.innerText = '✅';
+        if (text) text.innerText = 'Yerleşimi Tamamla (Kilitle)';
+        if (hint) hint.classList.remove('hidden');
+      } else {
+        btn.className = 'w-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs rounded-xl py-2 font-extrabold transition shadow-sm flex items-center justify-center gap-1.5 active:scale-95';
+        if (icon) icon.innerText = '📍';
+        if (text) text.innerText = 'Konumu Değiştir (Taşı)';
+        if (hint) hint.classList.add('hidden');
+      }
+    }
+
+    // Toggle Single Boat Move Mode for the selected boat
+    function toggleCekekBoatMoveMode(force) {
+      if (!selectedCekekBoatId) return;
+
+      const boatEl = document.getElementById(selectedCekekBoatId);
+      const isCurrentlyMovable = (cekekMovableBoatId === selectedCekekBoatId);
+      const targetState = (typeof force === 'boolean') ? force : !isCurrentlyMovable;
+
+      if (targetState) {
+        // Activate move mode strictly for this single boat
+        if (cekekMovableBoatId && cekekMovableBoatId !== selectedCekekBoatId) {
+          const prevBoat = document.getElementById(cekekMovableBoatId);
+          if (prevBoat) prevBoat.classList.remove('is-movable');
+        }
+        cekekMovableBoatId = selectedCekekBoatId;
+        if (boatEl) {
+          boatEl.classList.add('is-movable');
+          cekekHighestZ += 2;
+          boatEl.style.zIndex = cekekHighestZ;
+        }
+        updateCekekMoveButtonUI();
+        showToast('📍 Taşıma modu aktif: Tekneyi parmağınızla/fareyle yeni yerine sürükleyin.');
+      } else {
+        // Deactivate move mode & lock boat
+        if (cekekMovableBoatId) {
+          const mBoat = document.getElementById(cekekMovableBoatId);
+          if (mBoat) mBoat.classList.remove('is-movable');
+        }
+        cekekMovableBoatId = null;
+        updateCekekMoveButtonUI();
+        saveCekekState();
+        showToast('🔒 Tekne konumu kilitlendi ve kaydedildi.');
+      }
+    }
+
+    // Drag boat logic - strictly allowed ONLY when single boat move mode is active for this boat
     function startCekekDrag(e) {
       if (e.target.closest('#cekek-control-panel, button, input, select')) return;
+      if (cekekMovableBoatId !== this.id) {
+        // Locked against dragging - canvas pan gesture or click selection will handle it
+        return;
+      }
       e.preventDefault();
+      e.stopPropagation();
 
       cekekDragActiveEl = this;
       isCekekDragging = false;
@@ -4444,9 +4533,15 @@
 
     // Selection & Control Panel with Full Crew Roster & Transparency
     function selectCekekBoat(id) {
-      if (selectedCekekBoatId) {
+      if (selectedCekekBoatId && selectedCekekBoatId !== id) {
         const prev = document.getElementById(selectedCekekBoatId);
-        if (prev) prev.classList.remove('selected');
+        if (prev) {
+          prev.classList.remove('selected');
+          prev.classList.remove('is-movable');
+        }
+        if (cekekMovableBoatId === selectedCekekBoatId) {
+          cekekMovableBoatId = null;
+        }
       }
 
       selectedCekekBoatId = id;
@@ -4456,6 +4551,11 @@
       cekekHighestZ++;
       boatEl.style.zIndex = cekekHighestZ;
       boatEl.classList.add('selected');
+      if (cekekMovableBoatId === id) {
+        boatEl.classList.add('is-movable');
+      }
+
+      updateCekekMoveButtonUI();
 
       const boat = cekekState.boats.find(b => b.id === id);
       if (!boat) return;
@@ -4587,9 +4687,14 @@
       if (typeof stopCekekAdjusting === 'function') stopCekekAdjusting(0);
       if (selectedCekekBoatId) {
         const prev = document.getElementById(selectedCekekBoatId);
-        if (prev) prev.classList.remove('selected');
+        if (prev) {
+          prev.classList.remove('selected');
+          prev.classList.remove('is-movable');
+        }
         selectedCekekBoatId = null;
       }
+      cekekMovableBoatId = null;
+      updateCekekMoveButtonUI();
       document.getElementById('cekek-control-panel')?.classList.add('hidden');
       document.getElementById('cekek-rename-editor')?.classList.add('hidden');
     }
@@ -4842,6 +4947,7 @@
       closeAddCekekBoatModal();
       selectCekekBoat(newBoat.id);
       focusCekekBoat(newBoat.id);
+      toggleCekekBoatMoveMode(true);
       markLocalBoatAction('cekek_add', newBoat.id);
       showToast(`"${name}" sahaya eklendi.`);
       if (typeof sendMarinaNotification === 'function') {
@@ -5073,14 +5179,21 @@
       });
 
       // Desktop background mouse drag to pan
+      let desktopPanMoved = false;
       wrapper.addEventListener('mousedown', (e) => {
-        if (e.button !== 0 || e.target.closest('.boat-item, #cekek-control-panel, button, input')) return;
+        if (e.button !== 0 || e.target.closest('#cekek-control-panel, button, input')) return;
+        const targetBoat = e.target.closest('.boat-item');
+        if (targetBoat && targetBoat.id === cekekMovableBoatId) return; // Movable boat handles its own drag
+        desktopPanMoved = false;
         cekekDesktopPan = { px: e.clientX, py: e.clientY, x: cekekView.x, y: cekekView.y };
       });
       window.addEventListener('mousemove', (e) => {
         if (!cekekDesktopPan) return;
-        cekekView.x = cekekDesktopPan.x + (e.clientX - cekekDesktopPan.px);
-        cekekView.y = cekekDesktopPan.y + (e.clientY - cekekDesktopPan.py);
+        const dx = e.clientX - cekekDesktopPan.px;
+        const dy = e.clientY - cekekDesktopPan.py;
+        if (Math.hypot(dx, dy) > 4) desktopPanMoved = true;
+        cekekView.x = cekekDesktopPan.x + dx;
+        cekekView.y = cekekDesktopPan.y + dy;
         boundCekekPan();
         applyCekekTransform();
       });
@@ -5113,9 +5226,20 @@
           cekekTouchGesture = { type: 'pinch', dist: getDist(a, b), scale: cekekView.scale, x: cekekView.x, y: cekekView.y, cx: (a.x + b.x) / 2, cy: (a.y + b.y) / 2 };
           return;
         }
-        if (e.target.closest('.boat-item, #cekek-control-panel, button, input')) return;
+        if (e.target.closest('#cekek-control-panel, button, input')) return;
+        const targetBoat = e.target.closest('.boat-item');
+        if (targetBoat && targetBoat.id === cekekMovableBoatId) return; // Movable boat handles its own drag
         const p = getPt(e.touches[0]);
-        cekekTouchGesture = { type: 'pan', start: p, x: cekekView.x, y: cekekView.y };
+        cekekTouchGesture = {
+          type: 'pan',
+          start: p,
+          x: cekekView.x,
+          y: cekekView.y,
+          origX: cekekView.x,
+          origY: cekekView.y,
+          startTime: Date.now(),
+          targetBoatId: targetBoat ? targetBoat.id : null
+        };
       }, { capture: true, passive: false });
 
       wrapper.addEventListener('touchmove', (e) => {
@@ -5136,7 +5260,15 @@
         applyCekekTransform();
       }, { capture: true, passive: false });
 
-      wrapper.addEventListener('touchend', () => { cekekTouchGesture = null; });
+      wrapper.addEventListener('touchend', () => {
+        if (cekekTouchGesture && cekekTouchGesture.type === 'pan') {
+          const moved = Math.hypot(cekekView.x - cekekTouchGesture.origX, cekekView.y - cekekTouchGesture.origY);
+          if (moved < 8 && cekekTouchGesture.targetBoatId) {
+            selectCekekBoat(cekekTouchGesture.targetBoatId);
+          }
+        }
+        cekekTouchGesture = null;
+      });
       wrapper.addEventListener('touchcancel', () => { cekekTouchGesture = null; });
     }
 
