@@ -44,10 +44,10 @@
       "captain_title": "KAPTAN",
       "captain_name": "Mehmet",
       "captain_surname": "Ekim",
-      "notes": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 522, Y: 532]",
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794394043018_df592bff.jpg",
       "form_date": "2026-11-11",
-      "created_at": "2026-11-11T10:48:00.113Z",
+      "created_at": "2026-11-07T11:58:47.900Z",
       "updated_at": "2026-11-11T10:48:00.113Z",
       "crew": [
         {
@@ -92,8 +92,8 @@
       "captain_surname": "Derin",
       "notes": "",
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794392580113_d09b0fda.jpg",
-      "form_date": "2026-09-19",
-      "created_at": "2026-11-11T10:24:44.616Z",
+      "form_date": "2026-11-03",
+      "created_at": "2026-11-03T10:28:21.919Z",
       "updated_at": "2026-11-11T10:24:44.616Z",
       "crew": [
         {
@@ -105,12 +105,20 @@
           "sort_order": 1
         },
         {
+          "id": "9aeb617c-9357-4890-a461-e87be4fbcdd3",
+          "name": "Hüsnü Teoman",
+          "surname": "Derin",
+          "role": "Kaptan",
+          "phone": "0532 201 58 41",
+          "sort_order": 2
+        },
+        {
           "id": "d6f243a3-a1b0-4ac8-a77e-a85ded51be0a",
           "name": "Bahattin",
           "surname": "Kaplan",
           "role": "Gemici",
           "phone": "0532 171 37 67",
-          "sort_order": 2
+          "sort_order": 3
         },
         {
           "id": "7858a4e8-bcb2-4724-a9b3-8951de24b314",
@@ -118,7 +126,7 @@
           "surname": "Sinder",
           "role": "Gemici",
           "phone": "0536 475 24 47",
-          "sort_order": 3
+          "sort_order": 4
         },
         {
           "id": "d03b6a9b-8bbb-4267-8c40-b6e24b5f6925",
@@ -126,7 +134,7 @@
           "surname": "Kibar",
           "role": "Gemici",
           "phone": "",
-          "sort_order": 4
+          "sort_order": 5
         },
         {
           "id": "350ef8e3-41ef-4276-9b09-9ffff0ed701b",
@@ -134,7 +142,7 @@
           "surname": "Kambur",
           "role": "Gemici",
           "phone": "",
-          "sort_order": 5
+          "sort_order": 6
         },
         {
           "id": "e2597bdd-28a5-4c8b-9c98-fdf0809e192b",
@@ -142,7 +150,7 @@
           "surname": "Cömert",
           "role": "Gemici",
           "phone": "",
-          "sort_order": 6
+          "sort_order": 7
         }
       ]
     },
@@ -272,10 +280,10 @@
       "captain_title": "KAPTAN",
       "captain_name": "Ayhan",
       "captain_surname": "İnan",
-      "notes": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 1777, Y: 168]",
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794297043175_e5b76449.jpg",
       "form_date": "2026-11-10",
-      "created_at": "2026-11-10T07:51:12.519Z",
+      "created_at": "2026-11-09T08:15:10.405Z",
       "updated_at": "2026-11-10T07:51:40.363Z",
       "crew": [
         {
@@ -2237,6 +2245,97 @@
       "created_at": "2026-11-07T11:58:47.900Z",
       "updated_at": "2026-11-07T11:58:47.900Z",
       "crew": []
+    },
+    {
+      "id": "boat_040c847f-1772-4f48-96c7-15677935a2df",
+      "name": "Aquila 1(my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 559, Y: 555]",
+      "image_url": "",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-07T11:58:47.900Z",
+      "crew": []
+    },
+    {
+      "id": "boat_b26fb6a2-1974-4351-b43b-2f1b58777259",
+      "name": "Dali (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 271, Y: 262]",
+      "image_url": "",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-07T11:58:47.900Z",
+      "crew": []
+    },
+    {
+      "id": "boat_7f19fb75-f86f-4840-ab56-a1a4d5b65644",
+      "name": "Dlophin (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 2321, Y: 341]",
+      "image_url": "",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-07T11:58:47.900Z",
+      "crew": []
+    },
+    {
+      "id": "boat_32c7da10-2a89-4b55-a368-01319818f5da",
+      "name": "Sanjır (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 1864, Y: 303]",
+      "image_url": "",
+      "form_date": "2026-11-09",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-09T08:15:10.405Z",
+      "crew": []
+    },
+    {
+      "id": "boat_7a82d3cb-5301-4479-93e2-78fca3cd361c",
+      "name": "Slince III (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 865, Y: 540]",
+      "image_url": "",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-07T11:58:47.900Z",
+      "crew": []
+    },
+    {
+      "id": "boat_ea9079d2-f62d-4d87-9fab-bd95b457da2b",
+      "name": "Swing (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 2436, Y: 805]",
+      "image_url": "",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-07T11:58:47.900Z",
+      "crew": []
+    },
+    {
+      "id": "boat_65fd4522-d26e-420d-afec-8bce62df9a22",
+      "name": "Thirty Eigth (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "Çekek Sahası Yerleşim Planı [X: 598, Y: 572]",
+      "image_url": "",
+      "form_date": "2026-11-07",
+      "created_at": "2026-11-07T11:58:47.900Z",
+      "updated_at": "2026-11-07T11:58:47.900Z",
+      "crew": []
     }
   ],
   "reminders": [
@@ -2258,5 +2357,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-13T05:51:36.816Z"
+  "last_backup_at": "2026-11-13T05:52:36.652Z"
 }
