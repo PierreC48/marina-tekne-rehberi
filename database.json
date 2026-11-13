@@ -1,6 +1,302 @@
 {
   "boats": [
     {
+      "id": "a742df86-13ca-405d-9af7-a740ce2ce9ae",
+      "name": "L'opera",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ömer Faruk",
+      "captain_surname": "Öz",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794400324124_1a8c92ac.jpg",
+      "form_date": "2026-11-11",
+      "created_at": "2026-11-11T12:32:41.799Z",
+      "updated_at": "2026-11-11T12:32:41.799Z",
+      "crew": [
+        {
+          "id": "f9303271-baac-454f-88bf-ba0746af5c40",
+          "name": "Ömer Faruk",
+          "surname": "Öz",
+          "role": "Kaptan",
+          "phone": "0545 952 50 89",
+          "sort_order": 1
+        },
+        {
+          "id": "15677ca3-1448-47a1-882f-ae06b0c66a61",
+          "name": "Recep",
+          "surname": "Avcı",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "61664998-2299-4430-948f-bf28d03a4117",
+          "name": "Selahattin",
+          "surname": "Ürkmez",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "id": "3180ea77-d011-452f-a585-bc2ce3a6aa98",
+      "name": "Nymphaea (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Mehmet",
+      "captain_surname": "Ekim",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794394043018_df592bff.jpg",
+      "form_date": "2026-11-11",
+      "created_at": "2026-11-11T10:48:00.113Z",
+      "updated_at": "2026-11-11T10:48:00.113Z",
+      "crew": [
+        {
+          "id": "be810bc4-5f11-46d1-80d0-367069838020",
+          "name": "Mehmet",
+          "surname": "Ekim",
+          "role": "Kaptan",
+          "phone": "0542 346 61 67",
+          "sort_order": 1
+        },
+        {
+          "id": "4c9468e8-6cc8-4a8d-ba65-40647a394918",
+          "name": "Ferhat",
+          "surname": "Özkaya",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "0c73c4db-e89d-47a1-a620-f29f193dc0d7",
+          "name": "Kadir",
+          "surname": "Kıvrak",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "75bea355-281c-4c3f-aa8d-d687283a602c",
+          "name": "Şeyma",
+          "surname": "Uysal",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
+      "id": "5818d6fa-b16b-40ea-8676-f9bc386cfa4c",
+      "name": "Mys Tere Ab",
+      "captain_title": "KAPTAN",
+      "captain_name": "Hüsnü Teoman",
+      "captain_surname": "Derin",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794392580113_d09b0fda.jpg",
+      "form_date": "2026-09-19",
+      "created_at": "2026-11-11T10:24:44.616Z",
+      "updated_at": "2026-11-11T10:24:44.616Z",
+      "crew": [
+        {
+          "id": "ceaf6df2-e8f9-498d-8afd-b8be556f98ff",
+          "name": "Hüsnü Teoman",
+          "surname": "Derin",
+          "role": "Kaptan",
+          "phone": "0532 201 58 64",
+          "sort_order": 1
+        },
+        {
+          "id": "d6f243a3-a1b0-4ac8-a77e-a85ded51be0a",
+          "name": "Bahattin",
+          "surname": "Kaplan",
+          "role": "Gemici",
+          "phone": "0532 171 37 67",
+          "sort_order": 2
+        },
+        {
+          "id": "7858a4e8-bcb2-4724-a9b3-8951de24b314",
+          "name": "Yiğit",
+          "surname": "Sinder",
+          "role": "Gemici",
+          "phone": "0536 475 24 47",
+          "sort_order": 3
+        },
+        {
+          "id": "d03b6a9b-8bbb-4267-8c40-b6e24b5f6925",
+          "name": "Yusuf",
+          "surname": "Kibar",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        },
+        {
+          "id": "350ef8e3-41ef-4276-9b09-9ffff0ed701b",
+          "name": "Serhat",
+          "surname": "Kambur",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 5
+        },
+        {
+          "id": "e2597bdd-28a5-4c8b-9c98-fdf0809e192b",
+          "name": "Hüseyin",
+          "surname": "Cömert",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
+      "id": "9a25a865-3145-4d72-b11c-2d599c588f38",
+      "name": "Laura Blu",
+      "captain_title": "KAPTAN",
+      "captain_name": "Engın",
+      "captain_surname": "Erdogmus",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794376407547_e368b8bd.jpg",
+      "form_date": "2026-11-11",
+      "created_at": "2026-11-11T05:53:48.771Z",
+      "updated_at": "2026-11-11T05:53:48.771Z",
+      "crew": [
+        {
+          "id": "0f045a0a-358f-452c-bfe7-e86e6600ed8c",
+          "name": "Engın",
+          "surname": "Erdogmus",
+          "role": "Kaptan",
+          "phone": "0535 204 12 03",
+          "sort_order": 1
+        },
+        {
+          "id": "c7761a84-2f0d-426c-8a42-47a85a4c89ab",
+          "name": "Ekrem Berat",
+          "surname": "Aydın",
+          "role": "Gemici",
+          "phone": "0552 645 34 48",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
+      "id": "baf0845c-ec80-45b5-8f8a-9fcf9a78e01d",
+      "name": "Amberada",
+      "captain_title": "KAPTAN",
+      "captain_name": "Görkem",
+      "captain_surname": "Anık",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794305919215_82c629be.jpg",
+      "form_date": "2026-11-10",
+      "created_at": "2026-11-10T10:18:52.874Z",
+      "updated_at": "2026-11-10T10:18:52.874Z",
+      "crew": [
+        {
+          "id": "e143d95f-411b-43ab-b166-d8760c59f4fb",
+          "name": "Görkem",
+          "surname": "Anık",
+          "role": "Kaptan",
+          "phone": "0542 497 81 61",
+          "sort_order": 1
+        },
+        {
+          "id": "52d653cf-3fc4-4b1b-8a16-82e5fdbe3e95",
+          "name": "Mustafa",
+          "surname": "Deniz",
+          "role": "Gemici",
+          "phone": "0536 739 83 27",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
+      "id": "26514c01-9caa-4f00-89ae-06695a730c24",
+      "name": "Xo Cape Arnna",
+      "captain_title": "KAPTAN",
+      "captain_name": "Selçuk",
+      "captain_surname": "Görgülü",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794305864962_08df634d.jpg",
+      "form_date": "2026-11-10",
+      "created_at": "2026-11-10T10:17:56.624Z",
+      "updated_at": "2026-11-11T08:24:42.078Z",
+      "crew": [
+        {
+          "id": "7690db2f-1ae9-4c96-b5ce-aa71206b3962",
+          "name": "Selçuk",
+          "surname": "Görgülü",
+          "role": "Kaptan",
+          "phone": "0553 231 67 97",
+          "sort_order": 1
+        },
+        {
+          "id": "e3dee159-3a61-4b78-8f7a-9298a53725ce",
+          "name": "Rasim",
+          "surname": "Alsan",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
+      "id": "00e45031-a9b0-40b7-96a4-43e5fb91f9cd",
+      "name": "Krc 2",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ramazan",
+      "captain_surname": "Gök",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794305677445_fbd1d127.jpg",
+      "form_date": "2026-11-10",
+      "created_at": "2026-11-10T10:15:06.737Z",
+      "updated_at": "2026-11-11T08:26:47.512Z",
+      "crew": [
+        {
+          "id": "7d12988d-346d-4338-8e17-c0ce9228fa2b",
+          "name": "Göktan",
+          "surname": "Çelik",
+          "role": "Kaptan",
+          "phone": "0533 550 05 84",
+          "sort_order": 1
+        },
+        {
+          "id": "e3ddb1df-1304-4fda-856d-ded02e1acfb3",
+          "name": "Ramazan",
+          "surname": "Gök",
+          "role": "Gemici",
+          "phone": "0554 650 47 29",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
+      "id": "fe764764-8fda-42ad-bec9-270ebaba8255",
+      "name": "Aragon (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Ayhan",
+      "captain_surname": "İnan",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794297043175_e5b76449.jpg",
+      "form_date": "2026-11-10",
+      "created_at": "2026-11-10T07:51:12.519Z",
+      "updated_at": "2026-11-10T07:51:40.363Z",
+      "crew": [
+        {
+          "id": "99c8b1fa-3a47-4c66-818f-0b5dd81b0a3d",
+          "name": "Ayhan",
+          "surname": "İnan",
+          "role": "Kaptan",
+          "phone": "0506 609 54 07",
+          "sort_order": 1
+        },
+        {
+          "id": "a3e8dda3-de18-4fd6-90f6-775a43a39573",
+          "name": "Musa",
+          "surname": "Aydın",
+          "role": "Gemici",
+          "phone": "0533 701 88 51",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "c9d1712e-42b9-47f5-88f0-1c5a2a3da0f5",
       "name": "Marık (my)",
       "captain_title": "KAPTAN",
@@ -1962,5 +2258,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-09T11:38:03.155Z"
+  "last_backup_at": "2026-11-13T05:51:36.816Z"
 }
