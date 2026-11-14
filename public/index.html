@@ -172,10 +172,18 @@
         bottom: 8px !important;
         top: auto !important;
         width: auto !important;
-        max-width: 100% !important;
-        max-height: 52vh !important;
-        box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.35) !important;
+        max-width: calc(100% - 16px) !important;
+        max-height: calc(100% - 16px) !important;
+        max-height: 82vh !important;
+        box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.45) !important;
       }
+    }
+    #cekek-control-panel ::-webkit-scrollbar {
+      width: 4px;
+    }
+    #cekek-control-panel ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.5);
+      border-radius: 4px;
     }
     .no-scrollbar::-webkit-scrollbar {
       display: none;
@@ -190,9 +198,16 @@
       height: 100dvh !important;
     }
     body.cekek-tab-active main {
-      padding-top: 8px !important;
-      padding-bottom: 8px !important;
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
       overflow: hidden !important;
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
+    }
+    body.cekek-tab-active #view-cekek {
+      height: 100% !important;
+      flex: 1 1 0% !important;
+      min-height: 0 !important;
     }
   </style>
 </head>
@@ -487,8 +502,10 @@
         </div>
 
         <!-- Selected Boat Floating Control Panel -->
-        <div id="cekek-control-panel" class="absolute hidden bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200 p-3 sm:p-3.5 w-[280px] z-[60] flex flex-col gap-2 transition-all text-slate-900">
-          <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+        <div id="cekek-control-panel" class="absolute hidden bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border border-slate-200 z-[60] flex flex-col transition-all text-slate-900 w-[95%] sm:w-[310px] max-w-[340px] overflow-hidden">
+          
+          <!-- Sticky Header -->
+          <div class="flex items-center justify-between border-b border-slate-100 px-3 py-2 shrink-0 bg-white/80">
             <div class="min-w-0 pr-1">
               <span class="text-[9px] font-extrabold uppercase tracking-wider text-sky-600 block">Seçili Tekne</span>
               <h4 id="cekek-panel-boat-name" class="font-extrabold text-sm text-slate-900 truncate">Tekne Adı</h4>
@@ -502,114 +519,135 @@
             </div>
           </div>
 
-          <!-- Linked Rehber Info & Full Crew List -->
-          <div id="cekek-panel-rehber-box" class="bg-sky-50/90 border border-sky-200 rounded-xl p-2 text-xs flex flex-col gap-1.5">
-            <div class="flex items-center justify-between gap-1">
-              <div class="min-w-0">
-                <span class="text-[9px] font-extrabold uppercase tracking-wider text-sky-700">Mürettebat & İletişim</span>
-                <div id="cekek-panel-matched-title" class="font-extrabold text-xs text-sky-950 truncate">Rehber Kaydı</div>
+          <!-- Scrollable Body (Smooth scrolling, never overflows screen) -->
+          <div class="flex-1 overflow-y-auto overscroll-contain p-2.5 sm:p-3 space-y-2">
+
+            <!-- Linked Rehber Info & Crew Section -->
+            <div id="cekek-panel-rehber-box" class="bg-sky-50/90 border border-sky-200 rounded-xl p-2 text-xs flex flex-col gap-1.5">
+              <div class="flex items-center justify-between gap-1">
+                <div class="min-w-0">
+                  <span class="text-[9px] font-extrabold uppercase tracking-wider text-sky-700">Mürettebat & İletişim</span>
+                  <div id="cekek-panel-matched-title" class="font-extrabold text-xs text-sky-950 truncate">Rehber Kaydı</div>
+                </div>
+                <div class="flex items-center gap-1 shrink-0">
+                  <span id="cekek-panel-crew-badge" class="text-[9px] bg-sky-200 text-sky-900 px-2 py-0.5 rounded-full font-extrabold">0 Kişi</span>
+                  <button type="button" onclick="toggleCekekCrewDetails()" id="cekek-crew-toggle-btn" class="text-[10px] text-sky-700 hover:text-sky-900 font-bold px-1.5 py-0.5 rounded bg-sky-100 hover:bg-sky-200 transition" title="Detayları Aç/Kapat">
+                    <span id="cekek-crew-toggle-icon">▼</span>
+                  </button>
+                </div>
               </div>
-              <span id="cekek-panel-crew-badge" class="text-[9px] bg-sky-200 text-sky-900 px-2 py-0.5 rounded-full font-extrabold shrink-0">0 Kişi</span>
+
+              <!-- Captain Row (Always visible if exists) -->
+              <div id="cekek-panel-captain-row" class="hidden bg-white/95 p-1.5 rounded-lg border border-sky-100 flex items-center justify-between gap-1">
+                <div class="min-w-0">
+                  <span class="text-[9px] font-bold text-sky-700 block">Kaptan</span>
+                  <span id="cekek-panel-captain-name" class="font-bold text-slate-800 truncate block text-xs">-</span>
+                </div>
+                <div id="cekek-panel-captain-actions" class="flex items-center gap-1 shrink-0"></div>
+              </div>
+
+              <!-- Collapsible Crew & Registration Form Details -->
+              <div id="cekek-crew-collapsible" class="hidden space-y-1.5 pt-1 border-t border-sky-200/60">
+                <!-- Other Crew Members List -->
+                <div id="cekek-panel-crew-list" class="space-y-1 max-h-28 overflow-y-auto pr-0.5"></div>
+
+                <!-- Form Photo Button -->
+                <div id="cekek-panel-form-action" class="hidden pt-1 border-t border-sky-200/60 flex items-center justify-between">
+                  <span class="text-[10px] text-slate-500 font-medium">Kayıt Formu</span>
+                  <button type="button" id="cekek-panel-form-btn" class="px-2 py-0.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1">
+                    <span>📋</span>
+                    <span>Orijinal Form</span>
+                  </button>
+                </div>
+
+                <!-- Rebind Link -->
+                <div class="pt-1 border-t border-sky-200/60">
+                  <button type="button" onclick="toggleCekekRebindSelect()" class="text-[10px] font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1">
+                    <span>🔗</span>
+                    <span id="cekek-rebind-toggle-label">Rehber Bağlantısını Değiştir</span>
+                  </button>
+                  <div id="cekek-rebind-container" class="hidden mt-1.5">
+                    <select id="cekek-rebind-select" onchange="applyCekekBoatRebind(this.value)" class="w-full border border-sky-300 rounded-lg p-1 text-[11px] bg-white text-slate-800 font-semibold">
+                      <option value="">— Rehberden bir tekneye bağla —</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <!-- Captain Row -->
-            <div id="cekek-panel-captain-row" class="hidden bg-white/95 p-1.5 rounded-lg border border-sky-100 flex items-center justify-between gap-1">
-              <div class="min-w-0">
-                <span class="text-[9px] font-bold text-sky-700 block">Kaptan</span>
-                <span id="cekek-panel-captain-name" class="font-bold text-slate-800 truncate block text-xs">-</span>
-              </div>
-              <div id="cekek-panel-captain-actions" class="flex items-center gap-1 shrink-0"></div>
+            <!-- Move / Relocate Selected Boat Button (Single Boat Move Mode) -->
+            <div>
+              <button id="cekek-move-toggle-btn" type="button" onclick="toggleCekekBoatMoveMode()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs rounded-xl py-2 font-extrabold transition shadow-sm flex items-center justify-center gap-1.5 active:scale-95" title="Sadece bu teknenin yerini değiştirmek için tıklayın">
+                <span id="cekek-move-btn-icon">📍</span>
+                <span id="cekek-move-btn-text">Konumu Değiştir (Taşı)</span>
+              </button>
+              <p id="cekek-move-hint" class="hidden text-[10.5px] text-emerald-800 font-extrabold text-center mt-1 bg-emerald-50 p-1.5 rounded-lg border border-emerald-300">
+                ⚡ Tekneyi parmağınızla/fareyle yeni yerine sürükleyin, ardından bu butona tekrar basarak kilitleyin.
+              </p>
             </div>
 
-            <!-- Other Crew Members List -->
-            <div id="cekek-panel-crew-list" class="space-y-1 max-h-32 overflow-y-auto pr-0.5"></div>
+            <!-- Compact 2-Column Controls: Scale (Boyut) & Rotation (Döndür) -->
+            <div class="grid grid-cols-2 gap-2">
+              <!-- Scale Controls -->
+              <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200/80">
+                <div class="flex items-center justify-between text-[10.5px] font-bold text-slate-600 mb-1">
+                  <span>Boyut</span>
+                  <span id="cekek-scale-val" class="font-mono text-sky-600 font-extrabold">1.0x</span>
+                </div>
+                <div class="flex gap-1">
+                  <button type="button" id="cekek-scale-down-btn" onclick="changeCekekScale(-0.1)" onpointerdown="startCekekAdjusting()" onpointerup="stopCekekAdjusting(750)" onpointercancel="stopCekekAdjusting(0)" class="flex-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg py-0.5 font-extrabold text-xs text-slate-700 transition active:scale-95 shadow-xs" title="Küçült">－</button>
+                  <button type="button" id="cekek-scale-up-btn" onclick="changeCekekScale(0.1)" onpointerdown="startCekekAdjusting()" onpointerup="stopCekekAdjusting(750)" onpointercancel="stopCekekAdjusting(0)" class="flex-1 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg py-0.5 font-extrabold text-xs text-slate-700 transition active:scale-95 shadow-xs" title="Büyüt">＋</button>
+                </div>
+              </div>
 
-            <!-- Form Photo Button -->
-            <div id="cekek-panel-form-action" class="hidden pt-1 border-t border-sky-200/60 flex items-center justify-between">
-              <span class="text-[10px] text-slate-500 font-medium">Kayıt Formu</span>
-              <button type="button" id="cekek-panel-form-btn" class="px-2 py-0.5 bg-sky-600 hover:bg-sky-500 text-white rounded-lg text-[11px] font-bold transition flex items-center gap-1">
-                <span>📋</span>
-                <span>Orijinal Form</span>
+              <!-- Free Rotation Slider -->
+              <div class="bg-slate-50 p-1.5 rounded-xl border border-slate-200/80">
+                <div class="flex items-center justify-between text-[10.5px] font-bold text-slate-600 mb-1">
+                  <span>Döndür</span>
+                  <span id="cekek-rotation-val" class="font-mono text-sky-600 font-extrabold">0°</span>
+                </div>
+                <input type="range" id="cekek-rotation-slider" min="0" max="360" value="0" class="w-full accent-sky-600 cursor-pointer h-4"
+                       oninput="handleCekekRotation(event)"
+                       onchange="saveCekekState(); stopCekekAdjusting(600);"
+                       onpointerdown="startCekekAdjusting()"
+                       onpointerup="stopCekekAdjusting(600)"
+                       onpointercancel="stopCekekAdjusting(0)"
+                       ontouchstart="startCekekAdjusting()"
+                       ontouchend="stopCekekAdjusting(600)">
+              </div>
+            </div>
+
+            <!-- Rename Boat Button & Editor -->
+            <div>
+              <button id="cekek-rename-toggle" onclick="toggleCekekRenameEditor()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs rounded-xl py-1.5 font-bold transition flex items-center justify-center gap-1">
+                <span>✏️</span>
+                <span>İsmi Düzenle</span>
+              </button>
+              <div id="cekek-rename-editor" class="hidden mt-1.5 space-y-1.5">
+                <input id="cekek-rename-input" type="text" maxlength="150" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs font-bold" placeholder="Yeni tekne adı">
+                <div class="flex gap-1.5">
+                  <button onclick="saveCekekBoatName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg py-1 text-xs font-bold">Kaydet</button>
+                  <button onclick="toggleCekekRenameEditor(false)" class="flex-1 bg-slate-200 text-slate-700 rounded-lg py-1 text-xs font-bold">İptal</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Action Grid: Alarm / Görev Kur & Krokiden Kaldır -->
+            <div class="grid grid-cols-2 gap-2 pt-0.5">
+              <!-- Quick Reminder for this Boat -->
+              <button onclick="openReminderForCekekBoat()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-[11px] rounded-xl py-1.5 font-bold transition flex items-center justify-center gap-1 shadow-xs">
+                <span>⏰</span>
+                <span>Görev / Alarm</span>
+              </button>
+
+              <!-- Delete Boat from Yard Button -->
+              <button onclick="deleteSelectedCekekBoat()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-300 text-[11px] rounded-xl py-1.5 font-extrabold transition flex items-center justify-center gap-1 shadow-xs active:scale-95" title="Seçili tekneyi krokiden kaldır">
+                <span>🗑️</span>
+                <span>Krokiden Kaldır</span>
               </button>
             </div>
 
-            <!-- Rebind Link -->
-            <div class="pt-1 border-t border-sky-200/60">
-              <button type="button" onclick="toggleCekekRebindSelect()" class="text-[10px] font-bold text-sky-700 hover:text-sky-900 flex items-center gap-1">
-                <span>🔗</span>
-                <span id="cekek-rebind-toggle-label">Rehber Bağlantısını Değiştir</span>
-              </button>
-              <div id="cekek-rebind-container" class="hidden mt-1.5">
-                <select id="cekek-rebind-select" onchange="applyCekekBoatRebind(this.value)" class="w-full border border-sky-300 rounded-lg p-1 text-[11px] bg-white text-slate-800 font-semibold">
-                  <option value="">— Rehberden bir tekneye bağla —</option>
-                </select>
-              </div>
-            </div>
           </div>
-
-          <!-- Rename Boat Button & Editor -->
-          <div>
-            <button id="cekek-rename-toggle" onclick="toggleCekekRenameEditor()" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs rounded-xl py-1.5 font-bold transition">
-              ✏️ İsmi Düzenle
-            </button>
-            <div id="cekek-rename-editor" class="hidden mt-1.5 space-y-1.5">
-              <input id="cekek-rename-input" type="text" maxlength="150" class="w-full border border-slate-300 rounded-lg p-1.5 text-xs font-bold" placeholder="Yeni tekne adı">
-              <div class="flex gap-1.5">
-                <button onclick="saveCekekBoatName()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white rounded-lg py-1 text-xs font-bold">Kaydet</button>
-                <button onclick="toggleCekekRenameEditor(false)" class="flex-1 bg-slate-200 text-slate-700 rounded-lg py-1 text-xs font-bold">İptal</button>
-              </div>
-            </div>
-          </div>
-
-          <!-- Move / Relocate Selected Boat Button (Single Boat Move Mode) -->
-          <div>
-            <button id="cekek-move-toggle-btn" type="button" onclick="toggleCekekBoatMoveMode()" class="w-full bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs rounded-xl py-2 font-extrabold transition shadow-sm flex items-center justify-center gap-1.5 active:scale-95" title="Sadece bu teknenin yerini değiştirmek için tıklayın">
-              <span id="cekek-move-btn-icon">📍</span>
-              <span id="cekek-move-btn-text">Konumu Değiştir (Taşı)</span>
-            </button>
-            <p id="cekek-move-hint" class="hidden text-[10.5px] text-emerald-800 font-extrabold text-center mt-1 bg-emerald-50 p-1.5 rounded-lg border border-emerald-300">
-              ⚡ Tekneyi parmağınızla/fareyle yeni yerine sürükleyin, ardından bu butona tekrar basarak kilitleyin.
-            </p>
-          </div>
-
-          <!-- Scale Controls -->
-          <div>
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1">
-              <span>Boyut (Ölçek)</span>
-              <span id="cekek-scale-val" class="font-mono text-sky-600 font-extrabold">1.0x</span>
-            </div>
-            <div class="flex gap-1.5">
-              <button type="button" id="cekek-scale-down-btn" onclick="changeCekekScale(-0.1)" onpointerdown="startCekekAdjusting()" onpointerup="stopCekekAdjusting(750)" onpointercancel="stopCekekAdjusting(0)" class="flex-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1 font-extrabold text-sm text-slate-700 transition active:scale-95" title="Küçült">－</button>
-              <button type="button" id="cekek-scale-up-btn" onclick="changeCekekScale(0.1)" onpointerdown="startCekekAdjusting()" onpointerup="stopCekekAdjusting(750)" onpointercancel="stopCekekAdjusting(0)" class="flex-1 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-lg py-1 font-extrabold text-sm text-slate-700 transition active:scale-95" title="Büyüt">＋</button>
-            </div>
-          </div>
-
-          <!-- Free Rotation Slider -->
-          <div>
-            <div class="flex items-center justify-between text-[11px] font-bold text-slate-600 mb-1">
-              <span>Serbest Döndür</span>
-              <span id="cekek-rotation-val" class="font-mono text-sky-600 font-extrabold">0°</span>
-            </div>
-            <input type="range" id="cekek-rotation-slider" min="0" max="360" value="0" class="w-full accent-sky-600 cursor-pointer"
-                   oninput="handleCekekRotation(event)"
-                   onchange="saveCekekState(); stopCekekAdjusting(600);"
-                   onpointerdown="startCekekAdjusting()"
-                   onpointerup="stopCekekAdjusting(600)"
-                   onpointercancel="stopCekekAdjusting(0)"
-                   ontouchstart="startCekekAdjusting()"
-                   ontouchend="stopCekekAdjusting(600)">
-          </div>
-
-          <!-- Quick Reminder for this Boat -->
-          <button onclick="openReminderForCekekBoat()" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs rounded-xl py-1.5 font-bold transition flex items-center justify-center gap-1">
-            <span>⏰</span>
-            <span>Bu Tekneye Görev / Alarm Kur</span>
-          </button>
-
-          <!-- Delete Boat from Yard Button -->
-          <button onclick="deleteSelectedCekekBoat()" class="w-full bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs rounded-xl py-1.5 font-bold transition">
-            🗑️ Sahadan Kaldır
-          </button>
         </div>
 
         <!-- Settings Menu Overlay -->
@@ -1459,7 +1497,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=19').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=20').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -4557,6 +4595,10 @@
 
       updateCekekMoveButtonUI();
 
+      // Collapse extra crew details by default on mobile so all controls fit cleanly on screen
+      const isMobileScreen = window.innerWidth < 640 || window.innerHeight < 520;
+      toggleCekekCrewDetails(!isMobileScreen);
+
       const boat = cekekState.boats.find(b => b.id === id);
       if (!boat) return;
 
@@ -4695,8 +4737,26 @@
       }
       cekekMovableBoatId = null;
       updateCekekMoveButtonUI();
+      toggleCekekCrewDetails(false);
       document.getElementById('cekek-control-panel')?.classList.add('hidden');
       document.getElementById('cekek-rename-editor')?.classList.add('hidden');
+    }
+
+    function toggleCekekCrewDetails(force) {
+      const el = document.getElementById('cekek-crew-collapsible');
+      const icon = document.getElementById('cekek-crew-toggle-icon');
+      if (!el) return;
+      const willShow = (typeof force === 'boolean') ? force : el.classList.contains('hidden');
+      if (willShow) {
+        el.classList.remove('hidden');
+        if (icon) icon.innerText = '▲';
+      } else {
+        el.classList.add('hidden');
+        if (icon) icon.innerText = '▼';
+      }
+      requestAnimationFrame(() => {
+        positionCekekControlPanel();
+      });
     }
 
     function positionCekekControlPanel() {
@@ -4706,14 +4766,15 @@
       const wrapper = document.getElementById('cekek-map-wrapper');
       if (!boatEl || !panel || !wrapper) return;
 
-      const isMobile = window.innerWidth < 640;
+      const isMobile = window.innerWidth < 640 || window.innerHeight < 520;
       if (isMobile) {
         panel.style.left = '8px';
         panel.style.right = '8px';
         panel.style.bottom = '8px';
         panel.style.top = 'auto';
         panel.style.width = 'auto';
-        panel.style.maxWidth = '100%';
+        panel.style.maxWidth = 'calc(100% - 16px)';
+        panel.style.maxHeight = 'calc(100% - 16px)';
         return;
       }
 
@@ -4723,7 +4784,7 @@
       let left = (rect.right - wrapRect.left) + 16;
       let top = (rect.top - wrapRect.top);
 
-      const panelW = 280;
+      const panelW = 310;
       const panelH = panel.offsetHeight || 380;
 
       if (left + panelW > wrapRect.width - 10) {
@@ -4739,8 +4800,9 @@
       panel.style.top = top + 'px';
       panel.style.right = 'auto';
       panel.style.bottom = 'auto';
-      panel.style.width = '280px';
-      panel.style.maxWidth = '320px';
+      panel.style.width = panelW + 'px';
+      panel.style.maxWidth = '340px';
+      panel.style.maxHeight = (wrapRect.height - 20) + 'px';
     }
 
     function toggleCekekRenameEditor(force) {
@@ -4852,18 +4914,19 @@
       const boat = cekekState.boats.find(b => b.id === selectedCekekBoatId);
       if (!boat) return;
 
-      if (!confirm(`"${boat.name}" isimli tekneyi sahadan kaldırmak istediğinize emin misiniz?`)) return;
+      if (!confirm(`"${boat.name}" isimli tekneyi krokiden kaldırmak istediğinize emin misiniz?`)) return;
 
       const id = boat.id;
       const boatName = boat.name;
+      if (cekekMovableBoatId === id) cekekMovableBoatId = null;
       cekekState.boats = cekekState.boats.filter(b => b.id !== id);
       document.getElementById(id)?.remove();
       deselectCekekBoat();
       saveCekekState();
       markLocalBoatAction('cekek_del', id);
-      showToast(`"${boatName}" sahadan kaldırıldı.`);
+      showToast(`"${boatName}" krokiden kaldırıldı.`);
       if (typeof sendMarinaNotification === 'function') {
-        sendMarinaNotification('🗑️ Çekek Sahasından Tekne Çıkarıldı', `"${boatName}" çekek sahası yerleşiminden kaldırıldı.`, 'cekek-delete', 'cekek');
+        sendMarinaNotification('🗑️ Çekek Sahasından Tekne Çıkarıldı', `"${boatName}" çekek sahası krokisinden kaldırıldı.`, 'cekek-delete', 'cekek');
       }
 
       const counterEl = document.getElementById('cekek-boat-counter');
