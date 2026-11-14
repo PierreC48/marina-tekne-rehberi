@@ -1,6 +1,44 @@
 {
   "boats": [
     {
+      "id": "20608496-4648-4293-b489-545ef25443ec",
+      "name": "Chantelle",
+      "captain_title": "KAPTAN",
+      "captain_name": "Mesut",
+      "captain_surname": "Tontaş",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794644632420_4cbfde0a.jpg",
+      "form_date": "2026-07-07",
+      "created_at": "2026-11-14T08:25:50.633Z",
+      "updated_at": "2026-11-14T08:25:50.633Z",
+      "crew": [
+        {
+          "id": "a24ea388-5df4-4171-84b9-72117e502a20",
+          "name": "Mesut",
+          "surname": "Tontaş",
+          "role": "Tekne Sahibi",
+          "phone": "0544 558 32 37",
+          "sort_order": 1
+        },
+        {
+          "id": "c13e3621-6dee-4ad2-bbca-217224d3ed79",
+          "name": "Anastasiia",
+          "surname": "Safonova",
+          "role": "Yatçı-yolcu",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "088090b7-d97d-4343-9767-870f8dea0b48",
+          "name": "İbrahim",
+          "surname": "Akman",
+          "role": "Gemici",
+          "phone": "0544 958 32 37",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "0fe0c80e-b120-4725-bac2-c6ab64a7cfdc",
       "name": "Manta (gulet)",
       "captain_title": "KAPTAN",
@@ -2283,5 +2321,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-14T07:13:46.038Z"
+  "last_backup_at": "2026-11-14T08:25:50.644Z"
 }
