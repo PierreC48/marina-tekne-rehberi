@@ -1459,14 +1459,23 @@
       "id": "boat_911663bf-60c4-44a6-a6e6-2cdbfb577e22",
       "name": "Mayam (sb)",
       "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
+      "captain_name": "Yunus",
+      "captain_surname": "Türk",
       "notes": "Çekek Sahası Yerleşim Planı [X: 688, Y: 618]",
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-16T05:39:23.742Z",
+      "crew": [
+        {
+          "id": "3a1078b9-ebed-4cd9-a38b-bff33610780d",
+          "name": "Yunus",
+          "surname": "Türk",
+          "role": "Kaptan",
+          "phone": "0533 715 23 11",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "a36b17d2-dec7-4b0d-a36e-37a69d3a2707",
@@ -2326,5 +2335,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-16T05:35:16.300Z"
+  "last_backup_at": "2026-11-16T05:39:23.754Z"
 }
