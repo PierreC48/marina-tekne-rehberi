@@ -1,6 +1,44 @@
 {
   "boats": [
     {
+      "id": "9ed77c1c-e87a-4e47-8fe3-06341190b6b3",
+      "name": "Apropos",
+      "captain_title": "KAPTAN",
+      "captain_name": "Derya",
+      "captain_surname": "Demirci",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794817822549_393cccc5.jpg",
+      "form_date": "2026-11-16",
+      "created_at": "2026-11-16T08:34:51.543Z",
+      "updated_at": "2026-11-16T08:34:51.543Z",
+      "crew": [
+        {
+          "id": "200fd637-09e5-4be0-b4ff-6d0e9a15f2c7",
+          "name": "Onur",
+          "surname": "Aydin",
+          "role": "Kaptan",
+          "phone": "0532 325 87 73",
+          "sort_order": 1
+        },
+        {
+          "id": "aeebdb36-56b1-44f6-8c7d-236762e3a975",
+          "name": "Dilek",
+          "surname": "Mese",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "2e44d5a5-60b0-4326-9cad-020ff4d86f4b",
+          "name": "Derya",
+          "surname": "Demirci",
+          "role": "Sorumlu",
+          "phone": "0533 484 05 20",
+          "sort_order": 3
+        }
+      ]
+    },
+    {
       "id": "20608496-4648-4293-b489-545ef25443ec",
       "name": "Chantelle",
       "captain_title": "KAPTAN",
@@ -2322,5 +2360,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-16T05:40:29.061Z"
+  "last_backup_at": "2026-11-16T08:34:51.553Z"
 }
