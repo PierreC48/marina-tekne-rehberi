@@ -973,16 +973,25 @@
     },
     {
       "id": "boat_89d14f79-ff7a-4119-9040-a09d7a04569b",
-      "name": "Escape (sb)",
+      "name": "Escape 1 (mb)",
       "captain_title": "KAPTAN",
-      "captain_name": "",
-      "captain_surname": "",
+      "captain_name": "Yücel",
+      "captain_surname": "Kaçar",
       "notes": "Çekek Sahası Yerleşim Planı [X: 1069, Y: 361]",
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-16T05:32:16.776Z",
+      "crew": [
+        {
+          "id": "9c5ea99f-b19d-4c88-82a1-0ae241d98404",
+          "name": "Yücel",
+          "surname": "Kaçar",
+          "role": "Kaptan",
+          "phone": "0537 472 93 56",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "5dccbdd8-2e18-4590-9ec4-8b40cc6b94ca",
@@ -2299,5 +2308,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-16T05:28:13.121Z"
+  "last_backup_at": "2026-11-16T05:32:16.790Z"
 }
