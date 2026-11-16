@@ -1211,7 +1211,7 @@
     },
     {
       "id": "boat_c633d757-f7ce-45a5-95bb-3b7d7fde58b0",
-      "name": "İmagine (y)",
+      "name": "İmagine (y) Guernsey",
       "captain_title": "KAPTAN",
       "captain_name": "",
       "captain_surname": "",
@@ -1219,8 +1219,17 @@
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-16T05:35:16.289Z",
+      "crew": [
+        {
+          "id": "3ab9df7b-a1ca-43a2-a608-25a0638e7139",
+          "name": "Nıgel Brean",
+          "surname": "Dean",
+          "role": "Sorumlu",
+          "phone": "0533 394 09 62",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "3da2e4c0-4e3f-4d9d-a852-ba2be53541f2",
@@ -2317,5 +2326,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-16T05:33:37.198Z"
+  "last_backup_at": "2026-11-16T05:35:16.300Z"
 }
