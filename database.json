@@ -1159,8 +1159,17 @@
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-09T11:27:33.039Z",
-      "crew": []
+      "updated_at": "2026-11-16T05:33:37.187Z",
+      "crew": [
+        {
+          "id": "57cd758d-0839-4a18-8f23-dea13a6f376e",
+          "name": "Serhat",
+          "surname": "Ayan",
+          "role": "Sorumlu",
+          "phone": "0535 855 48 50",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "a2b6135b-7ec7-433f-b003-5235d93a7220",
@@ -2308,5 +2317,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-16T05:32:16.790Z"
+  "last_backup_at": "2026-11-16T05:33:37.198Z"
 }
