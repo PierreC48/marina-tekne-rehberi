@@ -10,34 +10,34 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794817822549_393cccc5.jpg",
       "form_date": "2026-11-16",
       "created_at": "2026-11-16T08:34:51.543Z",
-      "updated_at": "2026-11-16T09:45:57.925Z",
+      "updated_at": "2026-11-16T09:46:34.754Z",
       "crew": [
         {
-          "id": "b5da3617-0d2a-45cf-8f25-47cdd15aa360",
-          "name": "Onur",
-          "surname": "Aydin",
+          "id": "82dcb538-6985-4926-a214-06130754b5c0",
+          "name": "Derya",
+          "surname": "Demirci",
           "role": "Kaptan",
-          "phone": "0532 325 87 73",
+          "phone": "0533 484 05 20",
           "sort_order": 1
         },
         {
-          "id": "ebf86482-4a45-4e00-ab58-42a4c4e43ada",
+          "id": "fa47e018-121f-4d79-ad98-95ebee734e03",
+          "name": "Onur",
+          "surname": "Aydin",
+          "role": "Gemici",
+          "phone": "0532 325 87 73",
+          "sort_order": 2
+        },
+        {
+          "id": "c8e9cc1f-d844-4589-98b5-2e186aa0d1ef",
           "name": "Dilek",
           "surname": "Mese",
           "role": "Gemici",
           "phone": "",
-          "sort_order": 2
-        },
-        {
-          "id": "2261d7de-e543-422a-a9b3-4f23cd9188ad",
-          "name": "Derya",
-          "surname": "Demirci",
-          "role": "Sorumlu",
-          "phone": "0533 484 05 20",
           "sort_order": 3
         },
         {
-          "id": "b7242309-10df-4d9a-8262-152748c968af",
+          "id": "7e97f097-610d-4625-9f4d-35bc97617201",
           "name": "Mazlum",
           "surname": "Bağı",
           "role": "Gemici",
@@ -2368,5 +2368,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-16T09:45:58.016Z"
+  "last_backup_at": "2026-11-16T09:46:34.817Z"
 }
