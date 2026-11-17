@@ -1,6 +1,28 @@
 {
   "boats": [
     {
+      "id": "82438e9d-3d75-493c-b479-d4ffd5cb3c39",
+      "name": "Rashüs (my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Murat",
+      "captain_surname": "Ağsaran",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794902446300_0c50b9e1.jpg",
+      "form_date": "2026-11-17",
+      "created_at": "2026-11-17T08:01:10.786Z",
+      "updated_at": "2026-11-17T08:01:10.786Z",
+      "crew": [
+        {
+          "id": "c96c1eeb-4196-4a66-b7cb-a9af1855e459",
+          "name": "Murat",
+          "surname": "Ağsaran",
+          "role": "Kaptan",
+          "phone": "0505 933 64 47",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "9ed77c1c-e87a-4e47-8fe3-06341190b6b3",
       "name": "Apropos",
       "captain_title": "KAPTAN",
@@ -2330,5 +2352,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-17T05:45:15.427Z"
+  "last_backup_at": "2026-11-17T08:01:10.800Z"
 }
