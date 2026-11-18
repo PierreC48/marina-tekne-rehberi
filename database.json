@@ -1,6 +1,68 @@
 {
   "boats": [
     {
+      "id": "a3e4f526-efd3-4ca4-bfa9-c8cbdf21d4d9",
+      "name": "My Lara",
+      "captain_title": "KAPTAN",
+      "captain_name": "Dağhan",
+      "captain_surname": "Oztuna",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794999848786_a31e1008.jpg",
+      "form_date": "2026-11-17",
+      "created_at": "2026-11-18T11:04:26.491Z",
+      "updated_at": "2026-11-18T11:04:26.491Z",
+      "crew": [
+        {
+          "id": "68a7f8e7-99b4-4e04-bdb6-bf9844fffba2",
+          "name": "Dağhan",
+          "surname": "Oztuna",
+          "role": "Kaptan",
+          "phone": "0543 355 97 87",
+          "sort_order": 1
+        },
+        {
+          "id": "c0067e65-61e5-4fd6-beed-64edaedb685f",
+          "name": "Burak",
+          "surname": "Parlak",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "9ab80d7d-0ab9-484d-9a05-6f63e8ed8d25",
+          "name": "Muhammet",
+          "surname": "Sisman",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "924c2a09-2f8d-4b6f-85dd-41babf1baa22",
+          "name": "Adil",
+          "surname": "Erdogan",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        },
+        {
+          "id": "292a3452-8da9-4e8b-a0fd-d3933da4edef",
+          "name": "Hilal Sultan",
+          "surname": "Karateke",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 5
+        },
+        {
+          "id": "8b32a0aa-ec93-44b1-a2f3-1e106b4a7dfc",
+          "name": "Bahar",
+          "surname": "Arsali",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 6
+        }
+      ]
+    },
+    {
       "id": "82438e9d-3d75-493c-b479-d4ffd5cb3c39",
       "name": "Rashüs (my)",
       "captain_title": "KAPTAN",
@@ -2353,5 +2415,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-18T10:47:04.616Z"
+  "last_backup_at": "2026-11-18T11:04:26.503Z"
 }
