@@ -192,63 +192,55 @@
       "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1794392580113_d09b0fda.jpg",
       "form_date": "2026-11-03",
       "created_at": "2026-11-03T10:28:21.919Z",
-      "updated_at": "2026-11-18T07:23:01.666Z",
+      "updated_at": "2026-11-18T10:47:04.521Z",
       "crew": [
         {
-          "id": "20c237d0-0933-450b-bd45-aecbe789ff47",
-          "name": "Hüsnü Teoman",
-          "surname": "Derin",
-          "role": "Kaptan",
-          "phone": "0532 201 58 64",
-          "sort_order": 1
-        },
-        {
-          "id": "780a01eb-f7b0-48ec-9f7c-12362b834c5f",
+          "id": "29ea98b4-ae8e-4c8f-a6d8-57d638eae6e8",
           "name": "Hüsnü Teoman",
           "surname": "Derin",
           "role": "Kaptan",
           "phone": "0532 201 58 41",
-          "sort_order": 2
+          "sort_order": 1
         },
         {
-          "id": "95c1345f-4b8f-4d5b-aceb-54610dca4819",
+          "id": "b8acae8a-c6f6-45f4-8717-c78f093be3f3",
           "name": "Bahattin",
           "surname": "Kaplan",
           "role": "Gemici",
           "phone": "0532 171 37 67",
-          "sort_order": 3
+          "sort_order": 2
         },
         {
-          "id": "8d0a422d-40ac-44fc-ae02-1cfdf3a2a729",
+          "id": "39c0001e-84be-457a-91e4-599dd3f1e9ba",
           "name": "Yiğit",
           "surname": "Sinder",
           "role": "Gemici",
           "phone": "0536 475 24 47",
+          "sort_order": 3
+        },
+        {
+          "id": "22c63676-14a3-48cf-ac08-1e225c8e12df",
+          "name": "Yusuf",
+          "surname": "Kibar",
+          "role": "Gemici",
+          "phone": "",
           "sort_order": 4
         },
         {
-          "id": "93b9ac27-548b-4f1e-9338-c96814fdd97a",
-          "name": "Yusuf",
-          "surname": "Kibar",
+          "id": "35c014ea-f2a5-4527-9c37-1ab036e2d887",
+          "name": "Serhat",
+          "surname": "Kambur",
           "role": "Gemici",
           "phone": "",
           "sort_order": 5
         },
         {
-          "id": "5d44c7a0-2bd9-4854-be6a-9bfdaf2b5661",
-          "name": "Serhat",
-          "surname": "Kambur",
-          "role": "Gemici",
-          "phone": "",
-          "sort_order": 6
-        },
-        {
-          "id": "4f0f2481-afcf-45ca-89d8-6d0d84a76a7f",
+          "id": "ca35162e-83c8-412d-9b8b-0c85803d7f9c",
           "name": "Hüseyin",
           "surname": "Cömert",
           "role": "Gemici",
           "phone": "",
-          "sort_order": 7
+          "sort_order": 6
         }
       ]
     },
@@ -2361,5 +2353,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-18T09:12:03.983Z"
+  "last_backup_at": "2026-11-18T10:47:04.616Z"
 }
