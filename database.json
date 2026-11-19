@@ -1,6 +1,28 @@
 {
   "boats": [
     {
+      "id": "0bae8b64-fa06-4166-b941-1fc79076bc8a",
+      "name": "Ayshem(my)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Süleyman",
+      "captain_surname": "Yavuz",
+      "notes": "",
+      "image_url": "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/form_1795087457432_ead0b532.jpg",
+      "form_date": "2026-11-19",
+      "created_at": "2026-11-19T11:24:56.343Z",
+      "updated_at": "2026-11-19T11:24:56.343Z",
+      "crew": [
+        {
+          "id": "19b6ceea-4f5b-4621-91d2-fd288de66d49",
+          "name": "Süleyman",
+          "surname": "Yavuz",
+          "role": "Kaptan",
+          "phone": "0532 657 75 34",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "a3e4f526-efd3-4ca4-bfa9-c8cbdf21d4d9",
       "name": "My Lara",
       "captain_title": "KAPTAN",
@@ -2415,5 +2437,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-19T09:12:03.994Z"
+  "last_backup_at": "2026-11-19T11:24:56.355Z"
 }
