@@ -1497,7 +1497,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=21').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=22').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -3960,9 +3960,17 @@
 
     const CEKEK_SUPABASE_URL = "https://cxepumcfugqnxixznvir.supabase.co";
     const CEKEK_SUPABASE_KEY = "sb_publishable_80esJnSeEstFkWVztcCgdg_VGXC5yO0";
-    const CEKEK_DEFAULT_BG = "https://cxepumcfugqnxixznvir.supabase.co/storage/v1/object/public/marina-croquis/kroki-1793351270933-884ccafa-8412-4ac5-9e32-9384e730b015.png";
+    const CEKEK_DEFAULT_BG = "/uploads/kroki-1793351270933-884ccafa-8412-4ac5-9e32-9384e730b015.png";
     const CEKEK_WORLD_W = 2600;
     const CEKEK_WORLD_H = 1100;
+
+    function normalizeCekekBgUrl(url) {
+      if (!url || typeof url !== 'string') return CEKEK_DEFAULT_BG;
+      if (url.includes('supabase.co') && url.includes('kroki-1793351270933')) {
+        return CEKEK_DEFAULT_BG;
+      }
+      return url;
+    }
 
     let cekekState = {
       bgImage: CEKEK_DEFAULT_BG,
@@ -4073,10 +4081,11 @@
 
     function redrawCekekState(state) {
       cekekState = JSON.parse(JSON.stringify(state));
+      cekekState.bgImage = normalizeCekekBgUrl(cekekState.bgImage);
       const container = document.getElementById('cekek-map-container');
       if (!container) return;
 
-      const bgUrl = cekekState.bgImage || CEKEK_DEFAULT_BG;
+      const bgUrl = cekekState.bgImage;
       container.style.backgroundImage = `url("${bgUrl}")`;
       container.innerHTML = '';
 
@@ -4120,7 +4129,7 @@
         const remote = await res.json();
 
         let mergedBoats = Array.isArray(remote.boats) ? remote.boats : [];
-        let mergedBg = remote.bgImage || (localState ? localState.bgImage : null) || CEKEK_DEFAULT_BG;
+        let mergedBg = normalizeCekekBgUrl(remote.bgImage || (localState ? localState.bgImage : null));
 
         // Auto-merge: If user had added/edited boats locally in localStorage
         if (localState && Array.isArray(localState.boats) && localState.boats.length > 0) {
@@ -4175,7 +4184,7 @@
         const remote = await res.json();
         const remoteState = {
           boats: Array.isArray(remote.boats) ? remote.boats : [],
-          bgImage: remote.bgImage || CEKEK_DEFAULT_BG
+          bgImage: normalizeCekekBgUrl(remote.bgImage)
         };
 
         if (JSON.stringify(remoteState) !== JSON.stringify(confirmedCekekCloudState)) {
@@ -5146,7 +5155,7 @@
       await new Promise((resolve) => {
         bgImg.onload = resolve;
         bgImg.onerror = resolve;
-        bgImg.src = cekekState.bgImage || CEKEK_DEFAULT_BG;
+        bgImg.src = normalizeCekekBgUrl(cekekState.bgImage);
       });
       ctx.save();
       ctx.translate(0, headerH);

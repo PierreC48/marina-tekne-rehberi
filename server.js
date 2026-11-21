@@ -192,6 +192,14 @@ function normalizeSingleBoat(b) {
     }
   }
 
+  let rawImgUrl = String(b.image_url || '').trim();
+  if (rawImgUrl.includes('supabase.co/storage/v1/object/public/marina-croquis/')) {
+    const fname = rawImgUrl.split('/').pop().split('?')[0];
+    if (fname && fs.existsSync(path.join(UPLOADS_DIR, fname))) {
+      rawImgUrl = `/uploads/${fname}`;
+    }
+  }
+
   return {
     id: b.id || crypto.randomUUID(),
     name: normalizeBoatName(b.name),
@@ -199,7 +207,7 @@ function normalizeSingleBoat(b) {
     captain_name: captainName,
     captain_surname: captainSurname,
     notes: String(b.notes || '').trim(),
-    image_url: String(b.image_url || '').trim(),
+    image_url: rawImgUrl,
     form_date: formDate,
     created_at: createdAt,
     updated_at: updatedAt,
@@ -291,11 +299,20 @@ const initialData = {
 
 let inMemoryDb = null;
 let inMemoryCekekDb = null;
+const DEFAULT_LOCAL_KROKI = '/uploads/kroki-1793351270933-884ccafa-8412-4ac5-9e32-9384e730b015.png';
+
+function normalizeCekekBgImage(bg) {
+  if (!bg || typeof bg !== 'string') return DEFAULT_LOCAL_KROKI;
+  if (bg.includes('supabase.co') && bg.includes('kroki-1793351270933')) {
+    return DEFAULT_LOCAL_KROKI;
+  }
+  return bg;
+}
 
 // Read local cache for Cekek Sahasi
 function readLocalCekekDb() {
   if (!fs.existsSync(CEKEK_DB_FILE)) {
-    const emptyState = { bgImage: null, boats: [], updated_at: new Date().toISOString() };
+    const emptyState = { bgImage: DEFAULT_LOCAL_KROKI, boats: [], updated_at: new Date().toISOString() };
     try {
       fs.writeFileSync(CEKEK_DB_FILE, JSON.stringify(emptyState, null, 2), 'utf-8');
     } catch (e) {}
@@ -305,17 +322,18 @@ function readLocalCekekDb() {
     const raw = fs.readFileSync(CEKEK_DB_FILE, 'utf-8');
     const parsed = JSON.parse(raw);
     return {
-      bgImage: parsed.bgImage || null,
+      bgImage: normalizeCekekBgImage(parsed.bgImage),
       boats: Array.isArray(parsed.boats) ? parsed.boats : [],
       updated_at: parsed.updated_at || new Date().toISOString()
     };
   } catch (err) {
-    return { bgImage: null, boats: [], updated_at: new Date().toISOString() };
+    return { bgImage: DEFAULT_LOCAL_KROKI, boats: [], updated_at: new Date().toISOString() };
   }
 }
 
 function saveCekekDb(triggerSync = true) {
   if (!inMemoryCekekDb) return;
+  inMemoryCekekDb.bgImage = normalizeCekekBgImage(inMemoryCekekDb.bgImage);
   inMemoryCekekDb.updated_at = new Date().toISOString();
   try {
     fs.writeFileSync(CEKEK_DB_FILE, JSON.stringify(inMemoryCekekDb, null, 2), 'utf-8');
@@ -584,13 +602,28 @@ setInterval(() => {
   inMemoryDb = readLocalDb();
   inMemoryCekekDb = readLocalCekekDb();
 
-  // If local cekek has no boats, try loading from GitHub data-storage
-  if (!inMemoryCekekDb.boats || inMemoryCekekDb.boats.length === 0) {
-    const cloudCekek = await fetchCloudCekekDb();
-    if (cloudCekek && Array.isArray(cloudCekek.boats) && cloudCekek.boats.length > 0) {
-      inMemoryCekekDb = cloudCekek;
-      saveCekekDb(false);
+  // Merge cloud Cekek Sahasi from GitHub data-storage on startup
+  const cloudCekek = await fetchCloudCekekDb();
+  if (cloudCekek && Array.isArray(cloudCekek.boats) && cloudCekek.boats.length > 0) {
+    const localTime = new Date(inMemoryCekekDb.updated_at || 0).getTime();
+    const cloudTime = new Date(cloudCekek.updated_at || 0).getTime();
+    if (cloudTime >= localTime || !inMemoryCekekDb.boats || inMemoryCekekDb.boats.length === 0) {
+      const cloudIds = new Set(cloudCekek.boats.map(b => b.id));
+      const localOnly = (inMemoryCekekDb.boats || []).filter(b => !cloudIds.has(b.id));
+      inMemoryCekekDb = {
+        bgImage: normalizeCekekBgImage(cloudCekek.bgImage || inMemoryCekekDb.bgImage),
+        boats: [...cloudCekek.boats, ...localOnly],
+        updated_at: cloudCekek.updated_at || new Date().toISOString()
+      };
+    } else {
+      const localIds = new Set((inMemoryCekekDb.boats || []).map(b => b.id));
+      const cloudOnly = cloudCekek.boats.filter(b => !localIds.has(b.id));
+      inMemoryCekekDb.boats = [...(inMemoryCekekDb.boats || []), ...cloudOnly];
+      inMemoryCekekDb.bgImage = normalizeCekekBgImage(inMemoryCekekDb.bgImage || cloudCekek.bgImage);
     }
+    saveCekekDb(true);
+  } else {
+    saveCekekDb(true);
   }
 
   const cloudData = await fetchCloudDb();
@@ -1181,6 +1214,7 @@ const server = http.createServer(async (req, res) => {
 
     // API: GET /api/cekek (Çekek Sahası kroki ve tekne koordinatları)
     if (req.method === 'GET' && pathname === '/api/cekek') {
+      inMemoryCekekDb.bgImage = normalizeCekekBgImage(inMemoryCekekDb.bgImage);
       res.writeHead(200, {
         'Content-Type': 'application/json; charset=utf-8',
         'Cache-Control': 'no-cache, no-store, must-revalidate'
@@ -1207,13 +1241,13 @@ const server = http.createServer(async (req, res) => {
               fs.writeFileSync(filepath, Buffer.from(matches[2], 'base64'));
               inMemoryCekekDb.bgImage = `/uploads/${filename}`;
             } else {
-              inMemoryCekekDb.bgImage = body.bgImage;
+              inMemoryCekekDb.bgImage = normalizeCekekBgImage(body.bgImage);
             }
           } catch (e) {
-            inMemoryCekekDb.bgImage = body.bgImage;
+            inMemoryCekekDb.bgImage = normalizeCekekBgImage(body.bgImage);
           }
         } else {
-          inMemoryCekekDb.bgImage = body.bgImage;
+          inMemoryCekekDb.bgImage = normalizeCekekBgImage(body.bgImage);
         }
       }
 
