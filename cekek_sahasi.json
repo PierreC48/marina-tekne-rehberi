@@ -528,7 +528,127 @@
       "name": "Enterprice(cat)",
       "scale": 1,
       "rotation": 0
+    },
+    {
+      "id": "boat_6810b8b8-12a2-4038-b865-883e397c18e9",
+      "top": 667.948718,
+      "left": 2366.923077,
+      "name": "MM(My)",
+      "scale": 0.7,
+      "rotation": 77
+    },
+    {
+      "id": "boat_b1ee9847-9a17-4183-bf35-222931e1af94",
+      "top": 811.28205,
+      "left": 1242.564103,
+      "name": "MANTA(GULET)",
+      "scale": 0.8,
+      "rotation": 110
+    },
+    {
+      "id": "boat_e8bb696e-9bd4-4403-8d5e-82b092f85d33",
+      "top": 378.235,
+      "left": 1858.23,
+      "name": "My Lara",
+      "scale": 0.7,
+      "rotation": 94
+    },
+    {
+      "id": "boat_f59c3845-2930-48c5-acf1-62c16f4a2cad",
+      "top": 794.568587,
+      "left": 1196.376259,
+      "name": "L’OPERA 1(MY)",
+      "scale": 0.8,
+      "rotation": 111
+    },
+    {
+      "id": "boat_07cd5b40-7882-4890-9570-cf82181f7968",
+      "top": 236.495,
+      "left": 1574.1,
+      "name": "Marık(My)",
+      "scale": 0.7000000000000001,
+      "rotation": 93
+    },
+    {
+      "id": "boat_46128d45-b465-4f00-b9e6-41d6fbfa0194",
+      "top": 167.821,
+      "left": 1776.85,
+      "name": "ARAGON (MY)",
+      "scale": 0.6000000000000001,
+      "rotation": 98
+    },
+    {
+      "id": "boat_55ce4aa9-8b21-42fd-b1f3-9d431570c409",
+      "top": 249.618,
+      "left": 1173.67,
+      "name": "AMBERADA(CAT)",
+      "scale": 0.9,
+      "rotation": 0
+    },
+    {
+      "id": "boat_996883b7-07ba-44bf-a59f-ddaf2a6f66cf",
+      "top": 395.836,
+      "left": 2143.71,
+      "name": "RASHÜS(MY)",
+      "scale": 0.6000000000000001,
+      "rotation": 78
+    },
+    {
+      "id": "boat_044c6bd6-aa3d-4c43-a5b4-90c259026b8f",
+      "top": 120.588,
+      "left": 1651.28,
+      "name": "KRC 2 (MY)",
+      "scale": 0.6000000000000001,
+      "rotation": 96
+    },
+    {
+      "id": "boat_ebb40f4d-0d15-4cfc-b15a-de10488c98dd",
+      "top": 591.407,
+      "left": 992.248,
+      "name": "XO CAPE ARNNA(MB)",
+      "scale": 0.8,
+      "rotation": 23
+    },
+    {
+      "id": "boat_31edb640-2e4a-42fc-bf20-f8ae428dee54",
+      "top": 412.948718,
+      "left": 2414.025641,
+      "name": "B-Lıne(Y)",
+      "scale": 0.6,
+      "rotation": 158
+    },
+    {
+      "id": "boat_dfac9760-427b-4ac0-a64f-102805d67013",
+      "top": 238.236,
+      "left": 1624.12,
+      "name": "APROPOS(MY)",
+      "scale": 0.7,
+      "rotation": 91
+    },
+    {
+      "id": "boat_6687b40c-7005-4806-badf-c72e1561cf6a",
+      "top": 502.842,
+      "left": 419.679,
+      "name": "LAURA BLU",
+      "scale": 0.7,
+      "rotation": 112
+    },
+    {
+      "id": "boat_354dfd12-5649-4cb2-911c-274844bc182f",
+      "top": 377.692307,
+      "left": 2398.205127,
+      "name": "Ayshem(My)",
+      "scale": 0.7,
+      "rotation": 158
+    },
+    {
+      "id": "boat_80e9baad-1c07-4c94-9a95-a8dea489be12",
+      "top": 455.641026,
+      "left": 2413.589743,
+      "name": "Rama(Y)",
+      "scale": 0.6,
+      "rotation": 158
     }
   ],
-  "updated_at": "2026-11-21T06:56:59.104Z"
+  "updated_at": "2026-11-21T07:01:18.908Z"
 }
