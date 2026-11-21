@@ -1,5 +1,5 @@
 {
-  "bgImage": "/uploads/kroki-1793351270933-884ccafa-8412-4ac5-9e32-9384e730b015.png",
+  "bgImage": "/uploads/kroki-main.jpg",
   "boats": [
     {
       "id": "boat_5ffec908-0547-4215-b7b8-accdf399080f",
@@ -658,5 +658,5 @@
       "rotation": 93
     }
   ],
-  "updated_at": "2026-11-21T07:25:22.510Z"
+  "updated_at": "2026-11-21T07:43:59.367Z"
 }
