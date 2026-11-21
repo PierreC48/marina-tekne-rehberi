@@ -299,11 +299,11 @@ const initialData = {
 
 let inMemoryDb = null;
 let inMemoryCekekDb = null;
-const DEFAULT_LOCAL_KROKI = '/uploads/kroki-1793351270933-884ccafa-8412-4ac5-9e32-9384e730b015.png';
+const DEFAULT_LOCAL_KROKI = '/uploads/kroki-main.jpg';
 
 function normalizeCekekBgImage(bg) {
   if (!bg || typeof bg !== 'string') return DEFAULT_LOCAL_KROKI;
-  if (bg.includes('supabase.co') && bg.includes('kroki-1793351270933')) {
+  if (bg.includes('kroki-1793351270933')) {
     return DEFAULT_LOCAL_KROKI;
   }
   return bg;
@@ -1806,6 +1806,8 @@ const server = http.createServer(async (req, res) => {
       const headers = { 'Content-Type': contentType };
       if (ext === '.html' || ext === '.js' || ext === '.json') {
         headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+      } else if (['.png', '.jpg', '.jpeg', '.webp', '.svg'].includes(ext)) {
+        headers['Cache-Control'] = 'public, max-age=31536000, immutable';
       }
       res.writeHead(200, headers);
       fs.createReadStream(fullPath).pipe(res);

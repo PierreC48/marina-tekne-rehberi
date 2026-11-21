@@ -1,8 +1,10 @@
-const CACHE_NAME = 'marina-rehber-v22';
+const CACHE_NAME = 'marina-rehber-v23';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/uploads/kroki-main.jpg',
+  '/uploads/kroki-main.webp'
 ];
 
 self.addEventListener('install', (event) => {
@@ -55,13 +57,35 @@ self.addEventListener('notificationclick', (event) => {
   );
 });
 
-// Network-First with Cache Fallback ONLY for same-origin GET requests
+// Cache-First for static images (/uploads/) for 0ms instant rendering,
+// Network-First with Cache Fallback for HTML/API requests
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  const isStaticImage = url.pathname.startsWith('/uploads/') || request.destination === 'image' || /\.(png|jpe?g|webp|svg)$/i.test(url.pathname);
+  if (isStaticImage) {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        return fetch(request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone).catch(() => {});
+            });
+          }
+          return networkResponse;
+        });
+      })
+    );
+    return;
+  }
 
   event.respondWith(
     fetch(request)
