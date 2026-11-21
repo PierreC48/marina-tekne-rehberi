@@ -656,7 +656,23 @@
       "name": "CHANTELLE(KATT)",
       "scale": 0.7000000000000001,
       "rotation": 93
+    },
+    {
+      "id": "boat_663be996-ae9d-49f6-8c88-4a47c52af0f1",
+      "name": "ORION 1(Y)",
+      "left": 2431.17,
+      "top": 490,
+      "scale": 0.6,
+      "rotation": 156
+    },
+    {
+      "id": "boat_64263b32-2099-4008-9e30-63dbeb7bf716",
+      "name": "ALDA 2(MY)",
+      "left": 1805.29,
+      "top": 380.471,
+      "scale": 0.7,
+      "rotation": 93
     }
   ],
-  "updated_at": "2026-11-21T07:47:31.843Z"
+  "updated_at": "2026-11-21T07:55:05.495Z"
 }
