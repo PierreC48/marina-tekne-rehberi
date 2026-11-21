@@ -1497,7 +1497,7 @@
     // Register Service Worker for Offline PWA support
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js?v=20').then(reg => {
+        navigator.serviceWorker.register('/sw.js?v=21').then(reg => {
           reg.update().catch(() => {});
         }).catch(err => {
           console.warn('SW kaydı başarısız:', err);
@@ -4101,36 +4101,65 @@
 
     async function loadCekekState() {
       // 1. Try local cache first for instant rendering
+      let localState = null;
       try {
         const cached = localStorage.getItem('marinaCekekState');
         if (cached) {
-          const parsed = JSON.parse(cached);
-          if (parsed && Array.isArray(parsed.boats)) {
-            redrawCekekState(parsed);
+          localState = JSON.parse(cached);
+          if (localState && Array.isArray(localState.boats) && localState.boats.length > 0) {
+            redrawCekekState(localState);
           }
         }
       } catch (e) {}
 
-      // 2. Fetch from Supabase
+      // 2. Fetch from backend /api/cekek
       setCekekSyncStatus('Bağlanıyor…');
       try {
-        const [boatRows, settingRows] = await Promise.all([
-          cekekApiCall('marina_boats?select=id,data'),
-          cekekApiCall('marina_settings?select=bg_image&id=eq.1')
-        ]);
-        const remote = {
-          boats: (boatRows || []).map(r => r.data).filter(Boolean),
-          bgImage: (settingRows && settingRows.length && settingRows[0].bg_image) ? settingRows[0].bg_image : CEKEK_DEFAULT_BG
+        const res = await fetch('/api/cekek?t=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const remote = await res.json();
+
+        let mergedBoats = Array.isArray(remote.boats) ? remote.boats : [];
+        let mergedBg = remote.bgImage || (localState ? localState.bgImage : null) || CEKEK_DEFAULT_BG;
+
+        // Auto-merge: If user had added/edited boats locally in localStorage
+        if (localState && Array.isArray(localState.boats) && localState.boats.length > 0) {
+          const remoteIdSet = new Set(mergedBoats.map(b => b.id));
+          const localOnly = localState.boats.filter(b => !remoteIdSet.has(b.id));
+          if (localOnly.length > 0) {
+            console.log(`Yerel kayıtlı ${localOnly.length} adet tekne sunucuya aktarılıyor...`);
+            mergedBoats = [...mergedBoats, ...localOnly];
+            // Push merged back to server
+            fetch('/api/cekek', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ boats: mergedBoats, bgImage: mergedBg })
+            }).catch(() => {});
+          }
+        }
+
+        const finalState = {
+          boats: mergedBoats,
+          bgImage: mergedBg
         };
-        confirmedCekekCloudState = JSON.parse(JSON.stringify(remote));
+
+        confirmedCekekCloudState = JSON.parse(JSON.stringify(finalState));
         cekekLoaded = true;
-        redrawCekekState(remote);
+        redrawCekekState(finalState);
         setCekekSyncStatus('● Ortak kayıt aktif');
 
         if (cekekSyncTimer) clearInterval(cekekSyncTimer);
-        cekekSyncTimer = setInterval(refreshCekekCloudState, 5000);
+        cekekSyncTimer = setInterval(() => {
+          if (!document.hidden) refreshCekekCloudState();
+        }, 15000);
+
+        if (!window.__cekekVisibilityBound) {
+          window.__cekekVisibilityBound = true;
+          window.addEventListener('focus', () => { if (!document.hidden) refreshCekekCloudState(true); });
+          document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshCekekCloudState(true); });
+        }
       } catch (err) {
-        console.warn('Çekek bulut verisi yüklenemedi:', err);
+        console.warn('Çekek verisi yüklenemedi:', err);
         setCekekSyncStatus('⚠ Çevrimdışı / Yerel kayıt', true);
       }
     }
@@ -4138,23 +4167,24 @@
     async function refreshCekekCloudState(force = false) {
       if (!cekekLoaded && !force) return;
       if (cekekWaitingWrites > 0 || isCekekDragging) return;
+      if (document.hidden && !force) return;
 
       try {
-        const [boatRows, settingRows] = await Promise.all([
-          cekekApiCall('marina_boats?select=id,data'),
-          cekekApiCall('marina_settings?select=bg_image&id=eq.1')
-        ]);
-        const remote = {
-          boats: (boatRows || []).map(r => r.data).filter(Boolean),
-          bgImage: (settingRows && settingRows.length && settingRows[0].bg_image) ? settingRows[0].bg_image : CEKEK_DEFAULT_BG
+        const res = await fetch('/api/cekek?t=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const remote = await res.json();
+        const remoteState = {
+          boats: Array.isArray(remote.boats) ? remote.boats : [],
+          bgImage: remote.bgImage || CEKEK_DEFAULT_BG
         };
-        if (JSON.stringify(remote) !== JSON.stringify(confirmedCekekCloudState)) {
+
+        if (JSON.stringify(remoteState) !== JSON.stringify(confirmedCekekCloudState)) {
           if (confirmedCekekCloudState && confirmedCekekCloudState.boats && confirmedCekekCloudState.boats.length > 0) {
             const prevMap = new Map(confirmedCekekCloudState.boats.map(b => [b.id, b]));
-            const remoteMap = new Map((remote.boats || []).map(b => [b.id, b]));
+            const remoteMap = new Map((remoteState.boats || []).map(b => [b.id, b]));
 
             // Remote additions
-            for (const rb of (remote.boats || [])) {
+            for (const rb of (remoteState.boats || [])) {
               if (!prevMap.has(rb.id) && !recentLocalBoatActions.has('cekek_add_' + rb.id)) {
                 if (typeof sendMarinaNotification === 'function') {
                   sendMarinaNotification('🗺️ Çekek Sahasına Yeni Tekne Eklendi', `"${rb.name}" çekek sahası krokisine yerleştirildi.`, 'cekek-add', 'cekek');
@@ -4172,12 +4202,12 @@
             }
           }
 
-          confirmedCekekCloudState = JSON.parse(JSON.stringify(remote));
-          redrawCekekState(remote);
+          confirmedCekekCloudState = JSON.parse(JSON.stringify(remoteState));
+          redrawCekekState(remoteState);
         }
         setCekekSyncStatus('● Ortak kayıt aktif');
       } catch (err) {
-        setCekekSyncStatus('⚠ Bağlantı kesildi', true);
+        setCekekSyncStatus('⚠ Çevrimdışı / Yerel kayıt', true);
       }
     }
 
@@ -4200,33 +4230,18 @@
         localStorage.setItem('marinaCekekState', JSON.stringify(cekekState));
       } catch (e) {}
 
-      if (!cekekLoaded) return;
       const current = JSON.parse(JSON.stringify(cekekState));
 
       queueCekekCloudWrite(async () => {
-        const prev = confirmedCekekCloudState || { bgImage: null, boats: [] };
-        const prevBoats = new Map(prev.boats.map(b => [b.id, b]));
-        const nowIds = new Set(current.boats.map(b => b.id));
-        const changed = current.boats.filter(b => JSON.stringify(b) !== JSON.stringify(prevBoats.get(b.id)));
-        const deleted = prev.boats.filter(b => !nowIds.has(b.id)).map(b => b.id);
-
-        for (const id of deleted) {
-          await cekekApiCall('marina_boats?id=eq.' + encodeURIComponent(id), { method: 'DELETE' });
-        }
-        if (changed.length) {
-          await cekekApiCall('marina_boats?on_conflict=id', {
-            method: 'POST',
-            headers: { Prefer: 'resolution=merge-duplicates' },
-            body: JSON.stringify(changed.map(b => ({ id: b.id, data: b })))
-          });
-        }
-        if (current.bgImage && current.bgImage !== prev.bgImage) {
-          await cekekApiCall('marina_settings?on_conflict=id', {
-            method: 'POST',
-            headers: { Prefer: 'resolution=merge-duplicates' },
-            body: JSON.stringify([{ id: 1, bg_image: current.bgImage }])
-          });
-        }
+        const res = await fetch('/api/cekek', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            boats: current.boats,
+            bgImage: current.bgImage
+          })
+        });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
         confirmedCekekCloudState = current;
       });
     }
@@ -5076,8 +5091,27 @@
         const reader = new FileReader();
         reader.onload = async (ev) => {
           const dataUrl = ev.target.result;
-          cekekState.bgImage = dataUrl;
-          document.getElementById('cekek-map-container').style.backgroundImage = `url("${dataUrl}")`;
+          try {
+            const res = await fetch('/api/cekek/upload-bg', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ dataUrl })
+            });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.url) {
+                cekekState.bgImage = data.url;
+              } else {
+                cekekState.bgImage = dataUrl;
+              }
+            } else {
+              cekekState.bgImage = dataUrl;
+            }
+          } catch (err) {
+            cekekState.bgImage = dataUrl;
+          }
+
+          document.getElementById('cekek-map-container').style.backgroundImage = `url("${cekekState.bgImage}")`;
           saveCekekState();
           toggleCekekSettingsMenu(false);
           showToast('Kroki resmi başarıyla güncellendi!');

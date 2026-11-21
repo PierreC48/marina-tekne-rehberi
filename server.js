@@ -9,6 +9,7 @@ const DATA_DIR = path.join(__dirname, 'data');
 const BACKUPS_DIR = path.join(DATA_DIR, 'backups');
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
 const DB_FILE = path.join(DATA_DIR, 'rehber.json');
+const CEKEK_DB_FILE = path.join(DATA_DIR, 'cekek_sahasi.json');
 
 // Supabase Configuration (Permanent Cloud Storage for Images, DB & Backups)
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://cxepumcfugqnxixznvir.supabase.co';
@@ -20,6 +21,7 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN || '';
 const GITHUB_REPO = 'PierreC48/marina-tekne-rehberi';
 const GITHUB_BRANCH = 'data-storage';
 const GITHUB_FILE = 'database.json';
+const GITHUB_CEKEK_FILE = 'cekek_sahasi.json';
 
 // Ensure local directories exist
 if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -288,6 +290,105 @@ const initialData = {
 };
 
 let inMemoryDb = null;
+let inMemoryCekekDb = null;
+
+// Read local cache for Cekek Sahasi
+function readLocalCekekDb() {
+  if (!fs.existsSync(CEKEK_DB_FILE)) {
+    const emptyState = { bgImage: null, boats: [], updated_at: new Date().toISOString() };
+    try {
+      fs.writeFileSync(CEKEK_DB_FILE, JSON.stringify(emptyState, null, 2), 'utf-8');
+    } catch (e) {}
+    return emptyState;
+  }
+  try {
+    const raw = fs.readFileSync(CEKEK_DB_FILE, 'utf-8');
+    const parsed = JSON.parse(raw);
+    return {
+      bgImage: parsed.bgImage || null,
+      boats: Array.isArray(parsed.boats) ? parsed.boats : [],
+      updated_at: parsed.updated_at || new Date().toISOString()
+    };
+  } catch (err) {
+    return { bgImage: null, boats: [], updated_at: new Date().toISOString() };
+  }
+}
+
+function saveCekekDb(triggerSync = true) {
+  if (!inMemoryCekekDb) return;
+  inMemoryCekekDb.updated_at = new Date().toISOString();
+  try {
+    fs.writeFileSync(CEKEK_DB_FILE, JSON.stringify(inMemoryCekekDb, null, 2), 'utf-8');
+  } catch (e) {
+    console.error('Çekek yerel dosya yazma hatası:', e.message);
+  }
+  if (triggerSync) {
+    syncCekekToCloud();
+  }
+}
+
+async function syncCekekToCloud() {
+  if (!GITHUB_TOKEN || !inMemoryCekekDb) return;
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_CEKEK_FILE}`;
+    let sha = null;
+    const getRes = await fetch(`${url}?ref=${GITHUB_BRANCH}`, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'Marina-App'
+      }
+    });
+    if (getRes.ok) {
+      const d = await getRes.json();
+      sha = d.sha;
+    }
+
+    const payload = {
+      message: `Otomatik Çekek Sahası Yedeği (${new Date().toISOString()})`,
+      branch: GITHUB_BRANCH,
+      content: Buffer.from(JSON.stringify(inMemoryCekekDb, null, 2)).toString('base64'),
+      sha: sha || undefined
+    };
+
+    await fetch(url, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'Marina-App',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    console.log('✓ Çekek Sahası GitHub data-storage dalına kaydedildi.');
+  } catch (err) {
+    console.warn('Çekek Sahası GitHub yedekleme uyarısı:', err.message);
+  }
+}
+
+async function fetchCloudCekekDb() {
+  if (!GITHUB_TOKEN) return null;
+  try {
+    const url = `https://api.github.com/repos/${GITHUB_REPO}/contents/${GITHUB_CEKEK_FILE}?ref=${GITHUB_BRANCH}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${GITHUB_TOKEN}`,
+        'User-Agent': 'Marina-App'
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      const content = Buffer.from(data.content, 'base64').toString('utf-8');
+      const parsed = JSON.parse(content);
+      if (parsed && Array.isArray(parsed.boats)) {
+        console.log(`☁️ GitHub data-storage dalından ${parsed.boats.length} çekek teknesi yüklendi.`);
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.warn('GitHub çekek verisi okuma uyarısı:', err.message);
+  }
+  return null;
+}
 
 // Read local cache
 function readLocalDb() {
@@ -444,6 +545,8 @@ async function syncToCloud(createDailyBackup = true) {
         },
         body: JSON.stringify(payload)
       });
+      // Also sync Cekek Sahasi to GitHub data-storage
+      await syncCekekToCloud();
     }
     console.log(`✓ Kalıcı veritabanı ve günlük yedek (${todayStr}) buluta kaydedildi.`);
   } catch (err) {
@@ -471,11 +574,25 @@ setInterval(() => {
   if (inMemoryDb) {
     syncToCloud(true);
   }
+  if (inMemoryCekekDb) {
+    syncCekekToCloud();
+  }
 }, 6 * 60 * 60 * 1000).unref();
 
 // Initialize database, merge cloud + local, normalize & deduplicate
 (async () => {
   inMemoryDb = readLocalDb();
+  inMemoryCekekDb = readLocalCekekDb();
+
+  // If local cekek has no boats, try loading from GitHub data-storage
+  if (!inMemoryCekekDb.boats || inMemoryCekekDb.boats.length === 0) {
+    const cloudCekek = await fetchCloudCekekDb();
+    if (cloudCekek && Array.isArray(cloudCekek.boats) && cloudCekek.boats.length > 0) {
+      inMemoryCekekDb = cloudCekek;
+      saveCekekDb(false);
+    }
+  }
+
   const cloudData = await fetchCloudDb();
   if (cloudData) {
     if (Array.isArray(cloudData.boats)) {
@@ -1060,6 +1177,78 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (!inMemoryDb) inMemoryDb = readLocalDb();
+    if (!inMemoryCekekDb) inMemoryCekekDb = readLocalCekekDb();
+
+    // API: GET /api/cekek (Çekek Sahası kroki ve tekne koordinatları)
+    if (req.method === 'GET' && pathname === '/api/cekek') {
+      res.writeHead(200, {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'no-cache, no-store, must-revalidate'
+      });
+      res.end(JSON.stringify(inMemoryCekekDb));
+      return;
+    }
+
+    // API: POST /api/cekek (Çekek Sahası durumunu kaydet)
+    if (req.method === 'POST' && pathname === '/api/cekek') {
+      const body = await parseJsonBody(req, 10 * 1024 * 1024);
+
+      if (Array.isArray(body.boats)) {
+        inMemoryCekekDb.boats = body.boats;
+      }
+      if (body.bgImage !== undefined) {
+        if (typeof body.bgImage === 'string' && body.bgImage.startsWith('data:image/')) {
+          try {
+            const matches = body.bgImage.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+            if (matches) {
+              const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+              const filename = `kroki-${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
+              const filepath = path.join(UPLOADS_DIR, filename);
+              fs.writeFileSync(filepath, Buffer.from(matches[2], 'base64'));
+              inMemoryCekekDb.bgImage = `/uploads/${filename}`;
+            } else {
+              inMemoryCekekDb.bgImage = body.bgImage;
+            }
+          } catch (e) {
+            inMemoryCekekDb.bgImage = body.bgImage;
+          }
+        } else {
+          inMemoryCekekDb.bgImage = body.bgImage;
+        }
+      }
+
+      saveCekekDb(true);
+      res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({
+        success: true,
+        count: (inMemoryCekekDb.boats || []).length,
+        bgImage: inMemoryCekekDb.bgImage,
+        updated_at: inMemoryCekekDb.updated_at
+      }));
+      return;
+    }
+
+    // API: POST /api/cekek/upload-bg (Kroki resmi yükleme)
+    if (req.method === 'POST' && pathname === '/api/cekek/upload-bg') {
+      const body = await parseJsonBody(req, 10 * 1024 * 1024);
+      if (body.dataUrl && typeof body.dataUrl === 'string') {
+        const matches = body.dataUrl.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+        if (matches) {
+          const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+          const filename = `kroki-${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${ext}`;
+          const filepath = path.join(UPLOADS_DIR, filename);
+          fs.writeFileSync(filepath, Buffer.from(matches[2], 'base64'));
+          inMemoryCekekDb.bgImage = `/uploads/${filename}`;
+          saveCekekDb(true);
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({ success: true, url: inMemoryCekekDb.bgImage }));
+          return;
+        }
+      }
+      res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+      res.end(JSON.stringify({ error: 'Geçersiz resim verisi.' }));
+      return;
+    }
 
     // API: GET /api/boats
     if (req.method === 'GET' && pathname === '/api/boats') {
