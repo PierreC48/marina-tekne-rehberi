@@ -287,7 +287,7 @@
       "left": 2162.65,
       "name": "EROS (MY)",
       "scale": 0.5000000000000001,
-      "rotation": 91
+      "rotation": 80
     },
     {
       "id": "boat_8310a33e-c825-4eb3-bfba-0dd306af7da1",
@@ -674,5 +674,5 @@
       "rotation": 93
     }
   ],
-  "updated_at": "2026-11-23T06:09:57.409Z"
+  "updated_at": "2026-11-23T10:15:02.759Z"
 }
