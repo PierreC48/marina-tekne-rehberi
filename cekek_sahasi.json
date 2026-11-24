@@ -11,8 +11,8 @@
     },
     {
       "id": "boat_afffa2ee-ca8c-4d7c-b1ba-3caf7b08dcca",
-      "top": 374.466556,
-      "left": 2216.674074,
+      "top": 368.55,
+      "left": 2236.68,
       "name": "ANGEL II (MY)",
       "scale": 0.6,
       "rotation": 89
@@ -698,5 +698,5 @@
       "rotation": 89
     }
   ],
-  "updated_at": "2026-11-24T08:05:23.681Z"
+  "updated_at": "2026-11-24T08:05:30.918Z"
 }
