@@ -107,8 +107,8 @@
     },
     {
       "id": "boat_78d1f615-17e7-4ca9-8f34-c5bae5d14b8f",
-      "top": 481.788,
-      "left": 121.028,
+      "top": 485.51,
+      "left": 178.32,
       "name": "MAD CAT (SB)",
       "scale": 0.4,
       "rotation": 211
@@ -690,5 +690,5 @@
       "rotation": 89
     }
   ],
-  "updated_at": "2026-11-24T08:24:05.954Z"
+  "updated_at": "2026-11-24T08:24:09.528Z"
 }
