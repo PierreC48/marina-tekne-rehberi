@@ -648,7 +648,7 @@
       "name": "Rama(Y)",
       "scale": 0.6,
       "rotation": 158,
-      "linkedBoatId": "f2c133d6-b2ee-430e-87c6-eb91e2a308f6"
+      "linkedBoatId": null
     },
     {
       "id": "boat_663be996-ae9d-49f6-8c88-4a47c52af0f1",
@@ -699,5 +699,5 @@
       "rotation": 20
     }
   ],
-  "updated_at": "2026-11-24T08:47:20.168Z"
+  "updated_at": "2026-11-24T08:48:00.808Z"
 }
