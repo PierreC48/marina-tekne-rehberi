@@ -495,7 +495,7 @@
       "left": 272.385,
       "name": "Dusky(MB)",
       "scale": 0.8,
-      "rotation": 94
+      "rotation": 108
     },
     {
       "id": "boat_17ad37ce-dc77-46d7-9091-29f79798ede5",
@@ -690,5 +690,5 @@
       "rotation": 89
     }
   ],
-  "updated_at": "2026-11-24T08:25:32.714Z"
+  "updated_at": "2026-11-24T08:25:36.380Z"
 }
