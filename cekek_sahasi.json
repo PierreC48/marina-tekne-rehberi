@@ -111,7 +111,7 @@
       "left": 121.028,
       "name": "MAD CAT (SB)",
       "scale": 0.6000000000000001,
-      "rotation": 91
+      "rotation": 211
     },
     {
       "id": "boat_5539abb5-b750-4b5a-bed6-c6929f3bc925",
@@ -690,5 +690,5 @@
       "rotation": 89
     }
   ],
-  "updated_at": "2026-11-24T08:23:59.416Z"
+  "updated_at": "2026-11-24T08:24:03.583Z"
 }
