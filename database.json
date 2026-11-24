@@ -10,10 +10,10 @@
       "image_url": "/uploads/form_1795504211058_17876daa.jpg",
       "form_date": "2026-11-19",
       "created_at": "2026-11-24T07:10:38.167Z",
-      "updated_at": "2026-11-24T07:10:38.167Z",
+      "updated_at": "2026-11-24T08:32:04.845Z",
       "crew": [
         {
-          "id": "e64a7d3e-70d0-4345-9c00-90e0fb5add99",
+          "id": "bb81a4c8-7be4-446a-b383-679d81aa7d59",
           "name": "Kemal",
           "surname": "Bicak",
           "role": "Kaptan",
@@ -21,12 +21,28 @@
           "sort_order": 1
         },
         {
-          "id": "6877e90c-a3d6-494b-acb4-1f8dcfee010e",
+          "id": "549615ba-4d6d-41fd-9a1b-add0f9effb36",
           "name": "Mustafa",
           "surname": "Balikci",
           "role": "Gemici",
           "phone": "",
           "sort_order": 2
+        },
+        {
+          "id": "db62e1ed-9c45-4aa1-a510-a4f34ae98a03",
+          "name": "Okan",
+          "surname": "Sarıaydın",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "aa9feec8-ec4b-4c98-b406-094be35001a2",
+          "name": "Hatice",
+          "surname": "Tosun",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
         }
       ]
     },
@@ -2611,5 +2627,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-24T07:10:38.179Z"
+  "last_backup_at": "2026-11-24T08:32:04.857Z"
 }
