@@ -680,7 +680,15 @@
       "top": 719.412,
       "scale": 0.7,
       "rotation": 73
+    },
+    {
+      "id": "boat_6ac6a35e-ab7d-41ba-955c-541ef39bb1bb",
+      "name": "BLUE JOY(MB)",
+      "left": 1878,
+      "top": 662,
+      "scale": 0.7,
+      "rotation": 0
     }
   ],
-  "updated_at": "2026-11-24T06:19:23.415Z"
+  "updated_at": "2026-11-24T06:19:36.524Z"
 }
