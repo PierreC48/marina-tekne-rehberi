@@ -1888,7 +1888,7 @@
     },
     {
       "id": "boat_86223fe8-f3ac-4704-bcbb-42ad64f94138",
-      "name": "Nathalie (my)",
+      "name": "Nathalie-fux (my)",
       "captain_title": "KAPTAN",
       "captain_name": "",
       "captain_surname": "",
@@ -1896,8 +1896,17 @@
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-24T08:42:39.694Z",
+      "crew": [
+        {
+          "id": "2c495bbc-c50a-4809-b216-f299f938a850",
+          "name": "Mustafa Berkant",
+          "surname": "Fidan",
+          "role": "Sorumlu",
+          "phone": "0532 203 22 03",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "324655a9-7a9e-4d04-bb27-3de7bf8ad81d",
@@ -2636,5 +2645,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-24T08:39:43.665Z"
+  "last_backup_at": "2026-11-24T08:42:39.787Z"
 }
