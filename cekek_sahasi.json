@@ -688,7 +688,15 @@
       "top": 704.353,
       "scale": 0.7,
       "rotation": 74
+    },
+    {
+      "id": "boat_26992803-6239-4c19-89ea-804cf2ccd4dc",
+      "name": "LEVANTE (MY)",
+      "left": 1687,
+      "top": 718,
+      "scale": 0.7,
+      "rotation": 0
     }
   ],
-  "updated_at": "2026-11-24T06:19:54.055Z"
+  "updated_at": "2026-11-24T06:20:27.174Z"
 }
