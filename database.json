@@ -4,16 +4,16 @@
       "id": "f2c133d6-b2ee-430e-87c6-eb91e2a308f6",
       "name": "Rama(y) Özırmak",
       "captain_title": "KAPTAN",
-      "captain_name": "Sorumlu",
-      "captain_surname": "Tozkan",
+      "captain_name": "Tolga",
+      "captain_surname": "Tozkar",
       "notes": "",
       "image_url": "/uploads/form_1795510146706_d31ff877.jpg",
       "form_date": "2026-11-24",
       "created_at": "2026-11-24T08:46:33.802Z",
-      "updated_at": "2026-11-24T08:49:54.054Z",
+      "updated_at": "2026-11-24T08:50:09.564Z",
       "crew": [
         {
-          "id": "f3d21b78-0815-4ef9-b448-75564c7f7c45",
+          "id": "cbb3a2af-8548-48c9-a3f5-c3b69eea00a4",
           "name": "Tolga",
           "surname": "Tozkar",
           "role": "Kaptan",
@@ -2667,5 +2667,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-24T08:49:54.066Z"
+  "last_backup_at": "2026-11-24T08:50:09.587Z"
 }
