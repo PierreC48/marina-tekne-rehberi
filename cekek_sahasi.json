@@ -707,14 +707,6 @@
       "rotation": 163
     },
     {
-      "id": "boat_9c3b677b-438a-47c4-8b69-5807748602a2",
-      "top": 220.193,
-      "left": 1007.36,
-      "name": "CHANTELLE(KATT)",
-      "scale": 0.7000000000000001,
-      "rotation": 93
-    },
-    {
       "id": "boat_644f6b04-8150-4db5-a0cf-c4fb5428bac9",
       "name": "Lal(Y)",
       "left": 2313.076923,
@@ -723,5 +715,5 @@
       "rotation": 158
     }
   ],
-  "updated_at": "2026-11-24T12:06:24.971Z"
+  "updated_at": "2026-11-24T12:06:55.895Z"
 }
