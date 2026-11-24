@@ -1,6 +1,52 @@
 {
   "boats": [
     {
+      "id": "5e6c045b-68c3-4747-a042-e222590b82cb",
+      "name": "Levante",
+      "captain_title": "KAPTAN",
+      "captain_name": "Salim",
+      "captain_surname": "Cılız",
+      "notes": "",
+      "image_url": "/uploads/form_1795500792888_b88bb018.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T06:14:25.775Z",
+      "updated_at": "2026-11-24T06:14:25.775Z",
+      "crew": [
+        {
+          "id": "28f0cf5a-8771-4e67-8ccf-b9d9925ba8e1",
+          "name": "Salim",
+          "surname": "Ciliz",
+          "role": "Kaptan",
+          "phone": "0533 718 43 00",
+          "sort_order": 1
+        },
+        {
+          "id": "0edace3c-4b59-41bb-be00-2cbc1e652533",
+          "name": "Metehan Tugrul",
+          "surname": "Bayazit",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "18227952-0594-4bc5-8603-3e6e1ad6266c",
+          "name": "Sevin Sultan",
+          "surname": "Uslu",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "66029059-5b5f-432c-b5d6-9b9162a32fc2",
+          "name": "Selahattin",
+          "surname": "Beyenirsoy",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
       "id": "df9657b2-a0e9-4c45-9741-3b2830d7b516",
       "name": "Alda 2",
       "captain_title": "KAPTAN",
@@ -2505,5 +2551,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-22T13:46:19.209Z"
+  "last_backup_at": "2026-11-24T06:14:25.787Z"
 }
