@@ -672,7 +672,15 @@
       "top": 380.471,
       "scale": 0.7,
       "rotation": 93
+    },
+    {
+      "id": "boat_c61adaea-e6d5-4b3c-bb2f-2ff45a7bce63",
+      "name": "BIGGIE(EX.BIGGY)(MB)",
+      "left": 1250,
+      "top": 530,
+      "scale": 0.7,
+      "rotation": 0
     }
   ],
-  "updated_at": "2026-11-23T10:15:05.127Z"
+  "updated_at": "2026-11-24T06:18:44.863Z"
 }
