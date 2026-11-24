@@ -1,6 +1,36 @@
 {
   "boats": [
     {
+      "id": "18ebdbf9-e385-4e1a-8aa2-658fa71a1cc2",
+      "name": "Biggie (ex.biggy)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Yahya",
+      "captain_surname": "Güler",
+      "notes": "",
+      "image_url": "/uploads/form_1795500887241_79827087.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T06:15:28.610Z",
+      "updated_at": "2026-11-24T06:15:28.610Z",
+      "crew": [
+        {
+          "id": "000fd03b-ad48-4cbf-80d6-46c215999970",
+          "name": "Yahya",
+          "surname": "Güler",
+          "role": "Kaptan",
+          "phone": "0532 286 10 91",
+          "sort_order": 1
+        },
+        {
+          "id": "c448c8ab-bc4a-4e33-92a0-e53a892adc17",
+          "name": "Mehmet",
+          "surname": "Baygın",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
       "id": "5e6c045b-68c3-4747-a042-e222590b82cb",
       "name": "Levante",
       "captain_title": "KAPTAN",
@@ -2551,5 +2581,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-24T06:14:25.787Z"
+  "last_backup_at": "2026-11-24T06:15:28.624Z"
 }
