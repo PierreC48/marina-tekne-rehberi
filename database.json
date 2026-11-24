@@ -1,6 +1,28 @@
 {
   "boats": [
     {
+      "id": "f2c133d6-b2ee-430e-87c6-eb91e2a308f6",
+      "name": "B-line (y) Özırmak",
+      "captain_title": "KAPTAN",
+      "captain_name": "Tolga",
+      "captain_surname": "Tozkan",
+      "notes": "",
+      "image_url": "/uploads/form_1795509959690_dd0e5054.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T08:46:33.802Z",
+      "updated_at": "2026-11-24T08:46:33.802Z",
+      "crew": [
+        {
+          "id": "f9e1b03f-29e8-40a8-be32-41e07a95e6b0",
+          "name": "Tolga",
+          "surname": "Tozkar",
+          "role": "Sorumlu",
+          "phone": "0555 453 49 36",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "dc4d94ca-327a-47a8-8c18-bc3936e81d28",
       "name": "Koralle",
       "captain_title": "KAPTAN",
@@ -2645,5 +2667,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-24T08:42:39.787Z"
+  "last_backup_at": "2026-11-24T08:46:33.813Z"
 }
