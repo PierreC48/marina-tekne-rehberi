@@ -1,6 +1,28 @@
 {
   "boats": [
     {
+      "id": "660a3043-05bc-4a0b-98b1-f093885e9ac9",
+      "name": "Orıon 1(y) Özırmak",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "/uploads/form_1795510449286_7ff9ad6a.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T08:55:15.843Z",
+      "updated_at": "2026-11-24T08:55:15.843Z",
+      "crew": [
+        {
+          "id": "c3b002d8-0a1f-43cd-9a0d-88e4690e3351",
+          "name": "Tolga",
+          "surname": "Tozkar",
+          "role": "Sorumlu",
+          "phone": "0555 453 49 36",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
       "id": "5bc01f23-af6e-4e66-85e8-1c01d17c6b1d",
       "name": "B-line(y) Özırmak",
       "captain_title": "KAPTAN",
@@ -2689,5 +2711,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-24T08:53:02.088Z"
+  "last_backup_at": "2026-11-24T08:55:15.887Z"
 }
