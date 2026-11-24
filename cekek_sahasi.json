@@ -446,7 +446,7 @@
       "top": 327.602,
       "left": 1855.62,
       "name": "SANJIR (MY)",
-      "scale": 0.8,
+      "scale": 0.9,
       "rotation": 93
     },
     {
@@ -698,5 +698,5 @@
       "rotation": 89
     }
   ],
-  "updated_at": "2026-11-24T08:11:08.538Z"
+  "updated_at": "2026-11-24T08:11:09.708Z"
 }
