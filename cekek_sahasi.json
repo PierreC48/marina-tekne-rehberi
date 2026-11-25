@@ -721,7 +721,15 @@
       "top": 500.587,
       "scale": 0.7,
       "rotation": 155
+    },
+    {
+      "id": "boat_5495141c-35a9-4a5a-b4af-669c47ae3b69",
+      "name": "SİTA(Y)",
+      "left": 1072,
+      "top": 361,
+      "scale": 0.7,
+      "rotation": 0
     }
   ],
-  "updated_at": "2026-11-25T07:57:57.619Z"
+  "updated_at": "2026-11-25T07:58:07.306Z"
 }
