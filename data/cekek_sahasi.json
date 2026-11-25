@@ -3,16 +3,16 @@
   "boats": [
     {
       "id": "boat_5ffec908-0547-4215-b7b8-accdf399080f",
-      "top": 136.957,
-      "left": 1740.28,
+      "top": 125.155,
+      "left": 1659.27,
       "name": "KUKKİ (MY)",
       "scale": 0.7000000000000001,
       "rotation": 98
     },
     {
       "id": "boat_afffa2ee-ca8c-4d7c-b1ba-3caf7b08dcca",
-      "top": 374.466556,
-      "left": 2216.674074,
+      "top": 368.55,
+      "left": 2236.68,
       "name": "ANGEL II (MY)",
       "scale": 0.6,
       "rotation": 89
@@ -27,8 +27,8 @@
     },
     {
       "id": "boat_fd1d1a97-dd20-4017-8972-a892e9ad5389",
-      "top": 196.321,
-      "left": 1817.81,
+      "top": 237.602,
+      "left": 1816.94,
       "name": "KİLİM 1 (Y)",
       "scale": 0.7000000000000001,
       "rotation": 97
@@ -43,8 +43,8 @@
     },
     {
       "id": "boat_ddae854c-3bc0-406a-8afe-cf02f44e09b6",
-      "top": 126.087,
-      "left": 1686.06,
+      "top": 152.484,
+      "left": 1734.18,
       "name": "SHENA (MY)",
       "scale": 0.7000000000000001,
       "rotation": 93
@@ -107,11 +107,11 @@
     },
     {
       "id": "boat_78d1f615-17e7-4ca9-8f34-c5bae5d14b8f",
-      "top": 77.3662,
-      "left": 947.73,
+      "top": 485.51,
+      "left": 178.32,
       "name": "MAD CAT (SB)",
-      "scale": 0.6000000000000001,
-      "rotation": 91
+      "scale": 0.4,
+      "rotation": 211
     },
     {
       "id": "boat_5539abb5-b750-4b5a-bed6-c6929f3bc925",
@@ -219,11 +219,11 @@
     },
     {
       "id": "boat_0ddbaacb-ceed-469e-96a3-515617014845",
-      "top": 362.365,
-      "left": 2243.13,
+      "top": 386.428,
+      "left": 2192.52,
       "name": "SOLEİL (MY)",
       "scale": 0.5000000000000001,
-      "rotation": 89
+      "rotation": 84
     },
     {
       "id": "boat_f93bb801-3d80-4683-a39b-11602d296e64",
@@ -283,11 +283,11 @@
     },
     {
       "id": "boat_446058b1-bb0f-4326-ad5c-0aaadcd10950",
-      "top": 392.393,
-      "left": 2162.65,
+      "top": 420.126,
+      "left": 2110.53,
       "name": "EROS (MY)",
       "scale": 0.5000000000000001,
-      "rotation": 91
+      "rotation": 80
     },
     {
       "id": "boat_8310a33e-c825-4eb3-bfba-0dd306af7da1",
@@ -347,10 +347,10 @@
     },
     {
       "id": "boat_12091213-9b68-446e-a9f4-48860596de8c",
-      "top": 242.38,
-      "left": 1491.45,
+      "top": 232.394,
+      "left": 1445.29,
       "name": "MY ROSE (MY)",
-      "scale": 0.6000000000000001,
+      "scale": 0.7,
       "rotation": 98
     },
     {
@@ -387,8 +387,8 @@
     },
     {
       "id": "boat_75446093-7422-4ca6-b11f-9a816843d1ca",
-      "top": 749.23077,
-      "left": 2256.923078,
+      "top": 732.76,
+      "left": 2228.69,
       "name": "Eylül (mb)",
       "scale": 0.7000000000000001,
       "rotation": 75
@@ -443,10 +443,10 @@
     },
     {
       "id": "boat_32c7da10-2a89-4b55-a368-01319818f5da",
-      "top": 303.304843,
-      "left": 1864.045584,
+      "top": 327.602,
+      "left": 1855.62,
       "name": "SANJIR (MY)",
-      "scale": 0.7000000000000001,
+      "scale": 0.9,
       "rotation": 93
     },
     {
@@ -467,8 +467,8 @@
     },
     {
       "id": "boat_4f2dce5d-80b8-42f8-aae3-45043374899c",
-      "top": 235.802,
-      "left": 1546.68,
+      "top": 241.668,
+      "left": 1511.55,
       "name": "SWORD FİSH (MY)",
       "scale": 0.6000000000000001,
       "rotation": 276
@@ -491,24 +491,24 @@
     },
     {
       "id": "boat_3106d4ca-8a92-45d8-beb3-8f4b7b3094fe",
-      "top": 222.975,
-      "left": 947.968,
+      "top": 485.509,
+      "left": 272.385,
       "name": "Dusky(MB)",
       "scale": 0.8,
-      "rotation": 94
+      "rotation": 108
     },
     {
       "id": "boat_17ad37ce-dc77-46d7-9091-29f79798ede5",
-      "top": 528.795,
-      "left": 526.264,
+      "top": 511.418,
+      "left": 472.803,
       "name": "NYMPHAEA(MY)",
       "scale": 0.7000000000000001,
       "rotation": 292
     },
     {
       "id": "boat_040c847f-1772-4f48-96c7-15677935a2df",
-      "top": 498.527,
-      "left": 475.764,
+      "top": 546.226,
+      "left": 515.451,
       "name": "Aquila 1(MY)",
       "scale": 0.6000000000000001,
       "rotation": 112
@@ -547,10 +547,10 @@
     },
     {
       "id": "boat_e8bb696e-9bd4-4403-8d5e-82b092f85d33",
-      "top": 378.235,
-      "left": 1858.23,
+      "top": 333.112,
+      "left": 1813.28,
       "name": "My Lara",
-      "scale": 0.7,
+      "scale": 0.9,
       "rotation": 94
     },
     {
@@ -587,16 +587,16 @@
     },
     {
       "id": "boat_996883b7-07ba-44bf-a59f-ddaf2a6f66cf",
-      "top": 395.836,
-      "left": 2143.71,
+      "top": 402.429,
+      "left": 2163.32,
       "name": "RASHÜS(MY)",
       "scale": 0.6000000000000001,
       "rotation": 78
     },
     {
       "id": "boat_044c6bd6-aa3d-4c43-a5b4-90c259026b8f",
-      "top": 120.588,
-      "left": 1651.28,
+      "top": 126.524,
+      "left": 1699.74,
       "name": "KRC 2 (MY)",
       "scale": 0.6000000000000001,
       "rotation": 96
@@ -619,8 +619,8 @@
     },
     {
       "id": "boat_dfac9760-427b-4ac0-a64f-102805d67013",
-      "top": 238.236,
-      "left": 1624.12,
+      "top": 217.636,
+      "left": 1658.62,
       "name": "APROPOS(MY)",
       "scale": 0.7,
       "rotation": 91
@@ -647,16 +647,89 @@
       "left": 2413.589743,
       "name": "Rama(Y)",
       "scale": 0.6,
+      "rotation": 158,
+      "linkedBoatId": null
+    },
+    {
+      "id": "boat_663be996-ae9d-49f6-8c88-4a47c52af0f1",
+      "name": "ORION 1(Y)",
+      "left": 2431.17,
+      "top": 490,
+      "scale": 0.6,
+      "rotation": 156
+    },
+    {
+      "id": "boat_64263b32-2099-4008-9e30-63dbeb7bf716",
+      "name": "ALDA 2(MY)",
+      "left": 1763.34,
+      "top": 350.744,
+      "scale": 1,
+      "rotation": 93
+    },
+    {
+      "id": "boat_c61adaea-e6d5-4b3c-bb2f-2ff45a7bce63",
+      "name": "BIGGIE(EX.BIGGY)(MB)",
+      "left": 2267.64,
+      "top": 719.412,
+      "scale": 0.7,
+      "rotation": 73
+    },
+    {
+      "id": "boat_6ac6a35e-ab7d-41ba-955c-541ef39bb1bb",
+      "name": "BLUE JOY(MB)",
+      "left": 2303.88,
+      "top": 704.353,
+      "scale": 0.7,
+      "rotation": 74
+    },
+    {
+      "id": "boat_26992803-6239-4c19-89ea-804cf2ccd4dc",
+      "name": "LEVANTE (MY)",
+      "left": 717.586,
+      "top": 56.8242,
+      "scale": 0.7,
+      "rotation": 89
+    },
+    {
+      "id": "boat_052665aa-4260-4fb3-8ad7-a6db406d3df3",
+      "name": "KORALLE (MY)",
+      "left": 802.269,
+      "top": 467.594,
+      "scale": 0.7,
+      "rotation": 20
+    },
+    {
+      "id": "boat_943c270a-bdd4-4e91-905c-418e75303c0e",
+      "name": "ALMINA(Y)",
+      "left": 2279.54,
+      "top": 425.712,
+      "scale": 0.7,
+      "rotation": 163
+    },
+    {
+      "id": "boat_644f6b04-8150-4db5-a0cf-c4fb5428bac9",
+      "name": "Lal(Y)",
+      "left": 2298.87,
+      "top": 462.691,
+      "scale": 0.7,
       "rotation": 158
     },
     {
-      "id": "boat_9c3b677b-438a-47c4-8b69-5807748602a2",
-      "top": 220.193,
-      "left": 1007.36,
-      "name": "CHANTELLE(KATT)",
-      "scale": 0.7000000000000001,
-      "rotation": 93
+      "id": "boat_5dd37cd2-745b-45c8-90c0-b3f42f9b71d1",
+      "name": "CADENZA(Y)",
+      "left": 2319.75,
+      "top": 505.821,
+      "scale": 0.7,
+      "rotation": 155
+    },
+    {
+      "id": "boat_5495141c-35a9-4a5a-b4af-669c47ae3b69",
+      "name": "SİTA(Y)",
+      "left": 2162.09,
+      "top": 467.916,
+      "scale": 0.7,
+      "rotation": 351
     }
   ],
-  "updated_at": "2026-11-21T07:43:59.367Z"
+  "updated_at": "2026-11-25T10:38:28.796Z"
 }

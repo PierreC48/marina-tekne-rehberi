@@ -1,6 +1,194 @@
 {
   "boats": [
     {
+      "id": "660a3043-05bc-4a0b-98b1-f093885e9ac9",
+      "name": "Orıon 1(y) Özırmak",
+      "captain_title": "KAPTAN",
+      "captain_name": "",
+      "captain_surname": "",
+      "notes": "",
+      "image_url": "/uploads/form_1795510449286_7ff9ad6a.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T08:55:15.843Z",
+      "updated_at": "2026-11-24T08:55:15.843Z",
+      "crew": [
+        {
+          "id": "c3b002d8-0a1f-43cd-9a0d-88e4690e3351",
+          "name": "Tolga",
+          "surname": "Tozkar",
+          "role": "Sorumlu",
+          "phone": "0555 453 49 36",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
+      "id": "5bc01f23-af6e-4e66-85e8-1c01d17c6b1d",
+      "name": "B-line(y) Özırmak",
+      "captain_title": "KAPTAN",
+      "captain_name": "Tolga",
+      "captain_surname": "Tozkar",
+      "notes": "",
+      "image_url": "/uploads/form_1795510338871_32e332c6.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T08:53:02.077Z",
+      "updated_at": "2026-11-24T08:53:02.077Z",
+      "crew": [
+        {
+          "id": "9321abee-1040-41bc-afbe-484ddf0cb915",
+          "name": "Tolga",
+          "surname": "Tozkar",
+          "role": "Kaptan",
+          "phone": "0555 453 49 36",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
+      "id": "f2c133d6-b2ee-430e-87c6-eb91e2a308f6",
+      "name": "Rama(y) Özırmak",
+      "captain_title": "KAPTAN",
+      "captain_name": "Tolga",
+      "captain_surname": "Tozkar",
+      "notes": "",
+      "image_url": "/uploads/form_1795510146706_d31ff877.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T08:46:33.802Z",
+      "updated_at": "2026-11-24T08:50:09.564Z",
+      "crew": [
+        {
+          "id": "cbb3a2af-8548-48c9-a3f5-c3b69eea00a4",
+          "name": "Tolga",
+          "surname": "Tozkar",
+          "role": "Kaptan",
+          "phone": "0555 453 49 36",
+          "sort_order": 1
+        }
+      ]
+    },
+    {
+      "id": "dc4d94ca-327a-47a8-8c18-bc3936e81d28",
+      "name": "Koralle",
+      "captain_title": "KAPTAN",
+      "captain_name": "Kemal",
+      "captain_surname": "Bicak",
+      "notes": "",
+      "image_url": "/uploads/form_1795504211058_17876daa.jpg",
+      "form_date": "2026-11-19",
+      "created_at": "2026-11-24T07:10:38.167Z",
+      "updated_at": "2026-11-24T08:32:04.845Z",
+      "crew": [
+        {
+          "id": "bb81a4c8-7be4-446a-b383-679d81aa7d59",
+          "name": "Kemal",
+          "surname": "Bicak",
+          "role": "Kaptan",
+          "phone": "0533 164 27 88",
+          "sort_order": 1
+        },
+        {
+          "id": "549615ba-4d6d-41fd-9a1b-add0f9effb36",
+          "name": "Mustafa",
+          "surname": "Balikci",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "db62e1ed-9c45-4aa1-a510-a4f34ae98a03",
+          "name": "Okan",
+          "surname": "Sarıaydın",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "aa9feec8-ec4b-4c98-b406-094be35001a2",
+          "name": "Hatice",
+          "surname": "Tosun",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
+      "id": "18ebdbf9-e385-4e1a-8aa2-658fa71a1cc2",
+      "name": "Blue Joy & Bıggıe(ex.bıggy)",
+      "captain_title": "KAPTAN",
+      "captain_name": "Yahya",
+      "captain_surname": "Güler",
+      "notes": "",
+      "image_url": "/uploads/form_1795500942157_89192bb8.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T06:15:28.610Z",
+      "updated_at": "2026-11-24T06:17:47.468Z",
+      "crew": [
+        {
+          "id": "c461a46f-99fb-4800-bedb-8c1794cfacda",
+          "name": "Yahya",
+          "surname": "Güler",
+          "role": "Kaptan",
+          "phone": "0532 286 10 91",
+          "sort_order": 1
+        },
+        {
+          "id": "786031b1-18fe-47e4-8e26-5699884a7f50",
+          "name": "Mehmet",
+          "surname": "Baygın",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        }
+      ]
+    },
+    {
+      "id": "5e6c045b-68c3-4747-a042-e222590b82cb",
+      "name": "Levante",
+      "captain_title": "KAPTAN",
+      "captain_name": "Salim",
+      "captain_surname": "Cılız",
+      "notes": "",
+      "image_url": "/uploads/form_1795500792888_b88bb018.jpg",
+      "form_date": "2026-11-24",
+      "created_at": "2026-11-24T06:14:25.775Z",
+      "updated_at": "2026-11-24T06:14:25.775Z",
+      "crew": [
+        {
+          "id": "28f0cf5a-8771-4e67-8ccf-b9d9925ba8e1",
+          "name": "Salim",
+          "surname": "Ciliz",
+          "role": "Kaptan",
+          "phone": "0533 718 43 00",
+          "sort_order": 1
+        },
+        {
+          "id": "0edace3c-4b59-41bb-be00-2cbc1e652533",
+          "name": "Metehan Tugrul",
+          "surname": "Bayazit",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 2
+        },
+        {
+          "id": "18227952-0594-4bc5-8603-3e6e1ad6266c",
+          "name": "Sevin Sultan",
+          "surname": "Uslu",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 3
+        },
+        {
+          "id": "66029059-5b5f-432c-b5d6-9b9162a32fc2",
+          "name": "Selahattin",
+          "surname": "Beyenirsoy",
+          "role": "Gemici",
+          "phone": "",
+          "sort_order": 4
+        }
+      ]
+    },
+    {
       "id": "df9657b2-a0e9-4c45-9741-3b2830d7b516",
       "name": "Alda 2",
       "captain_title": "KAPTAN",
@@ -1002,8 +1190,17 @@
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-24T08:39:43.653Z",
+      "crew": [
+        {
+          "id": "4eb972a6-061d-4de1-a7d7-ba2ece4ba633",
+          "name": "Erdinç",
+          "surname": "Çolak",
+          "role": "Sorumlu",
+          "phone": "0536 782 99 99",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "4d4b00c1-4011-45d2-973b-5b3ef7f41849",
@@ -1757,7 +1954,7 @@
     },
     {
       "id": "boat_86223fe8-f3ac-4704-bcbb-42ad64f94138",
-      "name": "Nathalie (my)",
+      "name": "Nathalie-fux (my)",
       "captain_title": "KAPTAN",
       "captain_name": "",
       "captain_surname": "",
@@ -1765,8 +1962,17 @@
       "image_url": "",
       "form_date": "2026-11-07",
       "created_at": "2026-11-07T11:58:47.900Z",
-      "updated_at": "2026-11-07T11:58:47.900Z",
-      "crew": []
+      "updated_at": "2026-11-24T08:42:39.694Z",
+      "crew": [
+        {
+          "id": "2c495bbc-c50a-4809-b216-f299f938a850",
+          "name": "Mustafa Berkant",
+          "surname": "Fidan",
+          "role": "Sorumlu",
+          "phone": "0532 203 22 03",
+          "sort_order": 1
+        }
+      ]
     },
     {
       "id": "324655a9-7a9e-4d04-bb27-3de7bf8ad81d",
@@ -2505,5 +2711,5 @@
       "updated_at": "2026-11-05T10:06:20.251Z"
     }
   ],
-  "last_backup_at": "2026-11-21T07:43:59.553Z"
+  "last_backup_at": "2026-11-25T10:36:22.649Z"
 }
